@@ -1,0 +1,75 @@
+package utils
+
+import (
+	"crypto/rand"
+	"encoding/json"
+	"fmt"
+	"github.com/joho/godotenv"
+	"log"
+	"net/http"
+	"os"
+	"strings"
+)
+
+type IRespondData interface{}
+
+type Response struct {
+	IRespondData `json:"-"`
+	Payload      interface{} `json:"payload"`
+	ErrorCode    int         `json:"error_code"`
+	Message      string      `json:"message"`
+}
+
+type FindResponse struct {
+	IRespondData `json:"-"`
+	Limit        int         `json:"size"`
+	Offset       int         `json:"page"`
+	Total        uint        `json:"total"`
+	Data         interface{} `json:"data"`
+	ErrorCode    int         `json:"error_code"`
+	Message      string      `json:"message"`
+}
+
+func RespondJson(w http.ResponseWriter, data IRespondData, status int) {
+	w.Header().Add("Content-Type", "application/json")
+	w.WriteHeader(status)
+	json.NewEncoder(w).Encode(data)
+}
+
+func LoadEnv() {
+	log.Println("Loading env values...")
+
+	envName := "production"
+	envFile := ".env"
+	os.Setenv("IS_PRODUCTION", "true")
+
+	for _, arg := range os.Args {
+		if arg == "--dev" {
+			envName = "development"
+			envFile = ".env.development"
+			os.Setenv("IS_PRODUCTION", "")
+			break
+		}
+	}
+	log.Printf("Environment's been set as %s, using settings from %s\n", strings.ToUpper(envName), envFile)
+	godotenv.Load(envFile)
+}
+
+func TokenGenerator(bytes int) string {
+	b := make([]byte, bytes)
+	rand.Read(b)
+	return fmt.Sprintf("%x", b)
+}
+
+type ContextPayload struct {
+	M map[string]string
+}
+
+func (c *ContextPayload) Get(key string) string {
+	return c.M[key]
+}
+
+type ErrorData struct {
+	Error error
+	Code  int
+}

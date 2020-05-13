@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{.Title}}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100&display=swap" rel="stylesheet">
+    <style>
+        body, html {
+            height: 100%;
+        }
+
+        body {
+            background: rgb(240, 243, 243);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .box {
+            text-align: center;
+        }
+
+        .img {
+            margin: 0 0 2rem 0;
+            width: 3rem;
+            height: 3rem;
+            display: inline-block;
+        }
+
+        .message {
+            font-size: 1rem;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+<div class="box">
+    <div class="img">
+        <svg aria-hidden="true" focusable="false"
+             role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+            <path fill="currentColor"
+                  d="M173.898 439.404l-166.4-166.4c-9.997-9.997-9.997-26.206 0-36.204l36.203-36.204c9.997-9.998
+                  26.207-9.998 36.204 0L192 312.69 432.095 72.596c9.997-9.997 26.207-9.997 36.204 0l36.203
+                  36.204c9.997 9.997 9.997 26.206 0 36.204l-294.4 294.401c-9.998 9.997-26.207
+                  9.997-36.204-.001z"></path>
+        </svg>
+    </div>
+    <span class="message">{{.Text}}</span>
+</div>
+</body>
+</html>

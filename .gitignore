@@ -1,0 +1,16 @@
+# IDEs and code editors
+.idea
+.DS_Store
+.vcode
+.vc
+
+# Node
+node_modules
+
+# Dependencies
+vendor
+
+# Environment
+/.env
+
+!.gitkeep
