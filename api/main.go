@@ -5,8 +5,8 @@ import (
 	"github.com/gorilla/mux"
 	"net/http"
 	"os"
-	"uds/api/controllers"
-	mw "uds/api/middleware"
+	"uds-online/api/controllers"
+	mw "uds-online/api/middleware"
 )
 
 func main() {

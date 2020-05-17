@@ -38,15 +38,15 @@ function App() {
 						<Route exact path={ROUTES.LOGIN} component={LoginPage}/>
 						<Route exact path={ROUTES.RESET} component={ResetPage}/>
 						<Route exact path={ROUTES.FORGOT} component={ForgotPage}/>
-						<Layout>
-							<PrivateRoute exact path={ROUTES.HOME} component={HomePage}/>
-							<PrivateRoute exact path={ROUTES.MESSAGES} component={MessagesPage}/>
-							<PrivateRoute exact path={ROUTES.MESSAGE} component={MessageDetailedPage}/>
-							<PrivateRoute exact path={ROUTES.COMPOSE_MESSAGE} component={ComposeMessagePage}/>
-							<PrivateRoute exact path={ROUTES.COURSE} component={CoursePage}/>
-						</Layout>
+						<PrivateRoute exact path={ROUTES.HOME} component={() => <Layout><HomePage /></Layout>}/>
+						<PrivateRoute exact path={ROUTES.MESSAGES} component={() => <Layout><MessagesPage /></Layout>}/>
+						<PrivateRoute exact path={ROUTES.MESSAGE} component={() => <Layout><MessageDetailedPage /></Layout>}/>
+						<PrivateRoute exact path={ROUTES.COMPOSE_MESSAGE} component={() => <Layout><ComposeMessagePage /></Layout>}/>
+						<PrivateRoute exact path={ROUTES.COURSE} component={() => <Layout children={CoursePage}/>}/>
+						<Route exact component={() => <div>404</div>}/>
 					</Switch>
 				</Suspense>
+				
 			</Router>
 			<SnackbarProvider/>
 		</MuiThemeProvider>

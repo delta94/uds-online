@@ -8,7 +8,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"strings"
 )
 
 type IRespondData interface{}
@@ -38,21 +37,16 @@ func RespondJson(w http.ResponseWriter, data IRespondData, status int) {
 
 func LoadEnv() {
 	log.Println("Loading env values...")
-
-	envName := "production"
-	envFile := ".env"
 	os.Setenv("IS_PRODUCTION", "true")
-
 	for _, arg := range os.Args {
 		if arg == "--dev" {
-			envName = "development"
-			envFile = ".env.development"
+			envFile := ".env.development"
 			os.Setenv("IS_PRODUCTION", "")
+			godotenv.Load(envFile)
+			log.Printf("Environment's been set as DEVELOPMENT")
 			break
 		}
 	}
-	log.Printf("Environment's been set as %s, using settings from %s\n", strings.ToUpper(envName), envFile)
-	godotenv.Load(envFile)
 }
 
 func TokenGenerator(bytes int) string {

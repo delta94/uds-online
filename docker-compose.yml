@@ -1,0 +1,83 @@
+version: '3.7'
+
+services:
+  frontend:
+    build: ./uds-public
+    restart: 'no'
+    container_name: uds-frontend-public
+    volumes:
+      - ./Docker/data/public:/app/volume
+    command: cp -a /app/build/. /app/volume
+    networks:
+      - app-network
+    env_file:
+      - Docker/.env
+  api:
+    build: ./api
+    restart: unless-stopped
+    container_name: uds-api
+    networks:
+      - app-network
+    links:
+      - db
+    ports: 
+      - 7000:7000
+    env_file:
+      - Docker/.env
+    depends_on:
+      - db
+  db:
+    image: mysql:8.0.19
+    restart: always
+    container_name: uds-database
+    ports:
+      - '3322:3306'
+    networks:
+      - app-network
+    volumes:
+      - ./Docker/data/db:/var/lib/mysql
+    env_file:
+      - Docker/.env
+  nginx:
+    build: ./nginx
+    container_name: uds-nginx
+    restart: unless-stopped
+    links: 
+      - api
+    networks:
+      - app-network
+    volumes:
+      - type: bind
+        source: ./Docker/data/public
+        target: /var/www/html/app
+      - type: bind
+        source: ./nginx
+        target: /etc/nginx/conf.d
+      - type: bind
+        source: ./Docker/data/logs
+        target: /var/log/nginx/f
+      - type: bind
+        source: ./Docker/data/certbot/conf
+        target: /etc/letsencrypt
+      - type: bind
+        source: ./Docker/data/certbot/www
+        target: /var/www/certbot
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - frontend
+      - api
+      - db
+  certbot:
+     image: certbot/certbot
+     container_name: uds-certbot
+     restart: unless-stopped
+     volumes:
+       - ./Docker/data/certbot/conf:/etc/letsencrypt
+       - ./Docker/data/certbot/www:/var/www/certbot
+     entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+
+networks:
+  app-network:
+    driver: bridge

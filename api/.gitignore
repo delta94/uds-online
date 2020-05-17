@@ -14,4 +14,4 @@ vendor
 .env.development
 
 # Compiled
-#/main
+/main

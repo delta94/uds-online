@@ -15,10 +15,10 @@ import (
 	"strconv"
 	"strings"
 	"time"
-	"uds/api/middleware"
-	m "uds/api/models"
-	s "uds/api/services"
-	u "uds/api/utils"
+	"uds-online/api/middleware"
+	m "uds-online/api/models"
+	s "uds-online/api/services"
+	u "uds-online/api/utils"
 )
 
 var CreateAccount = func(w http.ResponseWriter, r *http.Request) {

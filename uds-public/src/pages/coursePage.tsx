@@ -3,7 +3,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {createStyles, makeStyles, Theme} from "@material-ui/core/styles";
 import {IReducerState} from "../reducers";
 import {PageWrapper} from "../components/pageWrapper";
-import {RouteChildrenProps} from "react-router-dom";
+import {RouteChildrenProps } from "react-router-dom";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({}),
@@ -40,7 +40,6 @@ interface Task {
     type: TaskType,
     data: TaskSingleAnswerData | TaskMultipleAnswersData | TaskCompareOptionsData // going to be serialised from JSON
 }
-
 
 export const CoursePage: FC<RouteChildrenProps<IRouteProps>> = ({match}) => {
     const classes = useStyles();

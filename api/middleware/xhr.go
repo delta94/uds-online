@@ -3,7 +3,7 @@ package middleware
 import (
 	"log"
 	"net/http"
-	u "uds/api/utils"
+	u "uds-online/api/utils"
 )
 
 const customAppHeader = "x-request-client"

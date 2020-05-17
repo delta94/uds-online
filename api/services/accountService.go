@@ -9,9 +9,9 @@ import (
 	"os"
 	"strconv"
 	"time"
-	"uds/api/middleware"
-	m "uds/api/models"
-	u "uds/api/utils"
+	"uds-online/api/middleware"
+	m "uds-online/api/models"
+	u "uds-online/api/utils"
 )
 
 type accountService struct {

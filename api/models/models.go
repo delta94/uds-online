@@ -6,7 +6,7 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"log"
 	"os"
-	u "uds/api/utils"
+	u "uds-online/api/utils"
 )
 
 var db *gorm.DB

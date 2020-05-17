@@ -10,7 +10,15 @@ node_modules
 # Dependencies
 vendor
 
-# Environment
-/.env
+# Nginx configuration
+/nginx/nginx.conf
 
+# Docker files (Environment, volumes for Database, frontend static files, certbot files, logs)
+/Docker/.env
+/Docker/data/db/*
+/Docker/data/logs/*
+/Docker/data/public/*
+/Docker/data/certbot/*/**
+
+# Git keep files (dummy)
 !.gitkeep

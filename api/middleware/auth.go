@@ -9,8 +9,8 @@ import (
 	"os"
 	"strconv"
 	"strings"
-	m "uds/api/models"
-	u "uds/api/utils"
+	m "uds-online/api/models"
+	u "uds-online/api/utils"
 )
 
 const RoleUser = 1

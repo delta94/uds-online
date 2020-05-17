@@ -1,0 +1,62 @@
+upstream api_server {
+    server api:7000;
+}
+
+server {
+    listen 80;
+    charset                   utf-8;
+    server_name               localhost;
+    error_log                 /var/log/nginx/f/nginx-errors.log;
+    root                      /var/www/html/app/;
+    index                     index.html;
+
+    #### SSL #####
+#    location /.well-known/acme-challenge/ {
+#        root /var/www/certbot;
+#    }
+#    location / {
+#        return 301 https://$host$request_uri;
+#    }
+
+    # Frontend application (public)
+    location / {
+        try_files             $uri /index.html =404;
+    }
+    # Static files (public)
+    location /static/ {
+        root                  /var/www/html/app/static/;
+        try_files             $uri =404;
+    }
+
+    # API
+    location /api/ {
+        proxy_pass            http://api_server;
+        proxy_http_version    1.1;
+        proxy_redirect        off;
+        proxy_cache_bypass    $http_upgrade;
+        add_header            Cache-Control no-cache;
+
+        proxy_set_header      Host $host;
+        proxy_set_header      X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header      X-Real-IP  $remote_addr;
+        proxy_set_header      X-Real-Scheme $scheme;
+        proxy_set_header      X-Real-Host $host;
+        proxy_set_header      X-Real-Uri $request_uri;
+        proxy_set_header      User-Agent $http_user_agent;
+        proxy_set_header      Referer $http_referer;
+        proxy_pass_header     Authorization;
+        proxy_pass_header     x-request-client;
+        add_header            Access-Control-Allow-Credentials true;
+        add_header            Access-Control-Allow-Headers   'X-Requested-With, x-request-client, Content-Type';
+        add_header            Access-Control-Allow-Methods   'GET, POST, OPTIONS, DELETE, PUT';
+        add_header            Access-Control-Allow-Origin    '*';
+    }
+
+    location = /robots.txt {
+        alias                 /var/www/html/app/robots.txt;
+    }
+
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico|woff|woff2|svg|ttf|eot|map)$ {
+        expires               4d;
+    }
+}
