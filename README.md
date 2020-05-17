@@ -12,7 +12,7 @@ This project consists of 2 frontend parts (public and admin) and API.
 
 ### Requirements
 * Ubuntu 18+
-* Docker Compose
+* Docker Engine, Docker-Compose
 
 ### Before starting the app:
 * It is recommended to clone the repository to a folder in 
@@ -22,11 +22,18 @@ home directory.
 * Copy `nginx/nginx._conf` file as `nginx/nginx.conf`. Configure it.
 * Let's Encrypt: configure `letsencrypt.sh` by editing it and entering 
 your email and domains. To debug it, use staging option (see the file's 
-contents). When ready, launch the script.
-
+contents). When ready, launch the script:
+```shell script
+sudo bash letsencrypt.sh
+```
 ### To start:
 ```shell script
-docker-compose up -d
+sudo docker-compose up -d
+```
+
+### To rebuild and start:
+```shell script
+sudo docker-compose up -d --build
 ```
 
 ### To remove all unused containers:

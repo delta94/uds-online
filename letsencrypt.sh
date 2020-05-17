@@ -10,7 +10,7 @@ if ! [ -x "$(command -v docker-compose)" ]; then
 fi
 
 rsa_key_size=4096
-data_path="./data/certbot"
+data_path="./Docker/data/certbot"
 
 if [ -d "$data_path" ]; then
   read -p "Existing data found for $domains. Continue and replace existing certificate? (y/N) " decision
