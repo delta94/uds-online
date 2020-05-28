@@ -12,6 +12,17 @@ services:
       - app-network
     env_file:
       - .env
+  frontend-admin:
+    build: ./uds-admin
+    restart: 'no'
+    container_name: uds-frontend-admin
+    volumes:
+      - ./Docker/data/admin:/app/volume
+    command: cp -a /app/build/. /app/volume
+    networks:
+      - app-network
+    env_file:
+      - .env
   db:
     build: ./db
     restart: always
@@ -74,6 +85,9 @@ services:
       - type: bind
         source: ./Docker/data/public
         target: /var/www/html/app
+      - type: bind
+        source: ./Docker/data/admin
+        target: /var/www/html/app-admin
       - type: bind
         source: ./nginx
         target: /etc/nginx/conf.d
