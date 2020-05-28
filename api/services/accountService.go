@@ -161,6 +161,7 @@ func Login(email, pwd string) (token string, errResp u.ErrorData) {
 	tk.IssuedAt = time.Now().Unix()
 	tk.ExpiresAt = time.Now().Add(time.Hour * time.Duration(expiresInHours)).Unix()
 	tk.Issuer = account.ID.String()
+	tk.Role = account.Role
 	jwtWC := jwt.NewWithClaims(jwt.GetSigningMethod("HS256"), tk)
 	token, _ = jwtWC.SignedString([]byte(os.Getenv("SECRET")))
 	return

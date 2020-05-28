@@ -48,7 +48,7 @@ export const Sidebar: FC<ISidebarProps> = ({isOpen}) => {
 	return (
 		<aside className={clsx(classes.root, {[classes.isOpen]: isOpen})}>
 			<List component="nav">
-				<ListItem button component={Link} to={ROUTES.HOME}>
+				<ListItem button component={Link} to={ROUTES.ACCOUNT}>
 					<ListItemIcon><Dashboard/></ListItemIcon>
 					<ListItemText primary="Dashboard" />
 				</ListItem>

@@ -120,7 +120,7 @@ export function LoginPage() {
 		}
 	}, [authState.token]);
 	if (loggedIn) {
-		return <Redirect to={ROUTES.ACCOUNT}/>
+		return <Redirect to={ROUTES.HOME}/>
 	}
 	
 	function onSubmit(e: React.SyntheticEvent | React.MouseEvent) {
@@ -176,7 +176,7 @@ export function LoginPage() {
 						/>
 					</FormControl>
 					<div className={classes.buttonBar}>
-						<Button component={Link} color="primary" to={ROUTES.FORGOT}>Forgot password?</Button>
+						<Button component='a' color="primary" target="_blank" href={ROUTES.FORGOT}>Forgot password?</Button>
 						<div className={classes.grow}/>
 						<Button type="submit" color="primary" variant="contained">Sign in</Button>
 					</div>

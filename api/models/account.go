@@ -12,8 +12,11 @@ import (
 
 type JWTToken struct {
 	jwt.StandardClaims
+	Role int `json:"role"`
 }
 
+// Model for Account.
+// Roles are integers, 1 - user, 2 - admin, 3 - assistant
 type Account struct {
 	ID                uuid.UUID `gorm:"primary_key;type:char(36);"`
 	Email             string    `gorm:"size:80;unique_index;not null" json:"email"`
