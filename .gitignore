@@ -14,8 +14,9 @@ vendor
 /nginx/nginx.conf
 
 # Docker files (Environment, volumes for Database, frontend static files, certbot files, logs)
-/Docker/.env
+/.env
 /Docker/data/db/*
+/Docker/data/db-backups/*
 /Docker/data/logs/*
 /Docker/data/public/*
 /Docker/data/certbot/*/**

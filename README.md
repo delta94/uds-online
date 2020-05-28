@@ -17,7 +17,7 @@ This project consists of 2 frontend parts (public and admin) and API.
 ### Before starting the app:
 * It is recommended to clone the repository to a folder in 
 home directory.
-* Copy `Docker/default.env` file as `Docker/.env`
+* Copy `/default.env` file as `/.env`
 * Configure the environment by the mentioned above `.env` file
 * Copy `nginx/nginx._conf` file as `nginx/nginx.conf`. Configure it.
 * Let's Encrypt: configure `letsencrypt.sh` by editing it and entering 
