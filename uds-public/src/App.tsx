@@ -42,7 +42,7 @@ function App() {
 						<PrivateRoute exact path={ROUTES.MESSAGES} component={() => <Layout><MessagesPage /></Layout>}/>
 						<PrivateRoute exact path={ROUTES.MESSAGE} component={() => <Layout><MessageDetailedPage /></Layout>}/>
 						<PrivateRoute exact path={ROUTES.COMPOSE_MESSAGE} component={() => <Layout><ComposeMessagePage /></Layout>}/>
-						<PrivateRoute exact path={ROUTES.COURSE} component={() => <Layout children={CoursePage}/>}/>
+						<PrivateRoute exact path={ROUTES.COURSE} component={() => <Layout><CoursePage /></Layout>}/>
 						<Route exact component={() => <div>404</div>}/>
 					</Switch>
 				</Suspense>

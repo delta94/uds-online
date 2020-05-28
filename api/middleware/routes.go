@@ -7,6 +7,7 @@ Init Route paths
 */
 var Routes = map[string]map[string]string{
 	"v1": {
+		"landing":        apiPrefix + "/v1/mvc/landing",
 		"authentication": apiPrefix + "/v1/authenticate",
 		"register":       apiPrefix + "/v1/register",
 		"confirmEmail":   apiPrefix + "/v1/redeem/confirmation",
