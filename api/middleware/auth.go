@@ -13,8 +13,10 @@ import (
 	u "uds-online/api/utils"
 )
 
-const RoleUser = 1
-const RoleAdmin = 2
+const RoleUser int = 1
+const RoleAdmin int = 2
+const RoleAssistant int = 3
+
 const authHeader = "Authorization"
 
 var JwtAuthMiddleware = func(next http.Handler, roles []int) http.Handler {
