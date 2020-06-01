@@ -29,7 +29,6 @@ func (s *accountService) Create(model *m.Account) error {
 	if err := model.Validate(); err != nil {
 		return err
 	}
-	model.Role = middleware.RoleUser
 	hashedPassword, _ := bcrypt.GenerateFromPassword(
 		[]byte(model.Password.Raw), bcrypt.DefaultCost,
 	)

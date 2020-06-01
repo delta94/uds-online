@@ -19,14 +19,18 @@ type Response struct {
 	Message      string      `json:"message"`
 }
 
-type FindResponse struct {
+type PaginatedResponsePayload struct {
+	Size  int         `json:"size"`
+	Page  int         `json:"page"`
+	Total uint        `json:"total"`
+	Data  interface{} `json:"data"`
+}
+
+type PaginatedResponse struct {
 	IRespondData `json:"-"`
-	Limit        int         `json:"size"`
-	Offset       int         `json:"page"`
-	Total        uint        `json:"total"`
-	Data         interface{} `json:"data"`
-	ErrorCode    int         `json:"error_code"`
-	Message      string      `json:"message"`
+	Payload      PaginatedResponsePayload `json:"payload"`
+	ErrorCode    int                      `json:"error_code"`
+	Message      string                   `json:"message"`
 }
 
 func RespondJson(w http.ResponseWriter, data IRespondData, status int) {

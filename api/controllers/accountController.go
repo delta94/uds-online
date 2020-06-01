@@ -28,7 +28,7 @@ var CreateAccount = func(w http.ResponseWriter, r *http.Request) {
 		u.RespondJson(w, u.Response{Message: "Invalid request", ErrorCode: u.ErrGeneral}, http.StatusOK)
 		return
 	}
-
+	account.Role = middleware.RoleUser
 	err = s.AccountService.Create(account)
 	if err != nil {
 		u.RespondJson(w, u.Response{Message: err.Error(), ErrorCode: u.ErrGeneral}, http.StatusOK)
@@ -94,7 +94,7 @@ var GetAccounts = func(w http.ResponseWriter, r *http.Request) {
 		u.RespondJson(w, u.Response{Message: "An Error occurred", ErrorCode: u.ErrGeneral}, http.StatusOK)
 		return
 	}
-	u.RespondJson(w, u.FindResponse{Limit: limit, Offset: offset, Total: total, Data: accounts}, http.StatusOK)
+	u.RespondJson(w, u.PaginatedResponse{Payload: u.PaginatedResponsePayload{Size: limit, Page: offset, Total: total, Data: accounts}}, http.StatusOK)
 }
 
 var UpdateAccount = func(w http.ResponseWriter, r *http.Request) {
