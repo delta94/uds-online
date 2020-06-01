@@ -64,7 +64,13 @@ Fetch multiple entries
 */
 func (s *accountService) Find(offset int, limit int) (data []*m.Account, total uint) {
 	objs := make([]*m.Account, 0)
-	query := m.GetDB().Table(s.TableName).Count(&total).Limit(limit).Offset(offset).Find(&objs)
+	query := m.GetDB().
+		Order("created_at desc").
+		Table(s.TableName).
+		Count(&total).
+		Limit(limit).
+		Offset(offset * limit).
+		Find(&objs)
 	if query.Error != nil && !query.RecordNotFound() {
 		return nil, 0
 	}
@@ -150,7 +156,7 @@ func Login(email, pwd string) (token string, errResp u.ErrorData) {
 		return
 	}
 	// Create JWT
-	expiresInHours, err := strconv.Atoi(os.Getenv("EXPIRES_IN_HOURS"))
+	expiresInHours, err := strconv.Atoi(os.Getenv("JWT_EXPIRATION_TIME"))
 	if err != nil {
 		dv := 1
 		log.Printf("Warning! JWT's value 'expiresInHours' for 'exp' not found! Using default value (%v)", dv)
@@ -161,6 +167,7 @@ func Login(email, pwd string) (token string, errResp u.ErrorData) {
 	tk.ExpiresAt = time.Now().Add(time.Hour * time.Duration(expiresInHours)).Unix()
 	tk.Issuer = account.ID.String()
 	tk.Role = account.Role
+	// Sign JWT With Credentials
 	jwtWC := jwt.NewWithClaims(jwt.GetSigningMethod("HS256"), tk)
 	token, _ = jwtWC.SignedString([]byte(os.Getenv("SECRET")))
 	return
