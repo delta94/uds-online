@@ -15,7 +15,6 @@ import (
 )
 
 type accountService struct {
-	Service
 	TableName string
 }
 

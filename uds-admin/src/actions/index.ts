@@ -7,6 +7,7 @@ import {IUser} from "../reducers/usersReducer";
 import {IAction, IPaginatablePayload} from "../helpers/models";
 import history from "../history";
 import {ROUTES} from "../constants";
+import store from "../store";
 
 export const log_in = (token: string, userID: string, role: number): IAction<ILoginPayload> => {
 	return {
@@ -86,7 +87,10 @@ export const authenticate = (email: string, password: string) => {
 	};
 };
 
-export const get_users = (page = 0) => {
+export const get_users = (page?: number) => {
+	if (page === undefined) {
+		page = store.getState().users.page;
+	}
 	return (dispatch: Dispatch) => {
 		return api_request<IPaginatablePayload<IUser>>({
 			method: "GET",
@@ -98,4 +102,39 @@ export const get_users = (page = 0) => {
 				dispatch(set_users(data, page, total, size));
 			});
 	}
-}
+};
+
+export const change_block = (id: string, blocked: boolean, callback?: () => void) => {
+	return (dispatch: Dispatch) => {
+		return api_request<any>({
+			method: "POST",
+			url: `accounts/change-block`,
+			data: {
+				blocked,
+				id
+			}
+		})
+			.then(() => {
+				if (callback) {
+					callback();
+				}
+			});
+	};
+};
+
+export const manual_email_confirm = (id: string, callback?: () => void) => {
+	return (dispatch: Dispatch) => {
+		return api_request<any>({
+			method: "POST",
+			url: `accounts/confirm`,
+			data: {
+				id
+			}
+		})
+			.then(() => {
+				if (callback) {
+					callback();
+				}
+			});
+	};
+};

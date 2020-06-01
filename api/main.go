@@ -27,6 +27,8 @@ func main() {
 
 	// Secure Routes
 	router.Handle(mw.Routes["v1"]["accounts"], mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.GetAccounts), []int{mw.RoleAdmin}))).Methods("GET", "OPTIONS")
+	router.Handle(mw.Routes["v1"]["accounts"]+"/confirm", mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.ManualEmailConfirm), []int{mw.RoleAdmin}))).Methods("POST")
+	router.Handle(mw.Routes["v1"]["accounts"]+"/change-block", mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.ChangeAccountBlockState), []int{mw.RoleAdmin}))).Methods("POST")
 	router.Handle(mw.Routes["v1"]["accounts"]+"/{id}", mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.GetAccount), []int{mw.RoleAdmin}))).Methods("GET", "OPTIONS")
 	router.Handle(mw.Routes["v1"]["accounts"]+"/{id}", mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.UpdateAccount), []int{mw.RoleAdmin}))).Methods("PUT", "OPTIONS")
 	router.Handle(mw.Routes["v1"]["accounts"]+"/{id}", mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.DeleteAccount), []int{mw.RoleAdmin}))).Methods("DELETE", "OPTIONS")

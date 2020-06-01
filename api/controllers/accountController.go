@@ -143,6 +143,50 @@ var DeleteAccount = func(w http.ResponseWriter, r *http.Request) {
 	u.RespondJson(w, nil, http.StatusNoContent)
 }
 
+var ManualEmailConfirm = func(w http.ResponseWriter, r *http.Request) {
+	type Body struct {ID string `json:"id"`}
+	body := &Body{}
+	err := json.NewDecoder(r.Body).Decode(body)
+	if err != nil || body.ID == "" {
+		u.RespondJson(w, u.Response{Message: "Invalid UUID", ErrorCode: u.ErrNotFound}, http.StatusOK)
+		return
+	}
+	query := m.GetDB().Table(s.AccountService.TableName).
+		Where("id = ?", body.ID).
+		Update(map[string]interface{}{"is_confirmed": 1})
+	err = query.Error
+	if err != nil || query.RowsAffected == 0 {
+		u.RespondJson(w, u.Response{Message: "Could not confirm Email", ErrorCode: u.ErrNotFound}, http.StatusOK)
+		return
+	}
+	u.RespondJson(w, u.Response{Message: "Email successfully confirmed"}, http.StatusOK)
+}
+var ChangeAccountBlockState = func(w http.ResponseWriter, r *http.Request) {
+	type Body struct {
+		ID      string `json:"id"`
+		Blocked bool   `json:"blocked"`
+	}
+	body := &Body{}
+	err := json.NewDecoder(r.Body).Decode(body)
+	if err != nil || body.ID == "" {
+		u.RespondJson(w, u.Response{Message: "Invalid UUID", ErrorCode: u.ErrNotFound}, http.StatusOK)
+		return
+	}
+	query := m.GetDB().Table(s.AccountService.TableName).
+		Where("id = ?", body.ID).
+		Update(map[string]interface{}{"is_blocked": body.Blocked})
+	err = query.Error
+	if err != nil || query.RowsAffected == 0 {
+		u.RespondJson(w, u.Response{Message: "Could not update user", ErrorCode: u.ErrNotFound}, http.StatusOK)
+		return
+	}
+	message := "User successfully blocked"
+	if !body.Blocked {
+		message = "User successfully unblocked"
+	}
+	u.RespondJson(w, u.Response{Message: message}, http.StatusOK)
+}
+
 var ConfirmEmail = func(w http.ResponseWriter, r *http.Request) {
 	tplSuccess := template.Must(template.ParseFiles("tpl/confirmation_success.html"))
 	tplFail := template.Must(template.ParseFiles("tpl/confirmation_fail.html"))
