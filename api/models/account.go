@@ -29,6 +29,7 @@ type Account struct {
 	UpdatedAt         time.Time
 	DeletedAt         *time.Time `sql:"index"`
 	IsBlocked         bool       `json:"is_blocked"`
+	AssignedCourses   []*Course  `json:"assigned_courses" gorm:"foreignkey:AssistantID"`
 }
 
 type Password struct {
