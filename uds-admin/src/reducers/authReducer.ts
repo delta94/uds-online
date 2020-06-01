@@ -3,7 +3,8 @@ import {
 	LOG_OUT
 } from "../actions/types";
 import {decode as jwtDecode} from "jsonwebtoken";
-import {AnyAction} from "redux";
+import {Action, AnyAction} from "redux";
+import {IAction} from "../helpers/models";
 
 const TOKEN = "_token";
 const storage = window.localStorage;
@@ -28,7 +29,11 @@ export interface ITokenPayload {
 	iat: number,
 	role: number
 }
-
+export interface ILoginPayload {
+	token: string,
+	userID: string,
+	role: number
+}
 const decodedToken = jwtDecode(storage.getItem(TOKEN) || "");
 const userID = decodedToken ? (decodedToken as ITokenPayload).iss : "";
 const role = decodedToken ? (decodedToken as ITokenPayload).role : undefined;
@@ -42,15 +47,16 @@ export const defaultState: IAuthState = {
 	role
 };
 
-export const reducer = (state: IAuthState = defaultState, action: AnyAction) => {
+export const reducer = (state: IAuthState = defaultState, action: AnyAction): IAuthState => {
 	switch (action.type) {
 		case LOG_IN: {
-			storage.setItem(TOKEN, action.payload.token);
+			const a = action as IAction<ILoginPayload>;
+			storage.setItem(TOKEN, a.payload.token);
 			state = {
 				...state,
-				token: action.payload.token,
-				userID: action.payload.userID,
-				role: action.payload.role
+				token: a.payload.token,
+				userID: a.payload.userID,
+				role: a.payload.role
 			};
 			break;
 		}

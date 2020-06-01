@@ -103,6 +103,8 @@ export const Header: FC<IHeaderProps> = ({onBurgerClick}) => {
 			onClick={handleMobileMenuClose}
 			onClose={handleMobileMenuClose}
 		>
+			
+			{/*
 			<MenuItem component={Link} to={ROUTES.MESSAGES}>
 				<IconButton color="inherit" >
 					{unreadMessages ?
@@ -115,6 +117,7 @@ export const Header: FC<IHeaderProps> = ({onBurgerClick}) => {
 				</IconButton>
 				<p>Messages</p>
 			</MenuItem>
+			*/}
 			
 			<MenuItem className={classes.logoutMobile}>
 				<IconButton color="inherit" onClick={() => dispatch(log_out())}>
@@ -138,12 +141,13 @@ export const Header: FC<IHeaderProps> = ({onBurgerClick}) => {
 						<MenuIcon/>
 					</IconButton>
 					<Typography className={classes.title} variant="h6" noWrap>
-						UNDOSTRES|ONLINE
+						UDT|CONTROL PANEL
 					</Typography>
 					
 					<div className={classes.grow}/>
 					
 					<div className={classes.sectionDesktop}>
+						{/*
 						<IconButton color="inherit" component={Link} to={ROUTES.MESSAGES}>
 							{unreadMessages ?
 								<Badge badgeContent={unreadMessages} color="secondary">
@@ -153,6 +157,7 @@ export const Header: FC<IHeaderProps> = ({onBurgerClick}) => {
 								<Mail />
 							}
 						</IconButton>
+						*/}
 						
 						<Button variant="outlined" size="medium" className={classes.logout} onClick={() => dispatch(log_out())}>
 							Log out

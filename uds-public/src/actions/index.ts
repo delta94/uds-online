@@ -3,6 +3,8 @@ import {decode as jwtDecode} from "jsonwebtoken";
 import {CLOSE_MESSAGE, EXIT_MESSAGE, LOG_IN, LOG_OUT, SHOW_POPUP_MESSAGE} from "./types";
 import {IAuthRequest, ITokenPayload} from "../reducers/authReducer";
 import {api_request} from "../helpers/api";
+import history from "../history";
+import {ROUTES} from "../constants";
 
 export const log_in = (token: string, userID: string): AnyAction => {
 	return {
@@ -12,6 +14,7 @@ export const log_in = (token: string, userID: string): AnyAction => {
 };
 
 export const log_out = (): AnyAction => {
+	history.push(ROUTES.LOGIN);
 	return {
 		type: LOG_OUT,
 	}
@@ -48,7 +51,7 @@ export const issue_password_reset = (email: string) => {
 }
 export const reset_password = (password: string, confirmation: string, token: string, callback?: (arg0: number) => void) => {
 	return (dispatch: Dispatch) => {
-		return api_request({
+		return api_request<null>({
 			method: "POST",
 			url: 'accounts/reset-password',
 			data: {
@@ -57,12 +60,6 @@ export const reset_password = (password: string, confirmation: string, token: st
 			version: 1
 		})
 			.then((response) => {
-				const {data} = response;
-				const {error_code} = data;
-				if (error_code) {
-					if (callback) callback(error_code);
-					return;
-				}
 				if (callback) callback(0);
 			})
 	}
@@ -75,6 +72,9 @@ export const reset_password = (password: string, confirmation: string, token: st
  * @param password
  */
 export const authenticate = (email: string, password: string) => {
+	interface AuthResponse {
+		token: string
+	}
 	const data: IAuthRequest = {
 		email,
 		password: {
@@ -82,18 +82,13 @@ export const authenticate = (email: string, password: string) => {
 		}
 	}
 	return (dispatch: Dispatch) => {
-		return api_request({
+		return api_request<AuthResponse>({
 			method: "POST",
 			url: `authenticate`,
 			data,
 			version: 1
 		})
-			.then((response) => {
-				const {data} = response;
-				if (data.error_code) {
-					return;
-				}
-				const token = data.payload.token || "";
+			.then(({token}) => {
 				const decoded = jwtDecode(token) as JsonWebKey;
 				const {iss} = decoded as ITokenPayload;
 				dispatch(log_in(token, iss));

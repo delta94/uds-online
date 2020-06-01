@@ -38,7 +38,7 @@ export const defaultState: IAuthState = {
 	userID
 };
 
-export const reducer = (state: IAuthState = defaultState, action: AnyAction) => {
+export const reducer = (state: IAuthState = defaultState, action: AnyAction): IAuthState => {
 	switch (action.type) {
 		case LOG_IN: {
 			storage.setItem(TOKEN, action.payload.token);

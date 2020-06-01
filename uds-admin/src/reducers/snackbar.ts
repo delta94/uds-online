@@ -26,7 +26,7 @@ export const defaultState: ISnackState = {
 };
 
 
-export const reducer = (state = defaultState, action: AnyAction) => {
+export const reducer = (state = defaultState, action: AnyAction): ISnackState => {
 	switch (action.type) {
 		
 		case SHOW_POPUP_MESSAGE: {

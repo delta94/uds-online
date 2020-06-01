@@ -14,7 +14,7 @@ const useStyles = makeStyles((theme) => ({
 		marginRight: 'auto',
 	},
 	content: {
-		padding: "1rem 1rem 0 1rem",
+		padding: "1rem 1rem 2rem 1rem",
 		flexGrow: 1
 	},
 }));

@@ -4,12 +4,13 @@ import {theme} from "./theme";
 import {MuiThemeProvider} from "@material-ui/core";
 import {useDispatch, useSelector} from "react-redux";
 import {IReducerState} from "./reducers";
-import {BrowserRouter as Router, Switch, Route} from "react-router-dom";
+import {Router, Switch, Route} from "react-router-dom";
 import SnackbarProvider from "./components/snackbarProvider";
 import PrivateRoute from "./components/privateRoute";
 import {ROUTES} from "./constants";
 import {Spinner} from "./components/spinner";
 import {Layout} from "./components/layout";
+import history from "./history";
 
 const LoginPage = lazy(() => import("./pages/loginPage"));
 const ResetPage = lazy(() => import("./pages/resetPage"));
@@ -32,7 +33,7 @@ function App() {
 	
 	return (
 		<MuiThemeProvider theme={theme}>
-			<Router>
+			<Router history={history}>
 				<Suspense fallback={<Spinner/>}>
 					<Switch>
 						<Route exact path={ROUTES.LOGIN} component={LoginPage}/>

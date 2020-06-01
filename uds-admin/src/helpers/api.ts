@@ -5,13 +5,18 @@ export interface IAPIRequestParams extends AxiosRequestConfig {
 	method: "GET" | "POST" | "PUT" | "DELETE",
 }
 
+export interface IAPIResponseData extends AxiosResponse {
+	data: {
+		error_code: number,
+		message: string,
+		payload: any
+	}
+}
+
 /**
  * Used to make an API request.
- * @param params {IAPIRequestParams}
- *
- * @return {Promise<AxiosResponse>}
  */
-export function api_request(params: IAPIRequestParams): Promise<AxiosResponse> {
+export function api_request<T>(params: IAPIRequestParams): Promise<T> {
 	const {
 		url,
 		method,
@@ -26,5 +31,5 @@ export function api_request(params: IAPIRequestParams): Promise<AxiosResponse> {
 	if (headers) config.headers = headers;
 	if (p) config.params = p;
 	config.url = `/v${version ? version : 1}/${config.url}`;
-	return axios(config);
+	return axios.request<{}, T>(config);
 }
