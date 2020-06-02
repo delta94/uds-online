@@ -119,11 +119,11 @@ func (s *accountService) Delete(id uint, soft bool) error {
 	return nil
 }
 
-func Login(email, pwd string) (token string, errResp u.ErrorData) {
+func Login(email, pwd string, roles []int) (token string, errResp u.ErrorData) {
 	account := &m.Account{}
 	password := &m.Password{}
 	// Find Account by Email
-	err := m.GetDB().Table("accounts").Take(account, "email = ?", email).Error
+	err := m.GetDB().Table("accounts").Take(account, "email = ? AND role in (?)", email, roles).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			errResp.Error = fmt.Errorf("incorrect email/password")

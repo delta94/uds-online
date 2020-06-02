@@ -11,7 +11,7 @@ type Course struct {
 	Annotation  string    `json:"annotation" gorm:"size:400"`
 	Price       int       `json:"price"`
 	Lessons     []*Lesson `gorm:"foreignkey:CourseID"`
-	AssistantID uuid.UUID `json:"-" gorm:"index;type:char(36);"`
+	AssistantID uuid.UUID `json:"assistant_id" gorm:"index;type:char(36);"`
 	Published   bool      `json:"published"`
 }
 
@@ -22,7 +22,7 @@ type Lesson struct {
 	Paid       bool           `json:"paid"`
 	Published  bool           `json:"published"`
 	Content    *LessonContent `json:"content" gorm:"foreignkey:LessonID"`
-	CourseID   uint           `json:"-"`
+	CourseID   uint           `json:"course_id"`
 }
 
 type LessonContent struct {

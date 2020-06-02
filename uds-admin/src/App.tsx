@@ -19,6 +19,11 @@ const MessagesPage = lazy(() => import("./pages/messagesPage"));
 const MessageDetailedPage = lazy(() => import("./pages/messagePage"));
 const CoursePage = lazy(() => import("./pages/coursePage"));
 const CoursesPage = lazy(() => import("./pages/coursesPage"));
+const CourseAddPage = lazy(() => import("./pages/courseAddPage"));
+const LessonPage = lazy(() => import("./pages/lessonPage"));
+const LessonAddPage = lazy(() => import("./pages/lessonAddPage"));
+
+
 const NotFoundPage = lazy(() => import("./pages/notFoundPage"));
 
 const {ROLE_ADMIN, ROLE_ASSISTANT} = ROLES;
@@ -59,18 +64,33 @@ function App() {
 						/>
 						<PrivateRoute exact
 									  roles={[ROLE_ADMIN, ROLE_ASSISTANT]}
+									  path={ROUTES.COURSES}
+									  component={() => <Layout><CoursesPage /></Layout>}
+						/>
+						<PrivateRoute exact
+									  roles={[ROLE_ADMIN, ROLE_ASSISTANT]}
+									  path={ROUTES.COURSE_ADD}
+									  component={() => <Layout><CourseAddPage /></Layout>}
+						/>
+						<PrivateRoute exact
+									  roles={[ROLE_ADMIN, ROLE_ASSISTANT]}
 									  path={ROUTES.COURSE}
 									  component={() => <Layout><CoursePage /></Layout>}
 						/>
 						<PrivateRoute exact
 									  roles={[ROLE_ADMIN, ROLE_ASSISTANT]}
-									  path={ROUTES.USERS}
-									  component={() => <Layout><UsersPage /></Layout>}
+									  path={ROUTES.LESSON_ADD}
+									  component={() => <Layout><LessonAddPage /></Layout>}
 						/>
 						<PrivateRoute exact
 									  roles={[ROLE_ADMIN, ROLE_ASSISTANT]}
-									  path={ROUTES.COURSES}
-									  component={() => <Layout><CoursesPage /></Layout>}
+									  path={ROUTES.LESSON}
+									  component={() => <Layout><LessonPage /></Layout>}
+						/>
+						<PrivateRoute exact
+									  roles={[ROLE_ADMIN, ROLE_ASSISTANT]}
+									  path={ROUTES.USERS}
+									  component={() => <Layout><UsersPage /></Layout>}
 						/>
 						<Route exact component={() => <Layout><NotFoundPage /></Layout>}/>
 					</Switch>

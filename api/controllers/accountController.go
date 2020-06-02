@@ -46,19 +46,21 @@ var CreateAccount = func(w http.ResponseWriter, r *http.Request) {
 	u.RespondJson(w, u.Response{Payload: p}, http.StatusCreated)
 }
 
-var Authenticate = func(w http.ResponseWriter, r *http.Request) {
-	account := &m.Account{}
-	err1 := json.NewDecoder(r.Body).Decode(account)
-	if err1 != nil {
-		u.RespondJson(w, u.Response{Message: "Invalid request", ErrorCode: u.ErrGeneral}, http.StatusOK)
-		return
+var Authenticate = func(roles []int) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		account := &m.Account{}
+		err1 := json.NewDecoder(r.Body).Decode(account)
+		if err1 != nil {
+			u.RespondJson(w, u.Response{Message: "Invalid request", ErrorCode: u.ErrGeneral}, http.StatusOK)
+			return
+		}
+		token, err2 := s.Login(account.Email, account.Password.Raw, roles)
+		if err2.Error != nil {
+			u.RespondJson(w, u.Response{Message: err2.Error.Error(), ErrorCode: err2.Code}, http.StatusOK)
+			return
+		}
+		u.RespondJson(w, u.Response{Payload: map[string]string{"token": token}}, http.StatusOK)
 	}
-	token, err2 := s.Login(account.Email, account.Password.Raw)
-	if err2.Error != nil {
-		u.RespondJson(w, u.Response{Message: err2.Error.Error(), ErrorCode: err2.Code}, http.StatusOK)
-		return
-	}
-	u.RespondJson(w, u.Response{Payload: map[string]string{"token": token}}, http.StatusOK)
 }
 
 var GetAccount = func(w http.ResponseWriter, r *http.Request) {

@@ -61,8 +61,8 @@ services:
     environment:
       - MYSQL_HOST=db
       - MYSQL_USER=root
-      - MYSQL_PASS=${MYSQL_ROOT_PASSWORD}
-      - MYSQL_DB=${MYSQL_DATABASE}
+      - MYSQL_PASS=${DB_PASS}
+      - MYSQL_DB=${DB_NAME}
       - MAX_BACKUPS=30
       - INIT_BACKUP=0
       - CRON_TIME=0 3 * * *

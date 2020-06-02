@@ -74,7 +74,7 @@ export const authenticate = (email: string, password: string) => {
 	return (dispatch: Dispatch) => {
 		return api_request<AuthResponse>({
 			method: "POST",
-			url: `authenticate`,
+			url: `authenticate/administration`,
 			data,
 			version: 1
 		})

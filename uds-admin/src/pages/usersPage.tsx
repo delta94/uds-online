@@ -24,7 +24,6 @@ const UsersPage: FC = () => {
 	const classes = useStyles();
 	const dispatch = useDispatch();
 	const usersState = useSelector((state: IReducerState) => state.users);
-	const pages = Math.ceil(usersState.total / usersState.size) || 1;
 	
 	useEffect(() => {
 		dispatch(get_users());

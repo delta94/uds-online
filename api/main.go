@@ -21,7 +21,8 @@ func main() {
 	// Public Routes
 	router.Handle(mw.Routes["v1"]["landing"], http.HandlerFunc(controllers.LandingPage)).Methods("GET")
 	router.Handle(mw.Routes["v1"]["register"], mw.XhrMiddleware(http.HandlerFunc(controllers.CreateAccount))).Methods("POST", "OPTIONS")
-	router.Handle(mw.Routes["v1"]["authentication"], mw.XhrMiddleware(http.HandlerFunc(controllers.Authenticate))).Methods("POST", "OPTIONS")
+	router.Handle(mw.Routes["v1"]["auth"], mw.XhrMiddleware(controllers.Authenticate([]int{mw.RoleUser}))).Methods("POST", "OPTIONS")
+	router.Handle(mw.Routes["v1"]["authAdmin"], mw.XhrMiddleware(controllers.Authenticate([]int{mw.RoleAdmin, mw.RoleAssistant}))).Methods("POST", "OPTIONS")
 	router.Handle(mw.Routes["v1"]["resetPassword"], mw.XhrMiddleware(http.HandlerFunc(controllers.IssuePasswordReset))).Methods("POST", "OPTIONS")
 	router.HandleFunc(mw.Routes["v1"]["confirmEmail"], controllers.ConfirmEmail).Methods("GET", "OPTIONS")
 
