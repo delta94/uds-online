@@ -1,13 +1,14 @@
 import {AnyAction, Dispatch} from "redux";
 import {decode as jwtDecode} from "jsonwebtoken";
 import {CLOSE_MESSAGE, EXIT_MESSAGE, LOG_IN, LOG_OUT, SET_USERS, SHOW_POPUP_MESSAGE} from "./types";
-import {IAuthRequest, ILoginPayload, ITokenPayload} from "../reducers/authReducer";
+import {AuthResponse, GetAssistantsResponse, IAuthRequest, ILoginPayload, ITokenPayload} from "../reducers/authReducer";
 import {api_request} from "../helpers/api";
 import {IUser} from "../reducers/usersReducer";
 import {IAction, IPaginatablePayload} from "../helpers/models";
 import history from "../history";
 import {ROUTES} from "../constants";
 import store from "../store";
+import {CreateCourseResponse} from "../reducers/courseReducer";
 
 export const log_in = (token: string, userID: string, role: number): IAction<ILoginPayload> => {
 	return {
@@ -62,9 +63,6 @@ export const set_users = (users: IUser[], page: number, total: number, size: num
  * @param password
  */
 export const authenticate = (email: string, password: string) => {
-	interface AuthResponse {
-		token: string
-	}
 	const data: IAuthRequest = {
 		email,
 		password: {
@@ -138,3 +136,32 @@ export const manual_email_confirm = (id: string, callback?: () => void) => {
 			});
 	};
 };
+
+export const get_assistants = (callback: (assistants: IUser[]) => void) => {
+	return (dispatch: Dispatch) => {
+		return api_request<GetAssistantsResponse>({
+			method: "GET",
+			url: `accounts/assistants`,
+			version: 1
+		})
+			.then((assistants) => {
+				callback(assistants);
+			})
+	};
+};
+
+export const create_course = (title: string, annotation: string, price: number, assistant_id: string, callback?: (course: CreateCourseResponse) => void) => {
+	return (dispatch: Dispatch) => {
+		return api_request<CreateCourseResponse>({
+			method: "POST",
+			url: `courses`,
+			data: {title, annotation, price, assistant_id},
+			version: 1
+		})
+			.then((course) => {
+				if (callback) {
+					callback(course);
+				}
+			})
+	}
+}

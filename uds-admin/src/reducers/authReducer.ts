@@ -5,6 +5,7 @@ import {
 import {decode as jwtDecode} from "jsonwebtoken";
 import {Action, AnyAction} from "redux";
 import {IAction} from "../helpers/models";
+import {IUser} from "./usersReducer";
 
 const TOKEN = "_token";
 const storage = window.localStorage;
@@ -33,6 +34,11 @@ export interface ILoginPayload {
 	token: string,
 	userID: string,
 	role: number
+}
+export type GetAssistantsResponse = IUser[];
+
+export interface AuthResponse {
+	token: string
 }
 const decodedToken = jwtDecode(storage.getItem(TOKEN) || "");
 const userID = decodedToken ? (decodedToken as ITokenPayload).iss : "";

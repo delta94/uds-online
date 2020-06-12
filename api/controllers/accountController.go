@@ -99,6 +99,17 @@ var GetAccounts = func(w http.ResponseWriter, r *http.Request) {
 	u.RespondJson(w, u.PaginatedResponse{Payload: u.PaginatedResponsePayload{Size: limit, Page: offset, Total: total, Data: accounts}}, http.StatusOK)
 }
 
+var GetAssistants = func(w http.ResponseWriter, r *http.Request) {
+	accounts, err := s.AccountService.GetAssistants()
+	if err != nil {
+		log.Printf("Error! Cound not fetch assistants")
+		u.RespondJson(w, u.Response{Message: "An Error occurred", ErrorCode: u.ErrGeneral}, http.StatusOK)
+		return
+	}
+	u.RespondJson(w, u.Response{Payload: accounts}, http.StatusOK)
+}
+
+
 var UpdateAccount = func(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	id, err1 := strconv.Atoi(params["id"])

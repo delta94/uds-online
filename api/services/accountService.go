@@ -73,6 +73,9 @@ func (s *accountService) Find(offset int, limit int) (data []*m.Account, total u
 	if query.Error != nil && !query.RecordNotFound() {
 		return nil, 0
 	}
+	if query.Error != nil {
+		return nil, 0
+	}
 	return objs, total
 }
 
@@ -158,7 +161,7 @@ func Login(email, pwd string, roles []int) (token string, errResp u.ErrorData) {
 	expiresInHours, err := strconv.Atoi(os.Getenv("JWT_EXPIRATION_TIME"))
 	if err != nil {
 		dv := 1
-		log.Printf("Warning! JWT's value 'expiresInHours' for 'exp' not found! Using default value (%v)", dv)
+		log.Printf("Warning! JWT's value 'JWT_EXPIRATION_TIME' for 'exp' not found! Using default value (%v)", dv)
 		expiresInHours = dv
 	}
 	tk := &m.JWTToken{}
@@ -170,6 +173,21 @@ func Login(email, pwd string, roles []int) (token string, errResp u.ErrorData) {
 	jwtWC := jwt.NewWithClaims(jwt.GetSigningMethod("HS256"), tk)
 	token, _ = jwtWC.SignedString([]byte(os.Getenv("SECRET")))
 	return
+}
+
+func (s *accountService) GetAssistants() (data []*m.Account, err error) {
+	objs := make([]*m.Account, 0)
+	query := m.GetDB().
+		Order("created_at desc").
+		Table(s.TableName).
+		Find(&objs, "role = ?", middleware.RoleAssistant)
+	if query.Error != nil && !query.RecordNotFound() {
+		return nil, nil
+	}
+	if query.Error != nil {
+		return nil, fmt.Errorf("could not get assistants")
+	}
+	return objs, nil
 }
 
 var AccountService = accountService{TableName: "accounts"}

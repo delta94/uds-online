@@ -123,7 +123,7 @@ export function LoginPage() {
 		return <Redirect to={ROUTES.HOME}/>
 	}
 	
-	function onSubmit(e: React.SyntheticEvent | React.MouseEvent) {
+	function onSubmit(e: React.SyntheticEvent | React.FormEvent) {
 		e.preventDefault();
 		dispatch(authenticate(email, password));
 	}

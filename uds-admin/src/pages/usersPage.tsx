@@ -14,7 +14,7 @@ const useStyles = makeStyles((theme: Theme) =>
 	createStyles({
 		buttonBar: {
 			display: 'flex',
-			justifyContent: 'flex-start',
+			justifyContent: 'flex-end',
 			marginBottom: 10
 		}
 	}),
@@ -38,7 +38,7 @@ const UsersPage: FC = () => {
 	return (
 		<PageWrapper heading="Пользователи">
 			<div className={classes.buttonBar}>
-				<Button color='primary' variant='contained' startIcon={<Add/>}>Добавить ассистента</Button>
+				<Button color='primary' variant='contained' startIcon={<Add/>} type="button">Добавить ассистента</Button>
 			</div>
 			<Suspense fallback={<ComponentSpinner/>}>
 				<UserTable users={usersState.items}

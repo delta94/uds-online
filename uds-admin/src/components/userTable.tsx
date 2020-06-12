@@ -2,7 +2,9 @@ import React, {FC, useState} from 'react';
 import {
 	Button,
 	Chip,
-	IconButton, Menu, MenuItem,
+	IconButton,
+	Menu,
+	MenuItem,
 	Paper,
 	Table,
 	TableBody,
@@ -35,7 +37,7 @@ const useStyles = makeStyles((theme: Theme) =>
 		tableContainer: {
 			marginBottom: 20,
 		},
-		btnBLock: {
+		btnBlock: {
 			color: 'red',
 		},
 		btnUnbLock: {},
@@ -166,7 +168,7 @@ const UserRow: FC<IUserRowProps> = ({user}) => {
 						</MenuItem>}
 						
 						{!user.is_blocked && <MenuItem
-							className={classes.btnBLock}
+							className={classes.btnBlock}
 							onClick={(e) => onBlockClick(e, user.ID)}>
 							<NotInterested fontSize="small"/>&nbsp;Заблокировать
 						</MenuItem>}
