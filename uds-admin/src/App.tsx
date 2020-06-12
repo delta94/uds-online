@@ -63,32 +63,32 @@ function App() {
 									  component={() => <Layout><MessageDetailedPage/></Layout>}
 						/>
 						<PrivateRoute exact
-									  roles={[ROLE_ADMIN, ROLE_ASSISTANT]}
+									  roles={[ROLE_ADMIN]}
 									  path={ROUTES.COURSES}
 									  component={() => <Layout><CoursesPage /></Layout>}
 						/>
 						<PrivateRoute exact
-									  roles={[ROLE_ADMIN, ROLE_ASSISTANT]}
+									  roles={[ROLE_ADMIN]}
 									  path={ROUTES.COURSE_ADD}
 									  component={() => <Layout><CourseAddPage /></Layout>}
 						/>
 						<PrivateRoute exact
-									  roles={[ROLE_ADMIN, ROLE_ASSISTANT]}
+									  roles={[ROLE_ADMIN]}
 									  path={ROUTES.COURSE}
 									  component={() => <Layout><CoursePage /></Layout>}
 						/>
 						<PrivateRoute exact
-									  roles={[ROLE_ADMIN, ROLE_ASSISTANT]}
+									  roles={[ROLE_ADMIN]}
 									  path={ROUTES.LESSON_ADD}
 									  component={() => <Layout><LessonAddPage /></Layout>}
 						/>
 						<PrivateRoute exact
-									  roles={[ROLE_ADMIN, ROLE_ASSISTANT]}
+									  roles={[ROLE_ADMIN]}
 									  path={ROUTES.LESSON}
 									  component={() => <Layout><LessonPage /></Layout>}
 						/>
 						<PrivateRoute exact
-									  roles={[ROLE_ADMIN, ROLE_ASSISTANT]}
+									  roles={[ROLE_ADMIN]}
 									  path={ROUTES.USERS}
 									  component={() => <Layout><UsersPage /></Layout>}
 						/>

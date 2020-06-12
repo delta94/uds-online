@@ -130,7 +130,7 @@ const CourseAddPage: FC = () => {
                                 {assistants && assistants.map((a) => {
                                     return (
                                         <MenuItem key={a.ID} value={a.ID}>
-                                            {a.email} (ID: {a.ID})
+                                            {a.email} &bull; [ ID: {a.ID} ]
                                         </MenuItem>
                                     )
                                 })}

@@ -1,7 +1,7 @@
 import React, {FC, useState} from "react";
 import clsx from 'clsx';
 import {Divider, List as ListComp , ListItem, ListItemIcon, ListItemText, useTheme} from "@material-ui/core";
-import {MenuBook, Person, Message, Dashboard, SvgIconComponent} from "@material-ui/icons";
+import {MenuBook, Person, Message, Dashboard, PermMedia, MonetizationOn, SvgIconComponent} from "@material-ui/icons";
 import {makeStyles} from "@material-ui/core/styles";
 import {Link} from "react-router-dom";
 import {ROUTES, ROLES} from "../constants";
@@ -71,19 +71,33 @@ export const Sidebar: FC<ISidebarProps> = ({isOpen}) => {
 								  text="Dashboard"
 				/>
 				
-				<OptionalListItem role={role!} roles={[ROLE_ADMIN, ROLE_ASSISTANT]}
+				<OptionalListItem role={role!} roles={[ROLE_ADMIN]}
 								  svgIcon={Person}
 								  route={ROUTES.USERS}
 								  text="Учетные записи"
 				/>
 				
 				<OptionalListItem role={role!}
-								  roles={[ROLE_ADMIN, ROLE_ASSISTANT]}
+								  roles={[ROLE_ADMIN]}
 								  svgIcon={MenuBook}
 								  route={ROUTES.COURSES}
 								  text="Курсы"
 				/>
-			
+				
+				<OptionalListItem role={role!}
+								  roles={[ROLE_ADMIN]}
+								  svgIcon={PermMedia}
+								  route={ROUTES.ASSETS}
+								  text="Ресурсы"
+				/>
+				
+				<OptionalListItem role={role!}
+								  roles={[ROLE_ADMIN]}
+								  svgIcon={MonetizationOn}
+								  route={ROUTES.PURCHASES}
+								  text="Продажи"
+				/>
+				
 				<OptionalListItem role={role!}
 								  roles={[ROLE_ADMIN, ROLE_ASSISTANT]}
 								  svgIcon={Message}

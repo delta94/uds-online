@@ -1,5 +1,6 @@
 export const ROUTES = {
   HOME: '/',
+  ASSETS: '/assets',
   USERS: '/users',
   MESSAGES: '/messages',
   MESSAGE: '/messages/:id/details',
@@ -8,6 +9,7 @@ export const ROUTES = {
   COURSE: '/courses/:id',
   LESSON_ADD: '/lessons/add',
   LESSON: '/courses/:course_id/lessons/:lesson_id',
+  PURCHASES: '/purchases',
   LOGIN: '/login',
   FORGOT: `${process.env.REACT_APP_PUBLIC}/forgot`
 } as const;
