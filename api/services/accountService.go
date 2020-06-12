@@ -61,11 +61,12 @@ func (s *accountService) Get(id uint) *m.Account {
 /**
 Fetch multiple entries
 */
-func (s *accountService) Find(offset int, limit int) (data []*m.Account, total uint) {
+func (s *accountService) Find(offset int, limit int, role int) (data []*m.Account, total uint) {
 	objs := make([]*m.Account, 0)
 	query := m.GetDB().
 		Order("created_at desc").
 		Table(s.TableName).
+		Where("role = ?", role).
 		Count(&total).
 		Limit(limit).
 		Offset(offset * limit).

@@ -1,12 +1,12 @@
 import {AnyAction, Dispatch} from "redux";
 import {decode as jwtDecode} from "jsonwebtoken";
-import {CLOSE_MESSAGE, EXIT_MESSAGE, LOG_IN, LOG_OUT, SET_USERS, SHOW_POPUP_MESSAGE} from "./types";
+import {CLOSE_MESSAGE, EXIT_MESSAGE, LOG_IN, LOG_OUT, SET_ASSISTANTS, SET_USERS, SHOW_POPUP_MESSAGE} from "./types";
 import {AuthResponse, GetAssistantsResponse, IAuthRequest, ILoginPayload, ITokenPayload} from "../reducers/authReducer";
 import {api_request} from "../helpers/api";
 import {IUser} from "../reducers/usersReducer";
 import {IAction, IPaginatablePayload} from "../helpers/models";
 import history from "../history";
-import {ROUTES} from "../constants";
+import {ROLES, ROUTES} from "../constants";
 import store from "../store";
 import {CreateCourseResponse} from "../reducers/courseReducer";
 
@@ -44,9 +44,9 @@ export const popup_snack = (message: string): AnyAction => {
 	}
 };
 
-export const set_users = (users: IUser[], page: number, total: number, size: number): IAction<IPaginatablePayload<IUser>> => {
+export const set_users = (isAssistants: boolean, users: IUser[], page: number, total: number, size: number): IAction<IPaginatablePayload<IUser>> => {
 	return {
-		type: SET_USERS,
+		type: isAssistants ? SET_ASSISTANTS: SET_USERS,
 		payload: {
 			data: users,
 			page,
@@ -85,19 +85,19 @@ export const authenticate = (email: string, password: string) => {
 	};
 };
 
-export const get_users = (page?: number) => {
+export const get_users = (role: number, page?: number) => {
 	if (page === undefined) {
-		page = store.getState().users.page;
+		page = store.getState().users.users.page;
 	}
 	return (dispatch: Dispatch) => {
 		return api_request<IPaginatablePayload<IUser>>({
 			method: "GET",
 			url: `accounts`,
-			params: {p: page},
+			params: {p: page, r: role},
 			version: 1
 		})
 			.then(({data, page, size, total}) => {
-				dispatch(set_users(data, page, total, size));
+				dispatch(set_users(role === ROLES.ROLE_ASSISTANT, data, page, total, size));
 			});
 	}
 };

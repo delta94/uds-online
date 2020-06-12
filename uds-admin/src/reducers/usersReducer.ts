@@ -1,5 +1,6 @@
 import {AnyAction} from "redux";
 import {
+	SET_ASSISTANTS,
 	SET_USERS,
 } from "../actions/types";
 import {IAction, IPaginatablePayload} from "../helpers/models";
@@ -15,17 +16,33 @@ export interface IUser {
 }
 
 export interface IUsersState {
-	items: IUser[],
-	page: number,
-	total: number,
-	size: number
+	users: {
+		items: IUser[],
+		page: number,
+		total: number,
+		size: number,
+	},
+	assistants: {
+		items: IUser[],
+		page: number,
+		total: number,
+		size: number,
+	}
 }
 
 export const defaultState: IUsersState = {
-	items: [],
-	page: 0,
-	total: 0,
-	size: 10
+	users: {
+		items: [],
+		page: 0,
+		total: 0,
+		size: 10,
+	},
+	assistants: {
+		items: [],
+		page: 0,
+		total: 0,
+		size: 10,
+	}
 };
 
 export const reducer = (state = defaultState, action: AnyAction): IUsersState => {
@@ -34,10 +51,25 @@ export const reducer = (state = defaultState, action: AnyAction): IUsersState =>
 			const a = action as IAction<IPaginatablePayload<IUser>>;
 			state = {
 				...state,
-				items: a.payload.data,
-				page: a.payload.page,
-				total: a.payload.total,
-				size: a.payload.size,
+				users: {
+					items: a.payload.data,
+					page: a.payload.page,
+					total: a.payload.total,
+					size: a.payload.size,
+				}
+			};
+			break;
+		}
+		case SET_ASSISTANTS: {
+			const a = action as IAction<IPaginatablePayload<IUser>>;
+			state = {
+				...state,
+				assistants: {
+					items: a.payload.data,
+					page: a.payload.page,
+					total: a.payload.total,
+					size: a.payload.size,
+				}
 			};
 			break;
 		}

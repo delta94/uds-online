@@ -74,7 +74,7 @@ export const Sidebar: FC<ISidebarProps> = ({isOpen}) => {
 				<OptionalListItem role={role!} roles={[ROLE_ADMIN, ROLE_ASSISTANT]}
 								  svgIcon={Person}
 								  route={ROUTES.USERS}
-								  text="Пользователи"
+								  text="Учетные записи"
 				/>
 				
 				<OptionalListItem role={role!}

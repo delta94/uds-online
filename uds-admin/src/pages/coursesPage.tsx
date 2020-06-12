@@ -29,10 +29,14 @@ const CoursesPage: FC = () => {
 	};
 	
 	return (
-		<PageWrapper heading="Курсы">
-			<div className={classes.buttonBar}>
-				<Button color="primary" variant="contained" component={Link} to={ROUTES.COURSE_ADD} startIcon={<Add />}>Добавить Курс</Button>
-			</div>
+		<PageWrapper heading="Курсы"
+					 actionArea={<Button
+						 color="primary"
+						 variant="contained"
+						 component={Link}
+						 to={ROUTES.COURSE_ADD}
+						 startIcon={<Add />}>Добавить Курс</Button>
+		}>
 			<CourseTable courses={[]} onChangePage={handlePageChange} total={1} page={1} size={1} />
 		</PageWrapper>
 	);

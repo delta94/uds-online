@@ -26,8 +26,8 @@ import {change_block, get_users, manual_email_confirm, popup_snack} from "../act
 
 
 const ITEM_HEIGHT = 48;
-const MSG_BLOCK_USER_TEXT = "Данный пользователь будет заблокирован. Он не сможет войти в систему до тех пор, пока вы не восстановите ему доступ. Продолжить?";
-const MSG_CONF_EMAIL_TEXT = "Указанный для данной учетной записи Email будет отмечен как подтвержденный. Продолжить?";
+const MSG_BLOCK_USER = "Данный пользователь будет заблокирован. Он не сможет войти в систему до тех пор, пока вы не восстановите ему доступ. Продолжить?";
+const MSG_CONF_EMAIL = "Указанный для данной учетной записи Email будет отмечен как подтвержденный. Продолжить?";
 
 const useStyles = makeStyles((theme: Theme) =>
 	createStyles({
@@ -46,6 +46,9 @@ const useStyles = makeStyles((theme: Theme) =>
 		},
 		actionColumn: {
 			width: '55px'
+		},
+		chip: {
+			margin: '2px 2px',
 		}
 	}),
 );
@@ -53,14 +56,16 @@ const useStyles = makeStyles((theme: Theme) =>
 
 interface IUserTableProps extends IPagination {
 	users: IUser[],
+	role: number,
 	onChangePage: Function,
 }
 
 interface IUserRowProps {
 	user: IUser,
+	role: number
 }
 
-const UserRow: FC<IUserRowProps> = ({user}) => {
+const UserRow: FC<IUserRowProps> = ({user, role}) => {
 	const classes = useStyles();
 	const [selectedUserID, setUserID] = useState<string | null>("");
 	// for menu
@@ -93,7 +98,7 @@ const UserRow: FC<IUserRowProps> = ({user}) => {
 		if (selectedUserID) {
 			dispatch(manual_email_confirm(selectedUserID, () => {
 				dispatch(popup_snack("Email для указанного аккаунта успешно подтвержден"));
-				dispatch(get_users());
+				dispatch(get_users(role));
 			}));
 		}
 		onModalClose();
@@ -103,7 +108,7 @@ const UserRow: FC<IUserRowProps> = ({user}) => {
 		if (selectedUserID) {
 			dispatch(change_block(selectedUserID, true, () => {
 				dispatch(popup_snack("Пользователь успешно заблокирован"));
-				dispatch(get_users());
+				dispatch(get_users(role));
 			}));
 		}
 		onModalClose();
@@ -114,7 +119,7 @@ const UserRow: FC<IUserRowProps> = ({user}) => {
 		if (id) {
 			dispatch(change_block(id, false, () => {
 				dispatch(popup_snack("Пользователь успешно разблокирован"));
-				dispatch(get_users());
+				dispatch(get_users(role));
 			}));
 		}
 		onModalClose();
@@ -132,10 +137,10 @@ const UserRow: FC<IUserRowProps> = ({user}) => {
 			<TableRow key={user.ID}>
 				<TableCell component="th" scope="row">
 					{user.email}&nbsp;
-					{!user.confirmed && <Chip label="Не подтвержден" size="small"/>}
+					{!user.confirmed && <Chip className={classes.chip} label="Не подтвержден" size="small" />}
+					{user.is_blocked && <Chip className={classes.chip} label="Заблокирован" size="small"/>}
 				</TableCell>
 				<TableCell align="right">{created}</TableCell>
-				<TableCell align="right" className={classes.textCenter}>{user.is_blocked && <Check/>}</TableCell>
 				<TableCell align="right" className={classes.actionColumn}>
 					<IconButton
 						aria-label="more"
@@ -179,7 +184,7 @@ const UserRow: FC<IUserRowProps> = ({user}) => {
 			<ConfirmDialog
 				heading="Блокировка пользователя"
 				open={blockModalOpen}
-				text={MSG_BLOCK_USER_TEXT}>
+				text={MSG_BLOCK_USER}>
 				
 				<Button onClick={onModalClose}>Отмена</Button>
 				
@@ -191,7 +196,7 @@ const UserRow: FC<IUserRowProps> = ({user}) => {
 			<ConfirmDialog
 				heading="Ручное подтверждение Email"
 				open={emailModalOpen}
-				text={MSG_CONF_EMAIL_TEXT}>
+				text={MSG_CONF_EMAIL}>
 				
 				<Button onClick={onModalClose}>Отмена</Button>
 				
@@ -206,7 +211,7 @@ const UserRow: FC<IUserRowProps> = ({user}) => {
 
 const UserTable: FC<IUserTableProps> = (props) => {
 	const classes = useStyles();
-	const {users, page, total, onChangePage, size} = props;
+	const {users, page, total, onChangePage, size, role} = props;
 	const count = Math.ceil(total / size) || 1;
 	return (
 		<div>
@@ -216,7 +221,6 @@ const UserTable: FC<IUserTableProps> = (props) => {
 						<TableRow>
 							<TableCell>Email</TableCell>
 							<TableCell align="right">Создан</TableCell>
-							<TableCell align="right" className={classes.textCenter}>Заблокрован</TableCell>
 							<TableCell align="right" className={classes.actionColumn}> </TableCell>
 						</TableRow>
 					</TableHead>
@@ -226,6 +230,7 @@ const UserTable: FC<IUserTableProps> = (props) => {
 								<UserRow
 									key={user.ID}
 									user={user}
+									role={role}
 								/>
 							)
 						})}

@@ -81,16 +81,23 @@ var GetAccount = func(w http.ResponseWriter, r *http.Request) {
 var GetAccounts = func(w http.ResponseWriter, r *http.Request) {
 	offset, err1 := strconv.Atoi(r.URL.Query().Get("p"))
 	limit, err2 := strconv.Atoi(r.URL.Query().Get("s"))
+	role, err3 := strconv.Atoi(r.URL.Query().Get("r"))
 	if err1 != nil {
 		offset = 0
 	}
 	if err2 != nil {
 		limit = 10
 	}
+	if err3 != nil {
+		role = middleware.RoleUser
+	}
 	if limit == 0 || limit > 50 {
 		limit = 10
 	}
-	accounts, total := s.AccountService.Find(offset, limit)
+	if role != middleware.RoleUser && role != middleware.RoleAssistant {
+		role = middleware.RoleUser
+	}
+	accounts, total := s.AccountService.Find(offset, limit, role)
 	if accounts == nil {
 		log.Printf("Error! Cound not fetch accounts")
 		u.RespondJson(w, u.Response{Message: "An Error occurred", ErrorCode: u.ErrGeneral}, http.StatusOK)
