@@ -69,7 +69,7 @@ const UsersPage: FC = () => {
 	}, []);
 	
 	const handlePageChange = (value: number, role: number) => {
-		dispatch(get_users(value - 1));
+		dispatch(get_users(role, value - 1));
 	}
 	console.log('Rendering page');
 	
