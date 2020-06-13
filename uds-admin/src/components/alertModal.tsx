@@ -52,12 +52,10 @@ const AlertModal: FC<IAlertModal> = ({open, text, heading, onClose}) => {
 					}
 					<Typography variant='body1'>{text}</Typography>
 					<div className={classes.buttonBar}>
-						<Button variant='contained'
-								color='primary'
-								className={classes.cancel}
-								onClick={() => onClose()}>
-							Отмена
-						</Button>
+						<Button
+							color='primary'
+							className={classes.cancel}
+							onClick={() => onClose()}>Закрыть</Button>
 					</div>
 				</div>
 			</Modal>

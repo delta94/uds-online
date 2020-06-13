@@ -1,5 +1,6 @@
-import React, {lazy, Suspense, useEffect, useState} from 'react';
+import React, {lazy, Suspense, useEffect, useRef, useState} from 'react';
 import "./axios";
+import {decode as jwtDecode} from "jsonwebtoken";
 import {theme} from "./theme";
 import {MuiThemeProvider} from "@material-ui/core";
 import {useDispatch, useSelector} from "react-redux";
@@ -11,7 +12,9 @@ import {ROLES, ROUTES} from "./constants";
 import {PageSpinner} from "./components/spinner";
 import {Layout} from "./components/layout";
 import history from "./history";
-
+import {ITokenPayload} from "./reducers/authReducer";
+import AlertModal from "./components/alertModal";
+import {log_out} from "./actions";
 
 const LoginPage = lazy(() => import("./pages/loginPage"));
 const HomePage = lazy(() => import("./pages/homePage"));
@@ -22,24 +25,55 @@ const CoursePage = lazy(() => import("./pages/coursePage"));
 const CoursesPage = lazy(() => import("./pages/coursesPage"));
 const CourseAddPage = lazy(() => import("./pages/courseAddPage"));
 const LessonPage = lazy(() => import("./pages/lessonPage"));
-
-
 const NotFoundPage = lazy(() => import("./pages/notFoundPage"));
 
 const {ROLE_ADMIN, ROLE_ASSISTANT} = ROLES;
+const CHECK_EXPIRATION_INTERVAL_SEC = 5;
 
 function App() {
-	// const dispatch = useDispatch();
+	const t = useRef<unknown>();
+	const dispatch = useDispatch();
 	const authState = useSelector((state: IReducerState) => state.auth);
 	const [logged, setLogged] = useState<boolean>(!!authState.token);
+	const [expiredAlertOpen, setExpiredAlertOpen] = useState<boolean>(false);
+	
 	useEffect(() => {
 		if (logged !== !!authState.token) {
 			setLogged(!!authState.token);
 		}
 	}, [authState.token]);
 	
+	// Notify user when token expired
+	useEffect(() => {
+		t.current = setInterval(() => {
+			if (logged) {
+				const decodedToken = jwtDecode(authState.token || "");
+				if (!decodedToken || (decodedToken as ITokenPayload).exp * 1000 < Date.now()) {
+					setExpiredAlertOpen(true);
+				}
+			} else {
+				setExpiredAlertOpen(false);
+			}
+		}, CHECK_EXPIRATION_INTERVAL_SEC * 1000);
+		return () => {
+			if (t && t.current) {
+ 				clearInterval(t.current as number);
+			}
+		};
+	}, [logged]);
+	
 	return (
 		<MuiThemeProvider theme={theme}>
+			<AlertModal
+				onClose={() => {
+					setExpiredAlertOpen(false);
+					dispatch(log_out());
+				}}
+				open={expiredAlertOpen}
+				heading="Внимание!"
+				text="Ваша сессия по работе с приложением истекла. Пожалуйста, войдите в систему повторно."
+			/>
+			
 			<Router history={history}>
 				<Suspense fallback={<PageSpinner/>}>
 					<Switch>
@@ -95,7 +129,6 @@ function App() {
 						<Route exact component={() => <Layout><NotFoundPage /></Layout>}/>
 					</Switch>
 				</Suspense>
-			
 			</Router>
 			<SnackbarProvider/>
 		</MuiThemeProvider>

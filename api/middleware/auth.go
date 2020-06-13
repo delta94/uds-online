@@ -40,14 +40,14 @@ var JwtAuthMiddleware = func(next http.Handler, roles []int) http.Handler {
 		token, err := jwt.ParseWithClaims(tokenPart, tk, func(token *jwt.Token) (interface{}, error) {
 			return []byte(os.Getenv("SECRET")), nil
 		})
-		// Malformed token, returns with http code 403 as usual
+		// Malformed token
 		if err != nil {
-			u.RespondJson(w, u.Response{Message: "Malformed authentication token"}, http.StatusForbidden)
+			u.RespondJson(w, u.Response{Message: "Malformed authentication token", ErrorCode: u.ErrMalformedToken}, http.StatusForbidden)
 			return
 		}
 		// Token is invalid
 		if !token.Valid {
-			u.RespondJson(w, u.Response{Message: "Token is not valid"}, http.StatusBadRequest)
+			u.RespondJson(w, u.Response{Message: "Token is not valid", ErrorCode: u.ErrAuth}, http.StatusBadRequest)
 			return
 		}
 		// Fetch User related to token
@@ -55,10 +55,10 @@ var JwtAuthMiddleware = func(next http.Handler, roles []int) http.Handler {
 		err = m.GetDB().Take(account, "id = ?", tk.Issuer).Error
 		if err != nil {
 			if err == gorm.ErrRecordNotFound {
-				u.RespondJson(w, u.Response{Message: "user not found"}, http.StatusOK)
+				u.RespondJson(w, u.Response{Message: "user not found", ErrorCode: u.ErrAuth}, http.StatusOK)
 				return
 			}
-			u.RespondJson(w, u.Response{Message: "connection error. Please retry"}, http.StatusOK)
+			u.RespondJson(w, u.Response{Message: "connection error. Please retry", ErrorCode: u.ErrAuth}, http.StatusOK)
 			return
 		}
 		authorized := false
@@ -69,7 +69,7 @@ var JwtAuthMiddleware = func(next http.Handler, roles []int) http.Handler {
 		}
 		if !authorized {
 			log.Printf("An attempt to use Role-protected route by [%s]. Access denied.\n", account.ID)
-			u.RespondJson(w, u.Response{Message: "Not authorized"}, http.StatusForbidden)
+			u.RespondJson(w, u.Response{Message: "Not authorized", ErrorCode: u.ErrForbidden}, http.StatusForbidden)
 			return
 		}
 		// Generate context

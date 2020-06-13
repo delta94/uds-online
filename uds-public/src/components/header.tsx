@@ -127,7 +127,7 @@ export const Header: FC<IHeaderProps> = ({onBurgerClick}) => {
 	
 	return (
 		<div className={classes.grow}>
-			<AppBar position="fixed">
+			<AppBar position="static">
 				<Toolbar>
 					<IconButton
 						edge="start"

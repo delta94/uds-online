@@ -54,9 +54,9 @@ function a11yProps(index: any) {
 	};
 }
 
-
 const TAB_USERS = "TAB_USERS";
 const TAB_ASSISTANTS = "TAB_ASSISTANTS";
+
 const UsersPage: FC = () => {
 	const classes = useStyles();
 	const dispatch = useDispatch();
@@ -71,7 +71,6 @@ const UsersPage: FC = () => {
 	const handlePageChange = (value: number, role: number) => {
 		dispatch(get_users(role, value - 1));
 	}
-	console.log('Rendering page');
 	
 	return (
 		<PageWrapper heading="Учетные записи"

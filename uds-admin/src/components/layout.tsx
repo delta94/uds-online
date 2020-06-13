@@ -7,7 +7,7 @@ import {Sidebar} from "./sidebar";
 
 const useStyles = makeStyles((theme) => ({
 	body: {
-		paddingTop: "70px",
+		paddingTop: 10,
 		display: 'flex',
 		maxWidth: '1920px',
 		marginLeft: 'auto',

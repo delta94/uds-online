@@ -1,6 +1,7 @@
 package utils
 
 var ErrAuth = 1001             // Authentication missing/corrupted
+var ErrMalformedToken = 10011  // Authentication missing/corrupted
 var ErrLogin = 1002            // Login failed
 var ErrMailNotConfirmed = 1003 // Login failed
 var ErrAuthUserNotFound = 1004 // User not found / login failed

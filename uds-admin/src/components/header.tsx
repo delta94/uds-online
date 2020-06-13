@@ -103,22 +103,6 @@ export const Header: FC<IHeaderProps> = ({onBurgerClick}) => {
 			onClick={handleMobileMenuClose}
 			onClose={handleMobileMenuClose}
 		>
-			
-			{/*
-			<MenuItem component={Link} to={ROUTES.MESSAGES}>
-				<IconButton color="inherit" >
-					{unreadMessages ?
-						<Badge badgeContent={unreadMessages} color="secondary">
-							<Mail/>
-						</Badge>
-						:
-						<Mail/>
-					}
-				</IconButton>
-				<p>Messages</p>
-			</MenuItem>
-			*/}
-			
 			<MenuItem className={classes.logoutMobile}>
 				<IconButton color="inherit" onClick={() => dispatch(log_out())}>
 					<ExitToAppOutlined/>
@@ -130,7 +114,7 @@ export const Header: FC<IHeaderProps> = ({onBurgerClick}) => {
 	
 	return (
 		<div className={classes.grow}>
-			<AppBar position="fixed">
+			<AppBar position="static">
 				<Toolbar>
 					<IconButton
 						edge="start"
