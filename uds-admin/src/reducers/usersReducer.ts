@@ -1,9 +1,9 @@
 import {AnyAction} from "redux";
+import {IAction, IPaginatablePayload, IPagination} from "../helpers/models";
 import {
 	SET_ASSISTANTS,
 	SET_USERS,
 } from "../actions/types";
-import {IAction, IPaginatablePayload} from "../helpers/models";
 
 export interface IUser {
 	ID: string,
@@ -15,19 +15,13 @@ export interface IUser {
 	UpdatedAt: string
 }
 
+interface IUserData extends IPagination {
+	items: IUser[]
+}
+
 export interface IUsersState {
-	users: {
-		items: IUser[],
-		page: number,
-		total: number,
-		size: number,
-	},
-	assistants: {
-		items: IUser[],
-		page: number,
-		total: number,
-		size: number,
-	}
+	users: IUserData,
+	assistants: IUserData,
 }
 
 export const defaultState: IUsersState = {

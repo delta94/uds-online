@@ -22,7 +22,6 @@ const CoursePage = lazy(() => import("./pages/coursePage"));
 const CoursesPage = lazy(() => import("./pages/coursesPage"));
 const CourseAddPage = lazy(() => import("./pages/courseAddPage"));
 const LessonPage = lazy(() => import("./pages/lessonPage"));
-const LessonAddPage = lazy(() => import("./pages/lessonAddPage"));
 
 
 const NotFoundPage = lazy(() => import("./pages/notFoundPage"));
@@ -81,11 +80,11 @@ function App() {
 						<PrivateRoute exact
 									  roles={[ROLE_ADMIN]}
 									  path={ROUTES.LESSON_ADD}
-									  component={() => <Layout><LessonAddPage /></Layout>}
+									  component={() => <Layout><LessonPage /></Layout>}
 						/>
 						<PrivateRoute exact
 									  roles={[ROLE_ADMIN]}
-									  path={ROUTES.LESSON}
+									  path={ROUTES.LESSON_EDIT}
 									  component={() => <Layout><LessonPage /></Layout>}
 						/>
 						<PrivateRoute exact

@@ -8,7 +8,7 @@ export const ROUTES = {
   COURSE_ADD: '/courses/add',
   COURSE: '/courses/:id',
   LESSON_ADD: '/courses/:course_id/lessons/add',
-  LESSON: '/courses/:course_id/lessons/:lesson_id',
+  LESSON_EDIT: '/courses/:course_id/lessons/:lesson_id',
   PURCHASES: '/purchases',
   LOGIN: '/login',
   FORGOT: `${process.env.REACT_APP_PUBLIC}/forgot`

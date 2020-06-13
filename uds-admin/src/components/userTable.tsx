@@ -50,14 +50,14 @@ const useStyles = makeStyles((theme: Theme) =>
 		chip: {
 			margin: '2px 2px',
 		}
-	}),
+	})
 );
 
 
 interface IUserTableProps extends IPagination {
 	users: IUser[],
 	role: number,
-	onChangePage: Function,
+	onChangePage:  (e: React.ChangeEvent<unknown>, v: number) => void,
 }
 
 interface IUserRowProps {
@@ -134,7 +134,7 @@ const UserRow: FC<IUserRowProps> = ({user, role}) => {
 	const created = Moment(user.CreatedAt).format("DD-MM-YYYY HH:mm");
 	return (
 		<>
-			<TableRow key={user.ID}>
+			<TableRow>
 				<TableCell component="th" scope="row">
 					{user.email}&nbsp;
 					{!user.confirmed && <Chip className={classes.chip} label="Не подтвержден" size="small" />}
