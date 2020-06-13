@@ -95,13 +95,9 @@ const useStyles = makeStyles((theme: Theme) =>
 				height: '100%'
 			}
 		},
-		phone: {
-			display: 'flex',
-			alignItems: 'center',
+		bottom: {
 			fontSize: '80%',
 			color: 'rgba(0, 0, 0, 0.54)',
-			justifyContent: 'center',
-			marginTop: '2rem'
 		}
 	}),
 );
@@ -133,12 +129,10 @@ export function LoginPage() {
 			<div className={classes.space}>
 				<div className={classes.bg} />
 				<article className={classes.textBlock}>
-					<Typography variant="h3">Welcome to UnDosTres|Online course app.</Typography>
+					<Typography variant="h4">Добро пожаловать в контрольную панель UnDosTres|Online</Typography>
 					<br/>
 					<Typography variant="body1">
-						Lorem ipsum dolor sit amet, consectetur adipisicing elit. Architecto assumenda, aut dolorum expedita
-						explicabo iure pariatur quae repellendus sunt. Dolore doloremque eos exercitationem id neque quaerat
-						similique tenetur. Deserunt, quaerat.
+						Пожалуйста, введите Ваши Email и пароль для  входа в систему.
 					</Typography>
 				</article>
 			</div>
@@ -149,7 +143,7 @@ export function LoginPage() {
 						UNDOSTRES|ONLINE
 					</Typography>
 					<Typography variant="subtitle2" className={classes.subheading}>
-						Authentication
+						Аутентификация
 					</Typography>
 					<FormControl fullWidth className={classes.formControl}>
 						<InputLabel htmlFor="email">Email</InputLabel>
@@ -164,7 +158,7 @@ export function LoginPage() {
 						/>
 					</FormControl>
 					<FormControl fullWidth className={classes.formControl}>
-						<InputLabel htmlFor="password">Password</InputLabel>
+						<InputLabel htmlFor="password">Пароль</InputLabel>
 						<Input
 							id="password"
 							value={password}
@@ -176,12 +170,14 @@ export function LoginPage() {
 						/>
 					</FormControl>
 					<div className={classes.buttonBar}>
-						<Button component='a' color="primary" target="_blank" href={ROUTES.FORGOT}>Forgot password?</Button>
+						<Button component='a' color="primary" target="_blank" href={ROUTES.FORGOT}>Забыли пароль?</Button>
 						<div className={classes.grow}/>
-						<Button type="submit" color="primary" variant="contained">Sign in</Button>
+						<Button type="submit" color="primary" variant="contained">Войти</Button>
 					</div>
 				</div>
-				<div className={classes.phone}><Phone />&nbsp;+7(0732)12-34-56</div>
+				<div className={classes.bottom}>
+					Developed - maximdev.com
+				</div>
 			</form>
 		
 		</div>

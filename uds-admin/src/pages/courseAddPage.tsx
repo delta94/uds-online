@@ -112,8 +112,7 @@ const CourseAddPage: FC = () => {
                         onChange={(e) => setTitle(e.target.value)}
                     />
                 </FormControl>
-
-
+                
                 <div className={classes.spacer}/>
 
                 <FormControl fullWidth>
@@ -154,6 +153,7 @@ const CourseAddPage: FC = () => {
                         id="textarea-annotation"
                         label="Краткое описание"
                         multiline
+                        FormHelperTextProps={{variant:"standard"}}
                         fullWidth
                         required
                         helperText={`${annotation.length}/${MAX_LENGTH_ANNOTATION} символов. Минимальная длинна ${MIN_LENGTH_ANNOTATION} символов.`}

@@ -36,8 +36,13 @@ func main() {
 	router.Handle(mw.Routes["v1"]["accounts"]+"/{id}", mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.DeleteAccount), []int{mw.RoleAdmin}))).Methods("DELETE", "OPTIONS")
 	router.Handle(mw.Routes["v1"]["accounts"]+"/reset-password", mw.XhrMiddleware(http.HandlerFunc(controllers.ResetPassword))).Methods("POST", "OPTIONS")
 
+	router.Handle(mw.Routes["v1"]["adminCourses"], mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.CreateCourse), []int{mw.RoleAdmin}))).Methods("POST", "OPTIONS")
+	router.Handle(mw.Routes["v1"]["adminCourses"], mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.GetCoursesAdmin), []int{mw.RoleAdmin}))).Methods("GET", "OPTIONS")
+	router.Handle(mw.Routes["v1"]["adminCourses"]+"/{id}", mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.GetCourseAdmin), []int{mw.RoleAdmin}))).Methods("GET", "OPTIONS")
 
-	router.Handle(mw.Routes["v1"]["courses"], mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.CreateCourse), []int{mw.RoleAdmin}))).Methods("POST", "OPTIONS")
+	router.Handle(mw.Routes["v1"]["courses"]+"/{id}", mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.GetCourse), []int{mw.RoleUser}))).Methods("GET", "OPTIONS")
+	router.Handle(mw.Routes["v1"]["courses"], mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.GetCourses), []int{mw.RoleUser}))).Methods("GET", "OPTIONS")
+
 
 	// S3
 	//router.HandleFunc("/api/v1/uploads", controllers.ListS3Uploads).Methods("POST")

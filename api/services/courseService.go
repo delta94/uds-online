@@ -22,5 +22,38 @@ func (s *courseService) Create(model *m.Course) error {
 	return nil
 }
 
+func (s *courseService) Find(offset int, limit int) (data []*m.Course, total uint) {
+	objs := make([]*m.Course, 0)
+	query := m.GetDB().
+		Order("created_at desc").
+		Table(s.TableName).
+		Where("published = ?", true).
+		Count(&total).
+		Limit(limit).
+		Offset(offset * limit).
+		Find(&objs)
+	if query.Error != nil && !query.RecordNotFound() {
+		return nil, 0
+	}
+	if query.Error != nil {
+		return nil, 0
+	}
+	return objs, total
+}
+
+func (s *courseService) FindAll() ([]*m.Course, error) {
+	objs := make([]*m.Course, 0)
+	query := m.GetDB().
+		Order("created_at desc").
+		Table(s.TableName).
+		Find(&objs)
+	if query.Error != nil && !query.RecordNotFound() {
+		return objs, nil
+	}
+	if query.Error != nil {
+		return nil, query.Error
+	}
+	return objs, nil
+}
 
 var CourseService = courseService{TableName: "courses"}

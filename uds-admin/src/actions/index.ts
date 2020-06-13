@@ -1,6 +1,15 @@
 import {AnyAction, Dispatch} from "redux";
 import {decode as jwtDecode} from "jsonwebtoken";
-import {CLOSE_MESSAGE, EXIT_MESSAGE, LOG_IN, LOG_OUT, SET_ASSISTANTS, SET_USERS, SHOW_POPUP_MESSAGE} from "./types";
+import {
+	CLOSE_MESSAGE,
+	EXIT_MESSAGE,
+	LOG_IN,
+	LOG_OUT,
+	SET_ASSISTANTS,
+	SET_COURSES,
+	SET_USERS,
+	SHOW_POPUP_MESSAGE
+} from "./types";
 import {AuthResponse, GetAssistantsResponse, IAuthRequest, ILoginPayload, ITokenPayload} from "../reducers/authReducer";
 import {api_request} from "../helpers/api";
 import {IUser} from "../reducers/usersReducer";
@@ -8,7 +17,7 @@ import {IAction, IPaginatablePayload} from "../helpers/models";
 import history from "../history";
 import {ROLES, ROUTES} from "../constants";
 import store from "../store";
-import {CreateCourseResponse} from "../reducers/courseReducer";
+import {CreateCourseResponse, GetCoursesResponse, ICourse} from "../reducers/courseReducer";
 
 export const log_in = (token: string, userID: string, role: number): IAction<ILoginPayload> => {
 	return {
@@ -53,6 +62,13 @@ export const set_users = (isAssistants: boolean, users: IUser[], page: number, t
 			total,
 			size
 		}
+	}
+};
+
+export const set_courses = (courses: ICourse[]): IAction<ICourse[]> => {
+	return {
+		type: SET_COURSES,
+		payload: courses
 	}
 };
 
@@ -154,7 +170,7 @@ export const create_course = (title: string, annotation: string, price: number, 
 	return (dispatch: Dispatch) => {
 		return api_request<CreateCourseResponse>({
 			method: "POST",
-			url: `courses`,
+			url: `admin/courses`,
 			data: {title, annotation, price, assistant_id},
 			version: 1
 		})
@@ -164,4 +180,17 @@ export const create_course = (title: string, annotation: string, price: number, 
 				}
 			})
 	}
+}
+
+export const get_courses = () => {
+	return (dispatch: Dispatch) => {
+		return api_request<GetCoursesResponse>({
+			method:  "GET",
+			url: `admin/courses`,
+			version: 1
+		})
+			.then((courses) => {
+				dispatch(set_courses(courses));
+			});
+	};
 }

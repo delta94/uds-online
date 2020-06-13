@@ -1,4 +1,4 @@
-import React, {FC, useState} from "react";
+import React, {FC, useEffect} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {createStyles, makeStyles, Theme} from "@material-ui/core/styles";
 import {IReducerState} from "../reducers";
@@ -8,6 +8,7 @@ import {Button} from "@material-ui/core";
 import {Add} from "@material-ui/icons";
 import {Link} from "react-router-dom";
 import {ROUTES} from "../constants";
+import {get_courses} from "../actions";
 
 const useStyles = makeStyles((theme: Theme) =>
 	createStyles({
@@ -22,7 +23,11 @@ const useStyles = makeStyles((theme: Theme) =>
 const CoursesPage: FC = () => {
 	const classes = useStyles();
 	const dispatch = useDispatch();
-	const authState = useSelector((state: IReducerState) => state.auth);
+	const courseState = useSelector((state: IReducerState) => state.course);
+	
+	useEffect(() => {
+		dispatch(get_courses());
+	}, []);
 	
 	const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
 	
@@ -37,7 +42,7 @@ const CoursesPage: FC = () => {
 						 to={ROUTES.COURSE_ADD}
 						 startIcon={<Add />}>Добавить Курс</Button>
 		}>
-			<CourseTable courses={[]} onChangePage={handlePageChange} total={1} page={1} size={1} />
+			<CourseTable courses={courseState.items} />
 		</PageWrapper>
 	);
 }

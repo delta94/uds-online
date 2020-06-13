@@ -1,11 +1,13 @@
 import React, {FC} from "react";
-import {IPagination} from "../helpers/models";
 import {createStyles, makeStyles, Theme} from "@material-ui/core/styles";
 import {ICourse} from "../reducers/courseReducer";
 import {Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@material-ui/core";
 import Moment from "moment";
 import {Pagination} from "@material-ui/lab";
-import {Add} from "@material-ui/icons";
+import {Visibility, VisibilityOff} from "@material-ui/icons";
+import {Link} from "react-router-dom";
+import {ROUTES} from "../constants";
+import {getCourseUrl} from "../helpers/getUrl";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -24,9 +26,8 @@ const useStyles = makeStyles((theme: Theme) =>
     }),
 );
 
-interface ICourseTableProps extends IPagination {
-    courses: ICourse[],
-    onChangePage: Function
+interface ICourseTableProps {
+    courses: ICourse[]
 }
 
 interface ICourseRowProps {
@@ -43,18 +44,22 @@ const CourseRow: FC<ICourseRowProps> = ({course}) => {
             <TableCell component="th" scope="row">
                 {title}
             </TableCell>
-            <TableCell align="right">{created}</TableCell>
-            <TableCell align="right">{published}</TableCell>
-            <TableCell align="right">{price}</TableCell>
-            <TableCell align="right"> </TableCell>
+            <TableCell align="right" className={classes.textCenter}>{created}</TableCell>
+            <TableCell align="right" className={classes.textCenter}>
+                {published ? <Visibility />: <VisibilityOff/>}
+            </TableCell>
+            <TableCell align="right" className={classes.textCenter}>{price}</TableCell>
+            <TableCell align="right">
+                <Button component={Link} to={getCourseUrl(ID.toString())} variant="contained" color="primary">
+                    Открыть
+                </Button>
+            </TableCell>
         </TableRow>
     )
 };
 
-export const CourseTable: FC<ICourseTableProps> = (props) => {
+export const CourseTable: FC<ICourseTableProps> = ({courses}) => {
     const classes = useStyles();
-    const {courses, page, total, onChangePage, size} = props;
-    const count = Math.ceil(total / size) || 1;
     return (
         <div>
             <TableContainer component={Paper} className={classes.tableContainer}>
@@ -62,7 +67,7 @@ export const CourseTable: FC<ICourseTableProps> = (props) => {
                     <TableHead>
                         <TableRow>
                             <TableCell>Название</TableCell>
-                            <TableCell align="right">Создан</TableCell>
+                            <TableCell align="right" className={classes.textCenter}>Создан</TableCell>
                             <TableCell align="right" className={classes.textCenter}>Опубликован</TableCell>
                             <TableCell align="right" className={classes.textCenter}>Стоимость, руб.</TableCell>
                             <TableCell align="right" className={classes.actionColumn}> </TableCell>
@@ -82,15 +87,6 @@ export const CourseTable: FC<ICourseTableProps> = (props) => {
                     </TableBody>
                 </Table>
             </TableContainer>
-
-            {total > size && <>
-                <Pagination count={count}
-                            page={page + 1}
-                            hidePrevButton
-                            hideNextButton
-                            onChange={(e, i) => onChangePage(e, i)}
-                />
-            </>}
         </div>
     );
 }

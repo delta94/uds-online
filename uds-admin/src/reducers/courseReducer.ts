@@ -1,4 +1,6 @@
 import {AnyAction} from "redux";
+import {SET_COURSES} from "../actions/types";
+import {IAction, IPaginatablePayload} from "../helpers/models";
 
 
 export interface ICourse {
@@ -20,6 +22,8 @@ export const defaultState: ICourseState = {
 	items: []
 };
 
+export type GetCoursesResponse = ICourse[];
+
 export interface CreateCourseResponse {
 	ID: number,
 	title: string,
@@ -29,8 +33,12 @@ export interface CreateCourseResponse {
 
 export const reducer = (state: ICourseState = defaultState, action: AnyAction): ICourseState => {
 	switch (action.type) {
-		case '': {
-			
+		case SET_COURSES: {
+			const a = action as IAction<ICourse[]>;
+			state = {
+				...state,
+				items: a.payload
+			};
 			break;
 		}
 	}

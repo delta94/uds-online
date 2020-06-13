@@ -27,3 +27,24 @@ var CreateCourse = func(w http.ResponseWriter, r *http.Request) {
 	payload["CreatedAt"] = course.CreatedAt
 	u.RespondJson(w, u.Response{Payload: payload}, http.StatusCreated)
 }
+
+var GetCourse = func(w http.ResponseWriter, r *http.Request) {
+
+}
+
+var GetCourses = func(w http.ResponseWriter, r *http.Request) {
+
+}
+
+var GetCourseAdmin = func(w http.ResponseWriter, r *http.Request) {
+
+}
+
+var GetCoursesAdmin = func(w http.ResponseWriter, r *http.Request) {
+	courses, err := srv.CourseService.FindAll()
+	if err != nil {
+		u.RespondJson(w, u.Response{Message: err.Error(), ErrorCode: u.ErrGeneral}, http.StatusOK)
+		return
+	}
+	u.RespondJson(w,  u.Response{Payload: courses},  http.StatusOK)
+}
