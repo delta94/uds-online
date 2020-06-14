@@ -15,6 +15,7 @@ import {
 import {ComponentSpinner} from "../components/spinner";
 import {getCourseUrl} from "../helpers/getUrl";
 import {Save} from "@material-ui/icons";
+import {TabLayout} from "../components/tabLayout";
 
 const HtmlEditor = lazy(() => import("../components/htmlEditor"));
 const MAX_LENGTH_TITLE = 80;
@@ -49,6 +50,9 @@ interface IRouteProps {
 	lesson_id?: string
 }
 
+const TAB_MAIN = "TAB_MAIN";
+const TAB_TASKS = "TAB_TASKS";
+
 const LessonPage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) => {
 	const {params: {course_id, lesson_id}} = match!;
 	const classes = useStyles();
@@ -79,111 +83,134 @@ const LessonPage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) => {
 		
 		return isValid;
 	};
-	return (
-		<PageWrapper heading={lesson_id ? "Редактирование раздела": "Добавить раздел"}>
-			<form autoComplete="off" spellCheck="false">
-				<FormControl fullWidth>
-					<TextField
-						id="input-title"
-						value={title}
-						label="Название раздела"
-						helperText={`${title.length}/${MAX_LENGTH_TITLE} символов. Минимальная длинна ${MIN_LENGTH_TITLE} символов.`}
-						fullWidth
-						required
-						inputProps={{
-							maxLength: MAX_LENGTH_TITLE,
-							minLength: MIN_LENGTH_TITLE,
+	
+	const tabContentMain = <>
+		<FormControl fullWidth>
+			<TextField
+				id="input-title"
+				value={title}
+				label="Название раздела"
+				helperText={`${title.length}/${MAX_LENGTH_TITLE} символов. Минимальная длинна ${MIN_LENGTH_TITLE} символов.`}
+				fullWidth
+				required
+				inputProps={{
+					maxLength: MAX_LENGTH_TITLE,
+					minLength: MIN_LENGTH_TITLE,
+				}}
+				onChange={(e) => setTitle(e.target.value)}
+			/>
+		</FormControl>
+		
+		<div className={classes.spacer}/>
+		
+		<FormControl fullWidth>
+			<TextField
+				id="textarea-annotation"
+				label="Краткое описание"
+				FormHelperTextProps={{variant: "standard"}}
+				multiline
+				fullWidth
+				required
+				helperText={`${annotation.length}/${MAX_LENGTH_ANNOTATION} символов. Минимальная длинна ${MIN_LENGTH_ANNOTATION} символов.`}
+				rows={3}
+				inputProps={{
+					maxLength: MAX_LENGTH_ANNOTATION,
+					minLength: MIN_LENGTH_ANNOTATION,
+				}}
+				value={annotation}
+				onChange={(e) => setAnnotation(e.target.value)}
+				variant="outlined"
+			/>
+		</FormControl>
+		
+		<div className={classes.spacer}/>
+		
+		<FormControl fullWidth>
+			<Suspense fallback={<ComponentSpinner/>}>
+				<Paper variant="outlined" className={classes.editorWrap}>
+					<Typography variant="subtitle1" className={classes.editorHeading}>
+						Содержание раздела (HTML)
+					</Typography>
+					<HtmlEditor
+						name="content-editor"
+						content={content}
+						onChange={onContentChange}
+						options={{
+							minLines: 15,
+							maxLines: 15,
+							showPrintMargin: false,
+							enableLiveAutocompletion: true,
+							enableBasicAutocompletion: false,
+							enableSnippets: false,
+							tabSize: 2,
+							fontSize: 14,
 						}}
-						onChange={(e) => setTitle(e.target.value)}
 					/>
-				</FormControl>
-				
-				<div className={classes.spacer}/>
-				
-				<FormControl fullWidth>
-					<TextField
-						id="textarea-annotation"
-						label="Краткое описание"
-						FormHelperTextProps={{variant:"standard"}}
-						multiline
-						fullWidth
-						required
-						helperText={`${annotation.length}/${MAX_LENGTH_ANNOTATION} символов. Минимальная длинна ${MIN_LENGTH_ANNOTATION} символов.`}
-						rows={3}
-						inputProps={{
-							maxLength: MAX_LENGTH_ANNOTATION,
-							minLength: MIN_LENGTH_ANNOTATION,
-						}}
-						value={annotation}
-						onChange={(e) => setAnnotation(e.target.value)}
-						variant="outlined"
-					/>
-				</FormControl>
-				
-				<div className={classes.spacer}/>
-				
-				<FormControl fullWidth>
-					<Suspense fallback={<ComponentSpinner />}>
-						<Paper variant="outlined" className={classes.editorWrap}>
-							<Typography variant="subtitle1" className={classes.editorHeading}>
-								Содержание раздела (HTML)
-							</Typography>
-							<HtmlEditor
-								name="content-editor"
-								content={content}
-								onChange={onContentChange}
-								options={{
-									minLines:15,
-									maxLines:15,
-									showPrintMargin: false,
-									enableLiveAutocompletion: true,
-									enableBasicAutocompletion: false,
-									enableSnippets: false,
-									tabSize: 2,
-									fontSize: 14,
-								}}
-							/>
-						</Paper>
-					</Suspense>
-				</FormControl>
-				
-				<FormControlLabel
-					control={
-						<Checkbox
-							checked={published}
-							onChange={() => setPublished(!published)}
-							name="chk-published"
-							color="primary"
-						/>
-					}
-					label="Опубликован"
+				</Paper>
+			</Suspense>
+		</FormControl>
+		
+		<FormControlLabel
+			control={
+				<Checkbox
+					checked={published}
+					onChange={() => setPublished(!published)}
+					name="chk-published"
+					color="primary"
 				/>
-				<FormControlLabel
-					control={
-						<Checkbox
-							checked={paid}
-							onChange={() => setPaid(!paid)}
-							name="chk-paid"
-							color="primary"
-						/>
-					}
-					label="Платный раздел"
+			}
+			label="Опубликован"
+		/>
+		<FormControlLabel
+			control={
+				<Checkbox
+					checked={paid}
+					onChange={() => setPaid(!paid)}
+					name="chk-paid"
+					color="primary"
+				/>
+			}
+			label="Платный раздел"
+		/>
+		<div className={classes.spacer}/>
+		<Divider/>
+		<div className={classes.buttonBar}>
+			<Button component={Link} to={getCourseUrl(course_id)} className={classes.cancelBtn}>Отмена</Button>
+			<Button disabled={!isFormValid()}
+					type="submit"
+					startIcon={<Save/>}
+					variant="contained"
+					color="primary">Создать</Button>
+		</div>
+	</>
+	
+	const tabContentTasks = <>
+		<Typography>
+			Менеджер заданий
+		</Typography>
+	</>
+	
+	return (
+		<PageWrapper heading={lesson_id ? "Редактирование раздела" : "Добавить раздел"}>
+			<form autoComplete="off" spellCheck="false">
+				<TabLayout
+					selected={TAB_MAIN}
+					tabs={[
+						{
+							id: 1,
+							label: "Основные параметры",
+							value: TAB_MAIN,
+							panelContent: tabContentMain
+						},
+						{
+							id: 2,
+							label: "Задания",
+							value: TAB_TASKS,
+							panelContent: tabContentTasks
+						}
+					]}
 				/>
 			</form>
-			
-			<div className={classes.spacer}/>
-			
-			<Divider />
-			
-			<div className={classes.buttonBar}>
-				<Button component={Link} to={getCourseUrl(course_id)} className={classes.cancelBtn}>Отмена</Button>
-				
-				<Button disabled={!isFormValid()}
-						type="submit"
-						startIcon={<Save/>}
-						variant="contained"
-						color="primary">Создать</Button>
-			</div>
 		</PageWrapper>
 	);
 };

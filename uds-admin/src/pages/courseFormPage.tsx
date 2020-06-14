@@ -26,7 +26,7 @@ import {ICourse} from "../reducers/courseReducer";
 
 const MAX_LENGTH_TITLE = 80;
 const MIN_LENGTH_TITLE = 10;
-const MAX_LENGTH_ANNOTATION = 500;
+const MAX_LENGTH_ANNOTATION = 700;
 const MIN_LENGTH_ANNOTATION = 10;
 const MAX_PRICE_VALUE = 9000;
 const MIN_PRICE_VALUE = 100;
@@ -101,7 +101,6 @@ const CourseFormPage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) => {
         if (price < MIN_PRICE_VALUE || price > MAX_PRICE_VALUE) {
             isValid = false;
         }
-        console.log("=>", oldState, published);
         // check if any change's been done
         if (course_id
             && oldState

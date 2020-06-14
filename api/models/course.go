@@ -4,11 +4,12 @@ import (
 	"fmt"
 	"github.com/jinzhu/gorm"
 	uuid "github.com/satori/go.uuid"
+	"unicode/utf8"
 )
 
 type Course struct {
 	gorm.Model
-	Title       string    `json:"title" gorm:"size:160;unique_index;not null"`
+	Title       string    `json:"title" gorm:"size:120;unique_index;not null"`
 	Annotation  string    `json:"annotation" gorm:"size:1000"`
 	Price       int       `json:"price"`
 	Lessons     []*Lesson `gorm:"foreignkey:CourseID"`
@@ -18,8 +19,8 @@ type Course struct {
 
 type Lesson struct {
 	gorm.Model
-	Title      string         `json:"title" gorm:"size:160;unique_index;not null"`
-	Annotation string         `json:"annotation" gorm:"size:400"`
+	Title      string         `json:"title" gorm:"size:120;unique_index;not null"`
+	Annotation string         `json:"annotation" gorm:"size:700"`
 	Paid       bool           `json:"paid"`
 	Published  bool           `json:"published"`
 	Content    *LessonContent `json:"content" gorm:"foreignkey:LessonID"`
@@ -34,6 +35,18 @@ type LessonContent struct {
 }
 
 func (course *Course) Validate() error {
+	if utf8.RuneCountInString(course.Title) < 10 {
+		return fmt.Errorf("title is too short")
+	}
+	if utf8.RuneCountInString(course.Title) > 80 {
+		return fmt.Errorf("title is too long")
+	}
+	if utf8.RuneCountInString(course.Annotation) < 10 {
+		return fmt.Errorf("annotation is too short")
+	}
+	if utf8.RuneCountInString(course.Annotation) > 500 {
+		return fmt.Errorf("annotation is too long")
+	}
 	if course.Price < 100 {
 		return fmt.Errorf("price is too low")
 	}

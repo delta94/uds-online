@@ -8,6 +8,7 @@ import (
 	"regexp"
 	"strings"
 	"time"
+	"unicode/utf8"
 )
 
 type JWTToken struct {
@@ -71,7 +72,7 @@ func (account *Account) Validate() error {
 		return fmt.Errorf("password is required")
 	}
 
-	if len(account.Password.Raw) < 6 {
+	if utf8.RuneCountInString(account.Password.Raw) < 6 {
 		return fmt.Errorf("password is too short")
 	}
 

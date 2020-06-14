@@ -1,13 +1,14 @@
-import React, {lazy, Suspense, useEffect, FC, useState} from "react";
+import React, {lazy, Suspense, useEffect, FC} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {createStyles, makeStyles, Theme} from "@material-ui/core/styles";
 import {IReducerState} from "../reducers";
 import {PageWrapper} from "../components/pageWrapper";
 import {get_users} from "../actions";
-import {Box, Button, Tab, Tabs} from "@material-ui/core";
+import {Button} from "@material-ui/core";
 import {Add} from "@material-ui/icons";
 import {ComponentSpinner} from "../components/spinner";
 import {ROLES} from "../constants";
+import {TabLayout} from "../components/tabLayout";
 
 const UserTable = lazy(() => import("../components/userTable"));
 
@@ -21,46 +22,12 @@ const useStyles = makeStyles((theme: Theme) =>
 	}),
 );
 
-interface TabPanelProps {
-	children?: React.ReactNode;
-	index: any;
-	value: any;
-}
-
-function TabPanel(props: TabPanelProps) {
-	const { children, value, index, ...other } = props;
-	
-	return (
-		<div
-			role="tabpanel"
-			hidden={value !== index}
-			id={`simple-tabpanel-${index}`}
-			aria-labelledby={`simple-tab-${index}`}
-			{...other}
-		>
-			{value === index && (
-				<>
-					{children}
-				</>
-			)}
-		</div>
-	);
-}
-
-function a11yProps(index: any) {
-	return {
-		id: `simple-tab-${index}`,
-		'aria-controls': `simple-tabpanel-${index}`,
-	};
-}
-
 const TAB_USERS = "TAB_USERS";
 const TAB_ASSISTANTS = "TAB_ASSISTANTS";
 
 const UsersPage: FC = () => {
 	const classes = useStyles();
 	const dispatch = useDispatch();
-	const [tab, setTab] = useState(TAB_USERS);
 	const usersState = useSelector((state: IReducerState) => state.users);
 	
 	useEffect(() => {
@@ -74,44 +41,51 @@ const UsersPage: FC = () => {
 	
 	return (
 		<PageWrapper heading="Учетные записи"
-					 actionArea={tab === TAB_ASSISTANTS && <Button
+					 actionArea={<Button
 						 color='primary'
 						 variant='contained'
 						 startIcon={<Add/>}
 						 type="button">Добавить ассистента</Button>}
 		>
-			<Tabs value={tab} onChange={(e, value) => setTab(value)} indicatorColor="primary">
-				<Tab value={TAB_USERS} label="Пользователи"{...a11yProps(TAB_USERS)} />
-				<Tab value={TAB_ASSISTANTS} label="Ассистенты" {...a11yProps(TAB_ASSISTANTS)} />
-			</Tabs>
-			<TabPanel value={tab} index={TAB_USERS}>
-				<Suspense fallback={<ComponentSpinner/>}>
-					<UserTable
-						role={ROLES.ROLE_USER}
-						users={usersState.users.items}
-						page={usersState.users.page}
-						size={usersState.users.size}
-						total={usersState.users.total}
-						onChangePage={
-							(e: React.ChangeEvent<unknown>, v: number) => handlePageChange(v, ROLES.ROLE_USER)
-						}
-					/>
-				</Suspense>
-			</TabPanel>
-			<TabPanel value={tab} index={TAB_ASSISTANTS}>
-				<Suspense fallback={<ComponentSpinner/>}>
-					<UserTable
-						role={ROLES.ROLE_ASSISTANT}
-						users={usersState.assistants.items}
-						page={usersState.assistants.page}
-						size={usersState.assistants.size}
-						total={usersState.assistants.total}
-						onChangePage={
-							(e: React.ChangeEvent<unknown>, v: number) => handlePageChange(v, ROLES.ROLE_ASSISTANT)
-						}
-					/>
-				</Suspense>
-			</TabPanel>
+			<TabLayout
+				selected={TAB_USERS}
+				tabs={[
+					{
+						id: 1,
+						value: TAB_USERS,
+						label: "Пользователи",
+						panelContent: <Suspense fallback={<ComponentSpinner/>}>
+							<UserTable
+								role={ROLES.ROLE_USER}
+								users={usersState.users.items}
+								page={usersState.users.page}
+								size={usersState.users.size}
+								total={usersState.users.total}
+								onChangePage={
+									(e: React.ChangeEvent<unknown>, v: number) => handlePageChange(v, ROLES.ROLE_USER)
+								}
+							/>
+						</Suspense>
+					},
+					{
+						id: 2,
+						label: "Ассистенты",
+						value: TAB_ASSISTANTS,
+						panelContent: <Suspense fallback={<ComponentSpinner/>}>
+							<UserTable
+								role={ROLES.ROLE_ASSISTANT}
+								users={usersState.assistants.items}
+								page={usersState.assistants.page}
+								size={usersState.assistants.size}
+								total={usersState.assistants.total}
+								onChangePage={
+									(e: React.ChangeEvent<unknown>, v: number) => handlePageChange(v, ROLES.ROLE_ASSISTANT)
+								}
+							/>
+						</Suspense>
+					}
+				]}
+			/>
 		</PageWrapper>
 	);
 }

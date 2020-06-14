@@ -5,13 +5,10 @@ import {IReducerState} from "../reducers";
 import {PageWrapper} from "../components/pageWrapper";
 import {RouteComponentProps, Link, withRouter} from "react-router-dom";
 import {Button} from "@material-ui/core";
-
 import {getAddLessonUrl, getEditCourseUrl} from "../helpers/getUrl";
-import {Add, Visibility, VisibilityOff, Edit} from "@material-ui/icons";
+import {Add, Edit} from "@material-ui/icons";
 import {ComponentSpinner} from "../components/spinner";
-
 import {Alert, AlertTitle} from "@material-ui/lab";
-import {ROUTES} from "../constants";
 import {get_course} from "../actions";
 
 const LessonTable = lazy(() => import("../components/lessonTable"));
@@ -89,7 +86,7 @@ export const CoursePage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) =>
                 Данный ресурс находится в не опубликованном состоянии.
                 Перед тем как пользователи сервиса смогут увидеть это курс, настоятельно рекомендуется проверить
                 корректность внутренних разделов и их содержания.
-                Чтобы опубликовать его, перейдите в раздел "Редактировать".
+                Чтобы опубликовать его, перейдите в раздел <strong>Редактировать</strong>.
             </Alert>}
             
             <Suspense fallback={<ComponentSpinner/>}>

@@ -37,6 +37,11 @@ var UpdateCourse = func(w http.ResponseWriter, r *http.Request) {
 		u.RespondJson(w, u.Response{Message: "Invalid request", ErrorCode: u.ErrGeneral}, http.StatusOK)
 		return
 	}
+	err = course.Validate()
+	if err != nil {
+		u.RespondJson(w, u.Response{Message: err.Error(), ErrorCode: u.ErrGeneral}, http.StatusOK)
+		return
+	}
 	fields := make(map[string]interface{})
 	fields["title"] = course.Title
 	fields["annotation"] = course.Annotation

@@ -1,7 +1,5 @@
-import React, {FC, useState} from "react";
-import {useDispatch, useSelector} from "react-redux";
+import React, {FC} from "react";
 import {createStyles, makeStyles, Theme} from "@material-ui/core/styles";
-import {IReducerState} from "../reducers";
 import {PageWrapper} from "../components/pageWrapper";
 import {Typography} from "@material-ui/core";
 
