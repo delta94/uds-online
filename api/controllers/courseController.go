@@ -2,7 +2,9 @@ package controllers
 
 import (
 	"encoding/json"
+	"github.com/gorilla/mux"
 	"net/http"
+	"strconv"
 	m "uds-online/api/models"
 	srv "uds-online/api/services"
 	u "uds-online/api/utils"
@@ -28,6 +30,28 @@ var CreateCourse = func(w http.ResponseWriter, r *http.Request) {
 	u.RespondJson(w, u.Response{Payload: payload}, http.StatusCreated)
 }
 
+var UpdateCourse = func(w http.ResponseWriter, r *http.Request) {
+	course := &m.Course{}
+	err := json.NewDecoder(r.Body).Decode(course)
+	if err != nil {
+		u.RespondJson(w, u.Response{Message: "Invalid request", ErrorCode: u.ErrGeneral}, http.StatusOK)
+		return
+	}
+	fields := make(map[string]interface{})
+	fields["title"] = course.Title
+	fields["annotation"] = course.Annotation
+	fields["price"] = course.Price
+	fields["assistant_id"] = course.AssistantID
+	fields["published"] = course.Published
+	err = srv.CourseService.Update(course.ID, fields)
+	if err != nil {
+		u.RespondJson(w, u.Response{Message: "Could not update course", ErrorCode: u.ErrGeneral}, http.StatusOK)
+		return
+	}
+	u.RespondJson(w, u.Response{Message: "Update complete"}, http.StatusOK)
+
+}
+
 var GetCourse = func(w http.ResponseWriter, r *http.Request) {
 
 }
@@ -37,11 +61,22 @@ var GetCourses = func(w http.ResponseWriter, r *http.Request) {
 }
 
 var GetCourseAdmin = func(w http.ResponseWriter, r *http.Request) {
-
+	params := mux.Vars(r)
+	id, err := strconv.Atoi(params["id"])
+	if err != nil {
+		u.RespondJson(w, u.Response{Message: "Invalid request"}, http.StatusOK)
+		return
+	}
+	course, err := srv.CourseService.GetForAdmin(uint(id))
+	if err != nil {
+		u.RespondJson(w, u.Response{Message: "Invalid request"}, http.StatusOK)
+		return
+	}
+	u.RespondJson(w, u.Response{Payload: course}, http.StatusOK)
 }
 
 var GetCoursesAdmin = func(w http.ResponseWriter, r *http.Request) {
-	courses, err := srv.CourseService.FindAll()
+	courses, err := srv.CourseService.FindAllForAdmin()
 	if err != nil {
 		u.RespondJson(w, u.Response{Message: err.Error(), ErrorCode: u.ErrGeneral}, http.StatusOK)
 		return

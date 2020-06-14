@@ -7,6 +7,7 @@ export const ROUTES = {
   COURSES: '/courses',
   COURSE_ADD: '/courses/add',
   COURSE: '/courses/:id',
+  COURSE_EDIT: '/courses/:id/edit',
   LESSON_ADD: '/courses/:course_id/lessons/add',
   LESSON_EDIT: '/courses/:course_id/lessons/:lesson_id',
   PURCHASES: '/purchases',

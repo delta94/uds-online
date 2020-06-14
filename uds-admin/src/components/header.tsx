@@ -33,12 +33,10 @@ const useStyles = makeStyles((theme) => ({
 		},
 	},
 	logout: {
-		color: '#FFFFFF',
-		backgroundColor: '#dc3545',
-		borderColor: '#dc3545',
+		color: theme.palette.danger.contrastText,
+		backgroundColor: theme.palette.danger.light,
 		['&:hover']: {
-			backgroundColor: '#c82333',
-			borderColor: '#bd2130',
+			backgroundColor: theme.palette.danger.main,
 		},
 		marginLeft: '1rem'
 	},
@@ -131,18 +129,6 @@ export const Header: FC<IHeaderProps> = ({onBurgerClick}) => {
 					<div className={classes.grow}/>
 					
 					<div className={classes.sectionDesktop}>
-						{/*
-						<IconButton color="inherit" component={Link} to={ROUTES.MESSAGES}>
-							{unreadMessages ?
-								<Badge badgeContent={unreadMessages} color="secondary">
-									<Mail/>
-								</Badge>
-								:
-								<Mail />
-							}
-						</IconButton>
-						*/}
-						
 						<Button variant="outlined" size="medium" className={classes.logout} onClick={() => dispatch(log_out())}>
 							Log out
 						</Button>

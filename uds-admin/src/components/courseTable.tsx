@@ -64,12 +64,9 @@ const CourseRow: FC<ICourseRowProps> = ({course}) => {
             </TableCell>
             <TableCell align="right" className={classes.textCenter}>{price}</TableCell>
             <TableCell align="right">
-                <IconButton title="Редактировать" color="primary" aria-label="edit" component={Link} to={getCourseUrl(ID.toString())}>
-                    <Edit/>
-                </IconButton>
-                {/*<Button component={Link} to={getCourseUrl(ID.toString())} variant="contained" color="primary">*/}
-                {/*    Открыть*/}
-                {/*</Button>*/}
+                <Button component={Link} to={getCourseUrl(ID.toString())} variant="contained" color="primary">
+                    Перейти
+                </Button>
             </TableCell>
         </TableRow>
     )

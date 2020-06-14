@@ -23,7 +23,7 @@ const MessagesPage = lazy(() => import("./pages/messagesPage"));
 const MessageDetailedPage = lazy(() => import("./pages/messagePage"));
 const CoursePage = lazy(() => import("./pages/coursePage"));
 const CoursesPage = lazy(() => import("./pages/coursesPage"));
-const CourseAddPage = lazy(() => import("./pages/courseAddPage"));
+const CourseFormPage = lazy(() => import("./pages/courseFormPage"));
 const LessonPage = lazy(() => import("./pages/lessonPage"));
 const NotFoundPage = lazy(() => import("./pages/notFoundPage"));
 
@@ -104,7 +104,12 @@ function App() {
 						<PrivateRoute exact
 									  roles={[ROLE_ADMIN]}
 									  path={ROUTES.COURSE_ADD}
-									  component={() => <Layout><CourseAddPage /></Layout>}
+									  component={() => <Layout><CourseFormPage /></Layout>}
+						/>
+						<PrivateRoute exact
+									  roles={[ROLE_ADMIN]}
+									  path={ROUTES.COURSE_EDIT}
+									  component={() => <Layout><CourseFormPage /></Layout>}
 						/>
 						<PrivateRoute exact
 									  roles={[ROLE_ADMIN]}

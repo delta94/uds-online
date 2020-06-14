@@ -13,14 +13,16 @@ import {
     Tooltip
 } from "@material-ui/core";
 import {createStyles, makeStyles, Theme} from "@material-ui/core/styles";
-import {Link} from "react-router-dom";
+import {Link, RouteComponentProps, withRouter} from "react-router-dom";
 import {ROUTES} from "../constants";
 import {Save, Info} from "@material-ui/icons";
 import {Alert} from "@material-ui/lab";
 import {useDispatch, useSelector} from "react-redux";
-import {create_course, get_assistants, popup_snack} from "../actions";
+import {create_course, get_assistants, get_course, popup_snack, update_course} from "../actions";
 import history from "../history";
 import {IUser} from "../reducers/usersReducer";
+import {getCourseUrl} from "../helpers/getUrl";
+import {ICourse} from "../reducers/courseReducer";
 
 const MAX_LENGTH_TITLE = 120;
 const MIN_LENGTH_TITLE = 10;
@@ -52,21 +54,39 @@ const useStyles = makeStyles((theme: Theme) =>
     }),
 );
 
-const CourseAddPage: FC = () => {
+interface IRouteProps {
+    id?: string
+}
+
+const CourseFormPage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) => {
     const classes = useStyles();
+    const {params: {id: course_id}} = match!;
     const [title, setTitle] = useState<string>("");
     const [annotation, setAnnotation] = useState<string>("");
     const [assistantID, setAssistantID] = React.useState<string>("");
     const [assistants, setAssistants] = React.useState<IUser[]>([]);
     const [price, setPrice] = useState<number>(1000);
+    const [published, setPublished] = useState<boolean>(false);
     const dispatch = useDispatch();
-
+    const [oldState, setOldState] = useState<ICourse | undefined>();
+    
     useEffect(() => {
         dispatch(get_assistants((assistants) => {
             setAssistants(assistants);
+            if (course_id) {
+                // prefetch course data
+                dispatch(get_course(course_id, (c => {
+                    setAnnotation(c.annotation);
+                    setTitle(c.title);
+                    setAssistantID(c.assistant_id);
+                    setPublished(c.published);
+                    setPrice(c.price);
+                    setOldState(c);
+                })));
+            }
         }));
-    }, [])
-
+    }, []);
+    
     const isFormValid = (): boolean => {
         let isValid = true;
         if (!title.trim() || title.length < MIN_LENGTH_TITLE || title.length > MAX_LENGTH_TITLE) {
@@ -81,22 +101,44 @@ const CourseAddPage: FC = () => {
         if (price < MIN_PRICE_VALUE || price > MAX_PRICE_VALUE) {
             isValid = false;
         }
+        console.log("=>", oldState, published);
+        // check if any change's been done
+        if (course_id
+            && oldState
+            && title.trim() === oldState.title
+            && price === oldState.price
+            && annotation.trim() === oldState.annotation
+            && assistantID === oldState.assistant_id
+            && published === oldState.published
+        ) {
+            isValid = false;
+        }
         return isValid;
     };
 
     const onSubmit = (e: React.SyntheticEvent | React.FormEvent) => {
         e.preventDefault();
-        if (isFormValid()) {
+        if (!isFormValid()) {
+           return;
+        }
+        if (course_id) {
+            // update course
+            dispatch(update_course(Number(course_id), title, annotation, price, assistantID, published, () => {
+                dispatch(popup_snack(`Курс "${title}" успешно обновлен`));
+                history.push(getCourseUrl(course_id));
+            }));
+        } else {
+            // create post
             dispatch(create_course(title, annotation, price, assistantID, (course) => {
-                dispatch(popup_snack(`Курс ${course.title} был успешно создан`));
+                dispatch(popup_snack(`Курс "${course.title}" был успешно создан`));
                 history.push(ROUTES.COURSES);
             }));
         }
     };
 
     return (
-        <PageWrapper heading="Добавить курс">
-            <form onSubmit={onSubmit}>
+        <PageWrapper heading={course_id ? "Редактрование курса" : "Добавить курс"}>
+            <form onSubmit={onSubmit} autoComplete="off">
                 <FormControl fullWidth>
                     <TextField
                         id="input-title"
@@ -188,10 +230,24 @@ const CourseAddPage: FC = () => {
 
                 <div className={classes.spacer}/>
 
-                <Alert severity="info">
-                    Внимание! По-умолчанию, созданый курс находится в не опубликованном состоянии.
-                </Alert>
-
+                {!course_id ?
+                    <Alert severity="info">
+                        Внимание! По-умолчанию, созданый курс находится в не опубликованном состоянии.
+                    </Alert>
+                    :
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={published}
+                                onChange={() => setPublished(!published)}
+                                name="chk-published"
+                                color="primary"
+                            />
+                        }
+                        label="Опубликован"
+                    />
+                }
+    
                 <div className={classes.spacer}/>
 
                 <Divider/>
@@ -203,7 +259,9 @@ const CourseAddPage: FC = () => {
                             type="submit"
                             startIcon={<Save/>}
                             variant="contained"
-                            color="primary">Создать</Button>
+                            color="primary">
+                        {course_id ? "Сохранить": "Создать"}
+                    </Button>
                 </div>
             </form>
 
@@ -211,4 +269,4 @@ const CourseAddPage: FC = () => {
     );
 };
 
-export default CourseAddPage;
+export default withRouter(CourseFormPage);

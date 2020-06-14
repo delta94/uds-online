@@ -22,6 +22,23 @@ func (s *courseService) Create(model *m.Course) error {
 	return nil
 }
 
+func (s *courseService) Update(id uint, fields map[string]interface{}) error {
+	query := m.GetDB().
+		Table(s.TableName).
+		Where("id = ?", id).
+		Update(fields)
+
+	err := query.Error
+	if query.RowsAffected == 0 {
+		return fmt.Errorf("no records updated")
+	}
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+
 func (s *courseService) Find(offset int, limit int) (data []*m.Course, total uint) {
 	objs := make([]*m.Course, 0)
 	query := m.GetDB().
@@ -41,7 +58,17 @@ func (s *courseService) Find(offset int, limit int) (data []*m.Course, total uin
 	return objs, total
 }
 
-func (s *courseService) FindAll() ([]*m.Course, error) {
+
+func (s *courseService) GetForAdmin(id uint) (*m.Course, error) {
+	o := &m.Course{}
+	err := m.GetDB().Table(s.TableName).Take(o, "id = ?", id).Error
+	if err != nil {
+		return nil, err
+	}
+	return o, nil
+}
+
+func (s *courseService) FindAllForAdmin() ([]*m.Course, error) {
 	objs := make([]*m.Course, 0)
 	query := m.GetDB().
 		Order("created_at desc").

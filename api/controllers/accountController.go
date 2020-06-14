@@ -75,7 +75,7 @@ var GetAccount = func(w http.ResponseWriter, r *http.Request) {
 		u.RespondJson(w, u.Response{Message: "Not found"}, http.StatusOK)
 		return
 	}
-	u.RespondJson(w, account, http.StatusOK)
+	u.RespondJson(w, u.Response{Payload: account}, http.StatusOK)
 }
 
 var GetAccounts = func(w http.ResponseWriter, r *http.Request) {

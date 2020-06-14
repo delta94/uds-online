@@ -166,7 +166,7 @@ export const get_assistants = (callback: (assistants: IUser[]) => void) => {
 	};
 };
 
-export const create_course = (title: string, annotation: string, price: number, assistant_id: string, callback?: (course: CreateCourseResponse) => void) => {
+export const create_course = (title: string, annotation: string, price: number, assistant_id: string, callback: (course: CreateCourseResponse) => void) => {
 	return (dispatch: Dispatch) => {
 		return api_request<CreateCourseResponse>({
 			method: "POST",
@@ -175,10 +175,35 @@ export const create_course = (title: string, annotation: string, price: number, 
 			version: 1
 		})
 			.then((course) => {
-				if (callback) {
-					callback(course);
-				}
+				callback(course);
 			})
+	}
+}
+
+export const update_course = (id: number, title: string, annotation: string, price: number, assistant_id: string, published: boolean, callback: () => void) => {
+	return (dispatch: Dispatch) => {
+		return api_request<any>({
+			method: "PUT",
+			url: `admin/courses`,
+			data: {ID: id, title, annotation, price, assistant_id, published},
+			version: 1
+		})
+			.then(() => {
+				callback();
+			})
+	}
+}
+
+export const get_course = (id: string, callback: (course: ICourse) => void) => {
+	return (dispatch: Dispatch) => {
+		return api_request<ICourse>({
+			method: "GET",
+			url: `admin/courses/${id}`,
+			version: 1
+		})
+			.then((course) => {
+				callback(course);
+			});
 	}
 }
 

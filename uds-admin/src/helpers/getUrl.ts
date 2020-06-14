@@ -17,3 +17,7 @@ export function getEditLessonUrl(course_id: string, lesson_id: string): string{
 export function getCourseUrl(id: string): string {
 	return `${ROUTES.COURSES}/${id}`;
 }
+
+export function getEditCourseUrl(id: string): string {
+	return ROUTES.COURSE_EDIT.replace(/:id/, id);
+}
