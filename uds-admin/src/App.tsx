@@ -25,6 +25,8 @@ const CoursePage = lazy(() => import("./pages/coursePage"));
 const CoursesPage = lazy(() => import("./pages/coursesPage"));
 const CourseFormPage = lazy(() => import("./pages/courseFormPage"));
 const LessonPage = lazy(() => import("./pages/lessonPage"));
+const AssetsPage = lazy(() => import("./pages/assetsPage"));
+const TradePage = lazy(() => import("./pages/tradePage"));
 const NotFoundPage = lazy(() => import("./pages/notFoundPage"));
 
 const {ROLE_ADMIN, ROLE_ASSISTANT} = ROLES;
@@ -87,16 +89,6 @@ function App() {
 									  component={() => <Layout><HomePage/></Layout>}
 						/>
 						<PrivateRoute exact
-									  roles={[ROLE_ADMIN, ROLE_ASSISTANT]}
-									  path={ROUTES.MESSAGES}
-									  component={() => <Layout><MessagesPage/></Layout>}
-						/>
-						<PrivateRoute exact
-									  roles={[ROLE_ADMIN, ROLE_ASSISTANT]}
-									  path={ROUTES.MESSAGE}
-									  component={() => <Layout><MessageDetailedPage/></Layout>}
-						/>
-						<PrivateRoute exact
 									  roles={[ROLE_ADMIN]}
 									  path={ROUTES.COURSES}
 									  component={() => <Layout><CoursesPage /></Layout>}
@@ -130,6 +122,27 @@ function App() {
 									  roles={[ROLE_ADMIN]}
 									  path={ROUTES.USERS}
 									  component={() => <Layout><UsersPage /></Layout>}
+						/>
+						
+						<PrivateRoute exact
+									  roles={[ROLE_ADMIN]}
+									  path={ROUTES.ASSETS}
+									  component={() => <Layout><AssetsPage /></Layout>}
+						/>
+						<PrivateRoute exact
+									  roles={[ROLE_ADMIN]}
+									  path={ROUTES.PURCHASES}
+									  component={() => <Layout><TradePage /></Layout>}
+						/>
+						<PrivateRoute exact
+									  roles={[ROLE_ADMIN, ROLE_ASSISTANT]}
+									  path={ROUTES.MESSAGES}
+									  component={() => <Layout><MessagesPage/></Layout>}
+						/>
+						<PrivateRoute exact
+									  roles={[ROLE_ADMIN, ROLE_ASSISTANT]}
+									  path={ROUTES.MESSAGE}
+									  component={() => <Layout><MessageDetailedPage/></Layout>}
 						/>
 						<Route exact component={() => <Layout><NotFoundPage /></Layout>}/>
 					</Switch>
