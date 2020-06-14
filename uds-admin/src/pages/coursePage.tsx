@@ -16,10 +16,10 @@ import {get_course} from "../actions";
 
 const LessonTable = lazy(() => import("../components/lessonTable"));
 
-
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         buttonBar: {
+            flexShrink: 0,
             ['& > *']: {
                 marginLeft: 5,
             }
@@ -44,12 +44,14 @@ interface IRouteProps {
 export const CoursePage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) => {
     const classes = useStyles();
     const dispatch = useDispatch();
+    const [title, setTitle] = useState<string>("");
     const [published, setPublished] = useState<boolean>(true);
     const lessonState = useSelector((state: IReducerState) => state.lessons);
     const {params: {id}} = match!;
     
     useEffect(() => {
-        dispatch(get_course(id, (c => {
+        dispatch(get_course(id, ((c) => {
+            setTitle(`"${c.title}"`);
             setPublished(c.published);
         })));
     }, []);
@@ -79,16 +81,20 @@ export const CoursePage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) =>
     
     return (
         <PageWrapper
-            heading="Содержание курса"
+            heading={"Курс " + title}
             actionArea={buttonArea}
         >
             {!published && <Alert severity="warning" className={classes.publishAlert}>
                 <AlertTitle>Внимание</AlertTitle>
-                Данный курс находится в не опубликованном состоянии. Чтобы опубликовать его, перейдите в раздел "Редактировать".
+                Данный ресурс находится в не опубликованном состоянии.
+                Перед тем как пользователи сервиса смогут увидеть это курс, настоятельно рекомендуется проверить
+                корректность внутренних разделов и их содержания.
+                Чтобы опубликовать его, перейдите в раздел "Редактировать".
             </Alert>}
             
             <Suspense fallback={<ComponentSpinner/>}>
                 <LessonTable
+                    course_id={id}
                     total={lessonState.total}
                     size={lessonState.size}
                     page={lessonState.page}

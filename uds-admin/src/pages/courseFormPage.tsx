@@ -24,7 +24,7 @@ import {IUser} from "../reducers/usersReducer";
 import {getCourseUrl} from "../helpers/getUrl";
 import {ICourse} from "../reducers/courseReducer";
 
-const MAX_LENGTH_TITLE = 120;
+const MAX_LENGTH_TITLE = 80;
 const MIN_LENGTH_TITLE = 10;
 const MAX_LENGTH_ANNOTATION = 500;
 const MIN_LENGTH_ANNOTATION = 10;
@@ -137,7 +137,7 @@ const CourseFormPage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) => {
     };
 
     return (
-        <PageWrapper heading={course_id ? "Редактрование курса" : "Добавить курс"}>
+        <PageWrapper heading={course_id ? "Редактирование курса" : "Добавить курс"}>
             <form onSubmit={onSubmit} autoComplete="off">
                 <FormControl fullWidth>
                     <TextField

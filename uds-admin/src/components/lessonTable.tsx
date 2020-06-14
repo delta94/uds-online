@@ -2,8 +2,21 @@ import React, {FC} from "react";
 import {createStyles, makeStyles, Theme} from "@material-ui/core/styles";
 import {IPagination} from "../helpers/models";
 import {ILesson} from "../reducers/lessonsReducer";
-import {Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@material-ui/core";
+import {
+	Button,
+	IconButton,
+	Paper,
+	Table,
+	TableBody,
+	TableCell,
+	TableContainer,
+	TableHead,
+	TableRow
+} from "@material-ui/core";
 import {Pagination} from "@material-ui/lab";
+import {Link} from "react-router-dom";
+import {getCourseUrl, getEditLessonUrl} from "../helpers/getUrl";
+import {Edit} from "@material-ui/icons";
 
 
 const ITEM_HEIGHT = 48;
@@ -34,16 +47,18 @@ const useStyles = makeStyles((theme: Theme) =>
 
 
 interface ILessonTableProps extends IPagination {
+	course_id: string,
 	lessons: ILesson[],
 	onChangePage: (e: React.ChangeEvent<unknown>, v: number) => void
 }
 
 interface ILessonRowProps {
+	course_id: string,
 	lesson: ILesson
 }
 
-
-export const LessonRow: FC<ILessonRowProps> = ({lesson}) => {
+export const LessonRow: FC<ILessonRowProps> = ({course_id, lesson}) => {
+	const {ID} = lesson;
 	return (
 		<>
 			<TableRow>
@@ -53,6 +68,11 @@ export const LessonRow: FC<ILessonRowProps> = ({lesson}) => {
 				<TableCell align="right"> </TableCell>
 				<TableCell align="right"> </TableCell>
 				<TableCell align="right"> </TableCell>
+				<TableCell align="right">
+					<IconButton component={Link} to={getEditLessonUrl(course_id, String(ID))}>
+						<Edit />
+					</IconButton>
+				</TableCell>
 			</TableRow>
 		</>
 	);
@@ -60,7 +80,7 @@ export const LessonRow: FC<ILessonRowProps> = ({lesson}) => {
 
 const LessonTable: FC<ILessonTableProps> = (props) => {
 	const classes = useStyles();
-	const {lessons, page, total, onChangePage, size} = props;
+	const {course_id, lessons, page, total, onChangePage, size} = props;
 	const count = Math.ceil(total / size) || 1;
 	
 	return (
@@ -69,10 +89,11 @@ const LessonTable: FC<ILessonTableProps> = (props) => {
 				<Table className={classes.table}>
 					<TableHead>
 						<TableRow>
-							<TableCell>Email</TableCell>
-							<TableCell align="right">Создан</TableCell>
+							<TableCell>Название</TableCell>
+							<TableCell align="right">Платный</TableCell>
+							<TableCell align="right">Опубликован</TableCell>
+							<TableCell align="right">Заданий</TableCell>
 							<TableCell align="right" className={classes.actionColumn}> </TableCell>
-							<TableCell align="right"> </TableCell>
 						</TableRow>
 					</TableHead>
 					<TableBody>
@@ -80,6 +101,7 @@ const LessonTable: FC<ILessonTableProps> = (props) => {
 							return (
 								<LessonRow
 									key={lesson.ID}
+									course_id={course_id}
 									lesson={lesson}
 								/>
 							)

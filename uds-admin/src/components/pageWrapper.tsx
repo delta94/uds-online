@@ -7,7 +7,7 @@ const useStyles = makeStyles((theme: Theme) =>
 		wrap: {
 			display: 'flex',
 			marginBottom: 10,
-			alignItems: 'center'
+			alignItems: 'flex-start'
 		},
 		heading: {
 			marginRight: 10,
@@ -30,7 +30,7 @@ export const PageWrapper: FC<IPageWrapperProps> = ({heading, actionArea, childre
 	return (
 		<>
 			{heading && <div className={classes.wrap}>
-				<Typography variant="h5" className={classes.heading}>{heading}</Typography>
+				<Typography variant="h6" className={classes.heading}>{heading}</Typography>
 				{actionArea}
 				<Divider className={classes.divider}/>
 			</div>}
