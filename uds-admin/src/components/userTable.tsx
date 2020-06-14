@@ -26,7 +26,7 @@ import {change_block, get_users, manual_email_confirm, popup_snack} from "../act
 
 
 const ITEM_HEIGHT = 48;
-const MSG_BLOCK_USER = "Данный пользователь будет заблокирован. Он не сможет войти в систему до тех пор, пока вы не восстановите ему доступ. Продолжить?";
+const MSG_BLOCK_USER = "Указанная учетная запись будет заблокирована. Её нельзя будет использовать для входа в систему до тех пор, пока вы её не разблокируете. Продолжить?";
 const MSG_CONF_EMAIL = "Указанный для данной учетной записи Email будет отмечен как подтвержденный. Продолжить?";
 
 const useStyles = makeStyles((theme: Theme) =>

@@ -10,7 +10,7 @@ export const ROUTES = {
   COURSE_EDIT: '/courses/:id/edit',
   LESSON_ADD: '/courses/:course_id/lessons/add',
   LESSON_EDIT: '/courses/:course_id/lessons/:lesson_id',
-  PURCHASES: '/purchases',
+  SALES: '/sales',
   LOGIN: '/login',
   FORGOT: `${process.env.REACT_APP_PUBLIC}/forgot`
 } as const;

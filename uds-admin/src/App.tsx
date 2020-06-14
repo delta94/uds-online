@@ -131,7 +131,7 @@ function App() {
 						/>
 						<PrivateRoute exact
 									  roles={[ROLE_ADMIN]}
-									  path={ROUTES.PURCHASES}
+									  path={ROUTES.SALES}
 									  component={() => <Layout><TradePage /></Layout>}
 						/>
 						<PrivateRoute exact

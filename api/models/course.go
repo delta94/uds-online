@@ -35,17 +35,19 @@ type LessonContent struct {
 }
 
 func (course *Course) Validate() error {
-	if utf8.RuneCountInString(course.Title) < 10 {
-		return fmt.Errorf("title is too short")
+	aLength := utf8.RuneCountInString(course.Annotation)
+	tLength := utf8.RuneCountInString(course.Title)
+	if tLength < 10 {
+		return fmt.Errorf("title is too short (%v)", tLength)
 	}
-	if utf8.RuneCountInString(course.Title) > 80 {
-		return fmt.Errorf("title is too long")
+	if tLength > 80 {
+		return fmt.Errorf("title is too long (%v)", tLength)
 	}
-	if utf8.RuneCountInString(course.Annotation) < 10 {
-		return fmt.Errorf("annotation is too short")
+	if aLength < 10 {
+		return fmt.Errorf("annotation is too short (%v)", aLength)
 	}
-	if utf8.RuneCountInString(course.Annotation) > 500 {
-		return fmt.Errorf("annotation is too long")
+	if aLength > 700 {
+		return fmt.Errorf("annotation is too long (%v)", aLength)
 	}
 	if course.Price < 100 {
 		return fmt.Errorf("price is too low")
