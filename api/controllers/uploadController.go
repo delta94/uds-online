@@ -31,6 +31,7 @@ var HandleLocalUpload = func(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println("Wrong file size limit", err.Error())
 		u.RespondJson(w, u.Response{Message: "Could not upload file. File size limit is wrong", ErrorCode: u.ErrGeneral}, http.StatusOK)
+		return
 	}
 	err = r.ParseMultipartForm(int64(1024 * 1024 * maxSizeMB))
 	if err != nil {
