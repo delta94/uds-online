@@ -52,6 +52,11 @@ func main() {
 	router.Handle(mw.Routes["v1"]["courses"]+"/{id}", mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.GetCourse), []int{mw.RoleUser}))).Methods("GET", "OPTIONS")
 	router.Handle(mw.Routes["v1"]["courses"], mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.GetCourses), []int{mw.RoleUser}))).Methods("GET", "OPTIONS")
 
+	// create lesson
+	router.Handle(mw.Routes["v1"]["lessons"], mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.CreateLesson), []int{mw.RoleAdmin}))).Methods("POST", "OPTIONS")
+	router.Handle(mw.Routes["v1"]["adminLessons"]+"/{id}", mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.GetLessonAdmin), []int{mw.RoleAdmin}))).Methods("GET", "OPTIONS")
+
+
 	// get purchases
 	router.Handle(mw.Routes["v1"]["purchases"], mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.GetPurchases), []int{mw.RoleAdmin}))).Methods("GET", "OPTIONS")
 	// create purchase

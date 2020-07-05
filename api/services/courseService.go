@@ -14,7 +14,7 @@ func (s *courseService) Create(model *m.Course) error {
 		return err
 	}
 	if err := m.GetDB().Create(model).Error; err != nil {
-		return fmt.Errorf("could not create course")
+		return err
 	}
 	if model.ID == 0 {
 		return fmt.Errorf("failed to create course, connection error")

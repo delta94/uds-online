@@ -18,6 +18,7 @@ import history from "../history";
 import {ROLES, ROUTES} from "../constants";
 import store from "../store";
 import {CreateCourseResponse, GetCoursesResponse, ICourse} from "../reducers/courseReducer";
+import {ILesson, ILessonTask} from "../reducers/lessonsReducer";
 
 export const log_in = (token: string, userID: string, role: number): IAction<ILoginPayload> => {
 	return {
@@ -235,6 +236,37 @@ export const get_courses = () => {
 			});
 	};
 }
+
+export const create_lesson = (course_id: number, annotation: string, content: string, title: string, paid: boolean, tasks: ILessonTask[], callback: (lesson: ILesson) => void) => {
+	const data = {
+		title,
+		annotation,
+		paid,
+		content,
+		course_id,
+		tasks
+	};
+	return (dispatch: Dispatch) => {
+		return api_request<any>({
+			method: "POST",
+			url: `lessons`,
+			data,
+			version: 1,
+		})
+			.then((lesson) => {
+				callback(lesson);
+			});
+	};
+};
+
+export const update_lesson = (annotation: string, content: string, title: string, paid: boolean, published: boolean) => {
+	return (dispatch: Dispatch) => {
+		return api_request({
+			method: "POST",
+			url: ``,
+		});
+	};
+};
 
 export const create_purchase = (course_id: number, account_id: string, sum: number, order: number, callback: () => void) => {
 	const data = {

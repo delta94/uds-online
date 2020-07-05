@@ -22,7 +22,7 @@ var CreatePurchase = func(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	p := make(map[string]interface{})
-	p["id"] = purchase.ID.String()
+	p["ID"] = purchase.ID.String()
 	p["sum"] = purchase.Sum
 	p["course_id"] = purchase.CourseID
 

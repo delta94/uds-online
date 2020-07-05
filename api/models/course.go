@@ -19,7 +19,7 @@ type Course struct {
 
 type Lesson struct {
 	gorm.Model
-	Title      string         `json:"title" gorm:"size:120;unique_index;not null"`
+	Title      string         `json:"title" gorm:"size:120;index:lesson_idx;not null"`
 	Annotation string         `json:"annotation" gorm:"size:700"`
 	Paid       bool           `json:"paid"`
 	Published  bool           `json:"published"`
@@ -32,6 +32,13 @@ type LessonContent struct {
 	Body     string        `json:"content" gorm:"size:16000"`
 	Tasks    []*LessonTask `json:"tasks" gorm:"foreignkey:LessonContentID"`
 	LessonID uint          `json:"-"`
+}
+
+type LessonTask struct {
+	gorm.Model
+	Type            int    `json:"type"`
+	Data            string `json:"data" gorm:""`
+	LessonContentID uint   `json:"-"`
 }
 
 func (course *Course) Validate() error {

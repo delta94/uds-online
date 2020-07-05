@@ -2,7 +2,7 @@ import {AnyAction} from "redux";
 import {IPagination} from "../helpers/models";
 
 export interface ILessonTask {
-	ID: number,
+	ID?: number,
 	type: number,
 	data: string
 }

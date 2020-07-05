@@ -16,6 +16,10 @@ import {ComponentSpinner} from "../components/spinner";
 import {getCourseUrl} from "../helpers/getUrl";
 import {Save} from "@material-ui/icons";
 import {TabLayout} from "../components/tabLayout";
+import {useDispatch} from "react-redux";
+import {create_course, create_lesson, popup_snack} from "../actions";
+import history from "../history";
+import {ROUTES} from "../constants";
 
 const HtmlEditor = lazy(() => import("../components/htmlEditor"));
 const MAX_LENGTH_TITLE = 80;
@@ -56,13 +60,13 @@ const TAB_TASKS = "TAB_TASKS";
 const LessonPage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) => {
 	const {params: {course_id, lesson_id}} = match!;
 	const classes = useStyles();
-	
 	const [title, setTitle] = useState<string>("");
 	const [annotation, setAnnotation] = useState<string>("");
 	const [content, setContent] = useState<string>("");
 	const [published, setPublished] = useState<boolean>(true);
 	const [paid, setPaid] = useState<boolean>(true);
-	
+	const dispatch = useDispatch();
+
 	useEffect(() => {
 		if (lesson_id) {
 			console.log("ID ", lesson_id);
@@ -83,12 +87,17 @@ const LessonPage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) => {
 		
 		return isValid;
 	};
+
 	const onSubmit = (e: FormEvent) => {
+		e.preventDefault();
 		if (!isFormValid()) {
-			e.preventDefault();
 			return;
 		}
-		
+		dispatch(create_lesson(Number(course_id), annotation, content, title, paid, [], (lesson) => {
+			dispatch(popup_snack(`Раздел успешно создан`));
+			history.push(getCourseUrl(course_id));
+			console.log(111)
+		}));
 	};
 	
 	const tabContentMain = <>
