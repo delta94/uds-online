@@ -86,5 +86,15 @@ var GetCoursesAdmin = func(w http.ResponseWriter, r *http.Request) {
 		u.RespondJson(w, u.Response{Message: err.Error(), ErrorCode: u.ErrGeneral}, http.StatusOK)
 		return
 	}
-	u.RespondJson(w,  u.Response{Payload: courses},  http.StatusOK)
+	u.RespondJson(w, u.Response{Payload: courses}, http.StatusOK)
+}
+
+var CreateLesson = func(w http.ResponseWriter, r *http.Request) {
+	lesson := &m.Lesson{}
+	err := json.NewDecoder(r.Body).Decode(lesson)
+	if err != nil {
+		u.RespondJson(w, u.Response{Message: "Invalid request", ErrorCode: u.ErrGeneral}, http.StatusOK)
+		return
+	}
+
 }

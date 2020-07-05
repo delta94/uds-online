@@ -106,8 +106,18 @@ var GetAccounts = func(w http.ResponseWriter, r *http.Request) {
 	u.RespondJson(w, u.PaginatedResponse{Payload: u.PaginatedResponsePayload{Size: limit, Page: offset, Total: total, Data: accounts}}, http.StatusOK)
 }
 
-var GetAssistants = func(w http.ResponseWriter, r *http.Request) {
-	accounts, err := s.AccountService.GetAssistants()
+var GetUsersPlain = func(w http.ResponseWriter, r *http.Request) {
+	accounts, err := s.AccountService.GetPlainList(middleware.RoleUser)
+	if err != nil {
+		log.Printf("Error! Cound not fetch users")
+		u.RespondJson(w, u.Response{Message: "An Error occurred", ErrorCode: u.ErrGeneral}, http.StatusOK)
+		return
+	}
+	u.RespondJson(w, u.Response{Payload: accounts}, http.StatusOK)
+}
+
+var GetAssistantsPlain = func(w http.ResponseWriter, r *http.Request) {
+	accounts, err := s.AccountService.GetPlainList(middleware.RoleAssistant)
 	if err != nil {
 		log.Printf("Error! Cound not fetch assistants")
 		u.RespondJson(w, u.Response{Message: "An Error occurred", ErrorCode: u.ErrGeneral}, http.StatusOK)

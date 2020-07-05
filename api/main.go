@@ -31,7 +31,8 @@ func main() {
 
 	// Secure Routes
 	router.Handle(mw.Routes["v1"]["accounts"], mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.GetAccounts), []int{mw.RoleAdmin}))).Methods("GET", "OPTIONS")
-	router.Handle(mw.Routes["v1"]["accounts"]+"/assistants", mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.GetAssistants), []int{mw.RoleAdmin}))).Methods("GET", "OPTIONS")
+	router.Handle(mw.Routes["v1"]["accounts"]+"/users", mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.GetUsersPlain), []int{mw.RoleAdmin}))).Methods("GET", "OPTIONS")
+	router.Handle(mw.Routes["v1"]["accounts"]+"/assistants", mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.GetAssistantsPlain), []int{mw.RoleAdmin}))).Methods("GET", "OPTIONS")
 	router.Handle(mw.Routes["v1"]["accounts"]+"/confirm", mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.ManualEmailConfirm), []int{mw.RoleAdmin}))).Methods("POST")
 	router.Handle(mw.Routes["v1"]["accounts"]+"/change-block", mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.ChangeAccountBlockState), []int{mw.RoleAdmin}))).Methods("POST")
 	router.Handle(mw.Routes["v1"]["accounts"]+"/{id}", mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.GetAccount), []int{mw.RoleAdmin}))).Methods("GET", "OPTIONS")

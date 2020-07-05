@@ -177,12 +177,12 @@ func Login(email, pwd string, roles []int) (token string, errResp u.ErrorData) {
 	return
 }
 
-func (s *accountService) GetAssistants() (data []*m.Account, err error) {
+func (s *accountService) GetPlainList(role int) (data []*m.Account, err error) {
 	objs := make([]*m.Account, 0)
 	query := m.GetDB().
 		Order("created_at desc").
 		Table(s.TableName).
-		Find(&objs, "role = ?", middleware.RoleAssistant)
+		Find(&objs, "role = ?", role)
 	if query.Error != nil && !query.RecordNotFound() {
 		return nil, nil
 	}
