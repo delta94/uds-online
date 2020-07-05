@@ -35,7 +35,7 @@ export interface ILoginPayload {
 	userID: string,
 	role: number
 }
-export type GetAssistantsResponse = IUser[];
+export type GetAccountsPlainResponse = IUser[];
 
 export interface AuthResponse {
 	token: string

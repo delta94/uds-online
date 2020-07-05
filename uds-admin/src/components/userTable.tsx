@@ -23,6 +23,7 @@ import {IPagination} from "../helpers/models";
 import {ConfirmDialog} from "./confirmDialog";
 import {useDispatch} from "react-redux";
 import {change_block, get_users, manual_email_confirm, popup_snack} from "../actions";
+import {ROLES} from "../constants";
 
 
 const ITEM_HEIGHT = 48;
@@ -56,13 +57,13 @@ const useStyles = makeStyles((theme: Theme) =>
 
 interface IUserTableProps extends IPagination {
 	users: IUser[],
-	role: number,
+	role: typeof ROLES.ROLE_USER | typeof ROLES.ROLE_ASSISTANT,
 	onChangePage:  (e: React.ChangeEvent<unknown>, v: number) => void,
 }
 
 interface IUserRowProps {
 	user: IUser,
-	role: number
+	role: typeof ROLES.ROLE_USER | typeof ROLES.ROLE_ASSISTANT
 }
 
 const UserRow: FC<IUserRowProps> = ({user, role}) => {

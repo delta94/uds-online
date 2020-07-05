@@ -15,6 +15,7 @@ import {
 	DialogTitle,
 	Typography
 } from "@material-ui/core";
+import {Add} from "@material-ui/icons";
 
 interface IFileUploadDialogProps {
 	text: string,
@@ -155,7 +156,11 @@ const FileUploadDialog: FC<IFileUploadDialogProps> = ({text, open, onClose}) => 
 const AssetsPage: FC = () => {
 	const [uploadDialogOpen, setUploadDialogOpen] = useState<boolean>(false);
 	
-	const uploadButton = <Button variant="contained" onClick={() => setUploadDialogOpen(true)}>Загрузить файл</Button>;
+	const uploadButton = <Button
+		variant="contained"
+		color="primary"
+		startIcon={<Add/>}
+		onClick={() => setUploadDialogOpen(true)}>Загрузить файл</Button>;
 	
 	return (
 		<PageWrapper heading="Ресурсы" actionArea={uploadButton}>

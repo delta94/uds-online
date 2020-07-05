@@ -10,7 +10,7 @@ import {
 	SET_USERS,
 	SHOW_POPUP_MESSAGE
 } from "./types";
-import {AuthResponse, GetAssistantsResponse, IAuthRequest, ILoginPayload, ITokenPayload} from "../reducers/authReducer";
+import {AuthResponse, GetAccountsPlainResponse, IAuthRequest, ILoginPayload, ITokenPayload} from "../reducers/authReducer";
 import {api_request} from "../helpers/api";
 import {IUser} from "../reducers/usersReducer";
 import {IAction, IPaginatablePayload} from "../helpers/models";
@@ -101,9 +101,12 @@ export const authenticate = (email: string, password: string) => {
 	};
 };
 
-export const get_users = (role: number, page?: number) => {
-	if (page === undefined) {
+export const get_users = (role: typeof ROLES.ROLE_USER | typeof ROLES.ROLE_ASSISTANT, page?: number) => {
+	if (page === undefined && role === ROLES.ROLE_USER) {
 		page = store.getState().users.users.page;
+	}
+	if (page === undefined && role === ROLES.ROLE_ASSISTANT) {
+		page = store.getState().users.assistants.page;
 	}
 	return (dispatch: Dispatch) => {
 		return api_request<IPaginatablePayload<IUser>>({
@@ -153,15 +156,28 @@ export const manual_email_confirm = (id: string, callback?: () => void) => {
 	};
 };
 
-export const get_assistants = (callback: (assistants: IUser[]) => void) => {
+export const get_assistants_plain = (callback: (assistants: IUser[]) => void) => {
 	return (dispatch: Dispatch) => {
-		return api_request<GetAssistantsResponse>({
+		return api_request<GetAccountsPlainResponse>({
 			method: "GET",
 			url: `accounts/assistants`,
 			version: 1
 		})
 			.then((assistants) => {
 				callback(assistants);
+			})
+	};
+};
+
+export const get_users_plain = (callback: (users: IUser[]) => void) => {
+	return (dispatch: Dispatch) => {
+		return api_request<GetAccountsPlainResponse>({
+			method: "GET",
+			url: `accounts/users`,
+			version: 1
+		})
+			.then((users) => {
+				callback(users);
 			})
 	};
 };
@@ -219,3 +235,23 @@ export const get_courses = () => {
 			});
 	};
 }
+
+export const create_purchase = (course_id: number, account_id: string, sum: number, order: number, callback: () => void) => {
+	const data = {
+		course_id,
+		account_id,
+		sum,
+		order
+	};
+	return (dispatch: Dispatch) => {
+		return api_request({
+			method: "POST",
+			url: `purchases`,
+			data,
+			version: 1
+		})
+			.then((response) => {
+				callback();
+			});
+	};
+};

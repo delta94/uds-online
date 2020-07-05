@@ -1,4 +1,4 @@
-import React, {FC, lazy, Suspense, useEffect, useState} from "react";
+import React, {FC, FormEvent, lazy, Suspense, useEffect, useState} from "react";
 import {PageWrapper} from "../components/pageWrapper";
 import {Link, RouteComponentProps, withRouter} from "react-router-dom";
 import {createStyles, makeStyles, Theme} from "@material-ui/core/styles";
@@ -82,6 +82,13 @@ const LessonPage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) => {
 		}
 		
 		return isValid;
+	};
+	const onSubmit = (e: FormEvent) => {
+		if (!isFormValid()) {
+			e.preventDefault();
+			return;
+		}
+		
 	};
 	
 	const tabContentMain = <>
@@ -192,7 +199,7 @@ const LessonPage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) => {
 	
 	return (
 		<PageWrapper heading={lesson_id ? "Редактирование раздела" : "Добавить раздел"}>
-			<form autoComplete="off" spellCheck="false">
+			<form autoComplete="off" spellCheck="false" onSubmit={onSubmit}>
 				<TabLayout
 					selected={TAB_MAIN}
 					tabs={[

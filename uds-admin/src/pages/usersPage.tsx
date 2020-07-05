@@ -35,7 +35,7 @@ const UsersPage: FC = () => {
 		dispatch(get_users(ROLES.ROLE_ASSISTANT));
 	}, []);
 	
-	const handlePageChange = (value: number, role: number) => {
+	const handlePageChange = (value: number, role: typeof ROLES.ROLE_USER | typeof ROLES.ROLE_ASSISTANT) => {
 		dispatch(get_users(role, value - 1));
 	}
 	
