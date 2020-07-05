@@ -46,10 +46,9 @@ export const Video: FC<IVideoProps> = ({src}) => {
 			<ReactPlayer ref={ref}
 						 onContextMenu={handleClick}
 						 playing={playing}
-						 controls={false}
-						 
+						 controls={true}
 						 onProgress={(data: any) => {console.log({data})}}
-						 url={process.env.REACT_APP_S3_VIDEO_ROOT + '/' + src}
+						 url={src}
 			/>
 			<div className={classes.controls}>
 				<button className={classes.playbackBtn} onClick={() => setPlaying(!playing)}>

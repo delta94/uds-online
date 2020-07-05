@@ -13,5 +13,8 @@ vendor
 # Environment
 .env.development
 
+# Uploads
+static
+
 # Compiled
 /main

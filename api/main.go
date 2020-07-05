@@ -17,6 +17,9 @@ func main() {
 		router.Use(mw.CorsMiddleware)
 	}
 
+	fileServer := http.FileServer(http.Dir("./static"))
+	router.PathPrefix("/static/").Handler(http.StripPrefix("/static", controllers.Neuter(fileServer))).Methods("GET", "OPTIONS")
+
 	// Handle Routes
 	// Public Routes
 	router.Handle(mw.Routes["v1"]["landing"], http.HandlerFunc(controllers.LandingPage)).Methods("GET")
@@ -49,9 +52,8 @@ func main() {
 	router.Handle(mw.Routes["v1"]["courses"]+"/{id}", mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.GetCourse), []int{mw.RoleUser}))).Methods("GET", "OPTIONS")
 	router.Handle(mw.Routes["v1"]["courses"], mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.GetCourses), []int{mw.RoleUser}))).Methods("GET", "OPTIONS")
 
-
-	// S3
-	//router.HandleFunc("/api/v1/uploads", controllers.ListS3Uploads).Methods("POST")
+	// Upload
+	router.HandleFunc("/api/v1/uploads", controllers.HandleLocalUpload).Methods("POST", "OPTIONS")
 
 	// Port
 	port := os.Getenv("PORT")
