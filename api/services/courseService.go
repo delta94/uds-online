@@ -38,8 +38,8 @@ func (s *courseService) Update(id uint, fields map[string]interface{}) error {
 	return nil
 }
 
-
-func (s *courseService) Find(offset int, limit int) (data []*m.Course, total uint) {
+func (s *courseService) Find(offset int, limit int) ([]*m.Course, uint, error) {
+	var total uint = 0
 	objs := make([]*m.Course, 0)
 	query := m.GetDB().
 		Order("created_at desc").
@@ -50,14 +50,13 @@ func (s *courseService) Find(offset int, limit int) (data []*m.Course, total uin
 		Offset(offset * limit).
 		Find(&objs)
 	if query.Error != nil && !query.RecordNotFound() {
-		return nil, 0
+		return nil, 0, query.Error
 	}
 	if query.Error != nil {
-		return nil, 0
+		return objs, 0, nil
 	}
-	return objs, total
+	return objs, total, nil
 }
-
 
 func (s *courseService) GetForAdmin(id uint) (*m.Course, error) {
 	o := &m.Course{}

@@ -14,7 +14,8 @@ var Routes = map[string]map[string]string{
 		"confirmEmail":  apiPrefix + "/v1/redeem/confirmation",
 		"accounts":      apiPrefix + "/v1/accounts",
 		"courses":       apiPrefix + "/v1/courses",
-		"adminCourses":       apiPrefix + "/v1/admin/courses",
+		"adminCourses":  apiPrefix + "/v1/admin/courses",
 		"resetPassword": apiPrefix + "/v1/issue-password-reset",
+		"purchases":     apiPrefix + "/v1/purchases",
 	},
 }

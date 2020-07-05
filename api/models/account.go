@@ -8,7 +8,6 @@ import (
 	"regexp"
 	"strings"
 	"time"
-	"unicode/utf8"
 )
 
 type JWTToken struct {
@@ -28,9 +27,10 @@ type Account struct {
 	Role              int       `json:"role"`
 	CreatedAt         time.Time
 	UpdatedAt         time.Time
-	DeletedAt         *time.Time `sql:"index"`
-	IsBlocked         bool       `json:"is_blocked"`
-	AssignedCourses   []*Course  `json:"assigned_courses" gorm:"foreignkey:AssistantID"`
+	DeletedAt         *time.Time  `sql:"index"`
+	IsBlocked         bool        `json:"is_blocked"`
+	AssignedCourses   []*Course   `json:"assigned_courses" gorm:"foreignkey:AssistantID"`
+	Purchases         []*Purchase `json:"purchases" gorm:"foreignkey:PurchaseID"`
 }
 
 type Password struct {
@@ -72,7 +72,7 @@ func (account *Account) Validate() error {
 		return fmt.Errorf("password is required")
 	}
 
-	if utf8.RuneCountInString(account.Password.Raw) < 6 {
+	if len(account.Password.Raw) < 6 {
 		return fmt.Errorf("password is too short")
 	}
 

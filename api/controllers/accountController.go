@@ -70,8 +70,8 @@ var GetAccount = func(w http.ResponseWriter, r *http.Request) {
 		u.RespondJson(w, u.Response{Message: "Invalid request"}, http.StatusOK)
 		return
 	}
-	account := s.AccountService.Get(uint(id))
-	if account == nil {
+	account, err := s.AccountService.Get(uint(id))
+	if err != nil {
 		u.RespondJson(w, u.Response{Message: "Not found"}, http.StatusOK)
 		return
 	}
@@ -97,10 +97,10 @@ var GetAccounts = func(w http.ResponseWriter, r *http.Request) {
 	if role != middleware.RoleUser && role != middleware.RoleAssistant {
 		role = middleware.RoleUser
 	}
-	accounts, total := s.AccountService.Find(offset, limit, role)
-	if accounts == nil {
+	accounts, total, err := s.AccountService.Find(offset, limit, role)
+	if err != nil {
 		log.Printf("Error! Cound not fetch accounts")
-		u.RespondJson(w, u.Response{Message: "An Error occurred", ErrorCode: u.ErrGeneral}, http.StatusOK)
+		u.RespondJson(w, u.Response{Message: err.Error(), ErrorCode: u.ErrGeneral}, http.StatusOK)
 		return
 	}
 	u.RespondJson(w, u.PaginatedResponse{Payload: u.PaginatedResponsePayload{Size: limit, Page: offset, Total: total, Data: accounts}}, http.StatusOK)
@@ -115,7 +115,6 @@ var GetAssistants = func(w http.ResponseWriter, r *http.Request) {
 	}
 	u.RespondJson(w, u.Response{Payload: accounts}, http.StatusOK)
 }
-
 
 var UpdateAccount = func(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
@@ -164,7 +163,9 @@ var DeleteAccount = func(w http.ResponseWriter, r *http.Request) {
 }
 
 var ManualEmailConfirm = func(w http.ResponseWriter, r *http.Request) {
-	type Body struct {ID string `json:"id"`}
+	type Body struct {
+		ID string `json:"id"`
+	}
 	body := &Body{}
 	err := json.NewDecoder(r.Body).Decode(body)
 	if err != nil || body.ID == "" {

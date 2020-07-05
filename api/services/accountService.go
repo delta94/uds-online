@@ -49,19 +49,20 @@ func (s *accountService) Create(model *m.Account) error {
 /**
 Search for a specific entry
 */
-func (s *accountService) Get(id uint) *m.Account {
+func (s *accountService) Get(id uint) (*m.Account, error) {
 	o := &m.Account{}
 	err := m.GetDB().Take(o, "id = ?", id).Error
 	if err != nil {
-		return nil
+		return nil, err
 	}
-	return o
+	return o, nil
 }
 
 /**
 Fetch multiple entries
 */
-func (s *accountService) Find(offset int, limit int, role int) (data []*m.Account, total uint) {
+func (s *accountService) Find(offset int, limit int, role int) ([]*m.Account, uint, error) {
+	var total uint = 0
 	objs := make([]*m.Account, 0)
 	query := m.GetDB().
 		Order("created_at desc").
@@ -72,12 +73,12 @@ func (s *accountService) Find(offset int, limit int, role int) (data []*m.Accoun
 		Offset(offset * limit).
 		Find(&objs)
 	if query.Error != nil && !query.RecordNotFound() {
-		return nil, 0
+		return nil, 0, query.Error
 	}
 	if query.Error != nil {
-		return nil, 0
+		return objs, 0, nil
 	}
-	return objs, total
+	return objs, total, nil
 }
 
 /**

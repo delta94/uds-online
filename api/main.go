@@ -48,9 +48,13 @@ func main() {
 	// get course
 	router.Handle(mw.Routes["v1"]["adminCourses"]+"/{id}", mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.GetCourseAdmin), []int{mw.RoleAdmin}))).Methods("GET", "OPTIONS")
 
-
 	router.Handle(mw.Routes["v1"]["courses"]+"/{id}", mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.GetCourse), []int{mw.RoleUser}))).Methods("GET", "OPTIONS")
 	router.Handle(mw.Routes["v1"]["courses"], mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.GetCourses), []int{mw.RoleUser}))).Methods("GET", "OPTIONS")
+
+	// get purchases
+	router.Handle(mw.Routes["v1"]["purchases"], mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.GetPurchases), []int{mw.RoleAdmin}))).Methods("GET", "OPTIONS")
+	// create purchase
+	router.Handle(mw.Routes["v1"]["purchases"], mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.CreatePurchase), []int{mw.RoleAdmin}))).Methods("POST", "OPTIONS")
 
 	// Upload
 	router.HandleFunc("/api/v1/uploads", controllers.HandleLocalUpload).Methods("POST", "OPTIONS")

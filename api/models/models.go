@@ -40,6 +40,7 @@ func init() {
 		&LessonContent{},
 		&LessonTask{},
 		&Course{},
+		&Purchase{},
 	)
 	// Foreign Keys
 	db.Model(&Password{}).AddForeignKey("account_id", "accounts(id)", "CASCADE", "NO ACTION")
@@ -47,6 +48,8 @@ func init() {
 	db.Model(&LessonContent{}).AddForeignKey("lesson_id", "lessons(id)", "CASCADE", "NO ACTION")
 	db.Model(&LessonTask{}).AddForeignKey("lesson_content_id", "lesson_contents(id)", "CASCADE", "NO ACTION")
 	db.Model(&Course{}).AddForeignKey("assistant_id", "accounts(id)", "SET NULL", "NO ACTION")
+	db.Model(&Purchase{}).AddForeignKey("account_id", "accounts(id)", "SET NULL", "NO ACTION")
+	db.Model(&Purchase{}).AddForeignKey("course_id", "courses(id)", "SET NULL", "NO ACTION")
 
 	//v4, _ := uuid.NewV4()
 	//lessons := []*Lesson{
