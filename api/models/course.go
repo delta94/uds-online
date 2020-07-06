@@ -12,7 +12,7 @@ type Course struct {
 	Title       string    `json:"title" gorm:"size:120;unique_index;not null"`
 	Annotation  string    `json:"annotation" gorm:"size:1000"`
 	Price       int       `json:"price"`
-	Lessons     []*Lesson `gorm:"foreignkey:CourseID"`
+	Lessons     []*Lesson `json:"lessons" gorm:"foreignkey:CourseID"`
 	AssistantID uuid.UUID `json:"assistant_id" gorm:"index;type:char(36);"`
 	Published   bool      `json:"published"`
 }
@@ -29,7 +29,7 @@ type Lesson struct {
 
 type LessonContent struct {
 	gorm.Model
-	Body     string        `json:"content" gorm:"size:16000"`
+	Body     string        `json:"body" gorm:"size:16000;"`
 	Tasks    []*LessonTask `json:"tasks" gorm:"foreignkey:LessonContentID"`
 	LessonID uint          `json:"-"`
 }
@@ -37,7 +37,7 @@ type LessonContent struct {
 type LessonTask struct {
 	gorm.Model
 	Type            int    `json:"type"`
-	Data            string `json:"data" gorm:""`
+	Data            string `json:"data" gorm:"size:6000;"`
 	LessonContentID uint   `json:"-"`
 }
 

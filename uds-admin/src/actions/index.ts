@@ -7,6 +7,7 @@ import {
 	LOG_OUT,
 	SET_ASSISTANTS,
 	SET_COURSES,
+	SET_LESSONS,
 	SET_USERS,
 	SHOW_POPUP_MESSAGE
 } from "./types";
@@ -211,6 +212,13 @@ export const update_course = (id: number, title: string, annotation: string, pri
 	}
 }
 
+export const set_lessons = (lessons: ILesson[]): IAction<ILesson[]> => {
+	return {
+		type: SET_LESSONS,
+		payload: lessons
+	};
+};
+
 export const get_course = (id: string, callback: (course: ICourse) => void) => {
 	return (dispatch: Dispatch) => {
 		return api_request<ICourse>({
@@ -219,6 +227,7 @@ export const get_course = (id: string, callback: (course: ICourse) => void) => {
 			version: 1
 		})
 			.then((course) => {
+				dispatch(set_lessons(course.lessons));
 				callback(course);
 			});
 	}
@@ -237,20 +246,24 @@ export const get_courses = () => {
 	};
 }
 
-export const create_lesson = (course_id: number, annotation: string, content: string, title: string, paid: boolean, tasks: ILessonTask[], callback: (lesson: ILesson) => void) => {
-	const data = {
-		title,
-		annotation,
-		paid,
-		content,
-		course_id,
-		tasks
+export const get_lesson = (id: number, callback : (lesson: ILesson) => void) => {
+	return (dispatch: Dispatch) => {
+		return api_request<ILesson>({
+			method: "GET",
+			url: `admin/lessons/${id}`
+		})
+			.then((lesson) => {
+				callback(lesson);
+			});
 	};
+};
+
+export const create_lesson = (lesson: ILesson, callback: (lesson: ILesson) => void) => {
 	return (dispatch: Dispatch) => {
 		return api_request<any>({
 			method: "POST",
-			url: `lessons`,
-			data,
+			url: `admin/lessons`,
+			data: lesson,
 			version: 1,
 		})
 			.then((lesson) => {
@@ -259,12 +272,17 @@ export const create_lesson = (course_id: number, annotation: string, content: st
 	};
 };
 
-export const update_lesson = (annotation: string, content: string, title: string, paid: boolean, published: boolean) => {
+export const update_lesson = (lesson: ILesson, callback: () => void) => {
 	return (dispatch: Dispatch) => {
-		return api_request({
-			method: "POST",
-			url: ``,
-		});
+		return api_request<any>({
+			method: "PUT",
+			url: `admin/lessons`,
+			data: lesson,
+			version: 1,
+		})
+			.then(() => {
+				callback();
+			});
 	};
 };
 

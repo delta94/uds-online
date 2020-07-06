@@ -40,20 +40,23 @@ func main() {
 	router.Handle(mw.Routes["v1"]["accounts"]+"/{id}", mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.DeleteAccount), []int{mw.RoleAdmin}))).Methods("DELETE", "OPTIONS")
 	router.Handle(mw.Routes["v1"]["accounts"]+"/reset-password", mw.XhrMiddleware(http.HandlerFunc(controllers.ResetPassword))).Methods("POST", "OPTIONS")
 
-	// create course
+	// create course (Admin)
 	router.Handle(mw.Routes["v1"]["adminCourses"], mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.CreateCourse), []int{mw.RoleAdmin}))).Methods("POST", "OPTIONS")
-	// update course
+	// update course (Admin)
 	router.Handle(mw.Routes["v1"]["adminCourses"], mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.UpdateCourse), []int{mw.RoleAdmin}))).Methods("PUT", "OPTIONS")
-	// get courses
+	// get courses (Admin)
 	router.Handle(mw.Routes["v1"]["adminCourses"], mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.GetCoursesAdmin), []int{mw.RoleAdmin}))).Methods("GET", "OPTIONS")
-	// get course
+	// get course (Admin)
 	router.Handle(mw.Routes["v1"]["adminCourses"]+"/{id}", mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.GetCourseAdmin), []int{mw.RoleAdmin}))).Methods("GET", "OPTIONS")
 
 	router.Handle(mw.Routes["v1"]["courses"]+"/{id}", mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.GetCourse), []int{mw.RoleUser}))).Methods("GET", "OPTIONS")
 	router.Handle(mw.Routes["v1"]["courses"], mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.GetCourses), []int{mw.RoleUser}))).Methods("GET", "OPTIONS")
 
-	// create lesson
-	router.Handle(mw.Routes["v1"]["lessons"], mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.CreateLesson), []int{mw.RoleAdmin}))).Methods("POST", "OPTIONS")
+	// create lesson (Admin)
+	router.Handle(mw.Routes["v1"]["adminLessons"], mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.CreateLesson), []int{mw.RoleAdmin}))).Methods("POST", "OPTIONS")
+	// update lesson (Admin)
+	router.Handle(mw.Routes["v1"]["adminLessons"], mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.UpdateLesson), []int{mw.RoleAdmin}))).Methods("PUT", "OPTIONS")
+	// get lesson (Admin)
 	router.Handle(mw.Routes["v1"]["adminLessons"]+"/{id}", mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.GetLessonAdmin), []int{mw.RoleAdmin}))).Methods("GET", "OPTIONS")
 
 

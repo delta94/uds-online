@@ -3,7 +3,6 @@ import {createStyles, makeStyles, Theme} from "@material-ui/core/styles";
 import {ICourse} from "../reducers/courseReducer";
 import {
     Button,
-    IconButton,
     Paper,
     Table,
     TableBody,
@@ -13,10 +12,8 @@ import {
     TableRow
 } from "@material-ui/core";
 import Moment from "moment";
-import {Pagination} from "@material-ui/lab";
-import {Edit, Visibility, VisibilityOff} from "@material-ui/icons";
+import {Visibility, VisibilityOff} from "@material-ui/icons";
 import {Link} from "react-router-dom";
-import {ROUTES} from "../constants";
 import {getCourseUrl} from "../helpers/getUrl";
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -54,15 +51,15 @@ const CourseRow: FC<ICourseRowProps> = ({course}) => {
             <TableCell component="th" scope="row">
                 {title}
             </TableCell>
-            <TableCell align="right" className={classes.textCenter}>{created}</TableCell>
-            <TableCell align="right" className={classes.textCenter}>
+            <TableCell align="center">{created}</TableCell>
+            <TableCell align="center">
                 {published ?
                     <Visibility titleAccess="Элемент опубликован"/>
                     :
                     <VisibilityOff titleAccess="Элемент не опубликован"/>
                 }
             </TableCell>
-            <TableCell align="right" className={classes.textCenter}>{price}</TableCell>
+            <TableCell align="center">{price}</TableCell>
             <TableCell align="right">
                 <Button component={Link} to={getCourseUrl(ID.toString())} variant="contained" color="primary">
                     Перейти
@@ -81,9 +78,9 @@ const CourseTable: FC<ICourseTableProps> = ({courses}) => {
                     <TableHead>
                         <TableRow>
                             <TableCell>Название</TableCell>
-                            <TableCell align="right" className={classes.textCenter}>Создан</TableCell>
-                            <TableCell align="right" className={classes.textCenter}>Опубликован</TableCell>
-                            <TableCell align="right" className={classes.textCenter}>Стоимость, руб.</TableCell>
+                            <TableCell align="center">Создан</TableCell>
+                            <TableCell align="center">Опубликован</TableCell>
+                            <TableCell align="center">Стоимость, руб.</TableCell>
                             <TableCell align="right" className={classes.actionColumn}> </TableCell>
                         </TableRow>
                     </TableHead>

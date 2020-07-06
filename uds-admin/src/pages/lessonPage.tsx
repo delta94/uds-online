@@ -17,9 +17,10 @@ import {getCourseUrl} from "../helpers/getUrl";
 import {Save} from "@material-ui/icons";
 import {TabLayout} from "../components/tabLayout";
 import {useDispatch} from "react-redux";
-import {create_course, create_lesson, popup_snack} from "../actions";
+import {create_lesson, get_lesson, popup_snack, update_lesson} from "../actions";
 import history from "../history";
-import {ROUTES} from "../constants";
+import {ILesson, ILessonTask} from "../reducers/lessonsReducer";
+import {TaskPreview} from "../components/taskPreview";
 
 const HtmlEditor = lazy(() => import("../components/htmlEditor"));
 const MAX_LENGTH_TITLE = 80;
@@ -62,19 +63,30 @@ const LessonPage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) => {
 	const classes = useStyles();
 	const [title, setTitle] = useState<string>("");
 	const [annotation, setAnnotation] = useState<string>("");
-	const [content, setContent] = useState<string>("");
+	const [body, setBody] = useState<string>("");
 	const [published, setPublished] = useState<boolean>(true);
 	const [paid, setPaid] = useState<boolean>(true);
+	const [contentID, setContentID] = useState<number>();
+	const [tasks, setTasks] = useState<ILessonTask[]>([]);
 	const dispatch = useDispatch();
 
 	useEffect(() => {
 		if (lesson_id) {
-			console.log("ID ", lesson_id);
+			dispatch(get_lesson(Number(lesson_id), (lesson) => {
+				const {title, content, annotation, paid, published} = lesson;
+				setTitle(title);
+				setAnnotation(annotation);
+				setPaid(paid);
+				setPublished(published);
+				setBody(content!.body);
+				setTasks(content!.tasks);
+				setContentID(content!.ID)
+			}));
 		}
 	}, []);
 	
 	const onContentChange = (value: string) => {
-		setContent(value);
+		setBody(value);
 	};
 	const isFormValid = (): boolean => {
 		let isValid = true;
@@ -93,10 +105,29 @@ const LessonPage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) => {
 		if (!isFormValid()) {
 			return;
 		}
-		dispatch(create_lesson(Number(course_id), annotation, content, title, paid, [], (lesson) => {
-			dispatch(popup_snack(`Раздел успешно создан`));
+		const lesson: ILesson = {
+			annotation,
+			course_id: Number(course_id),
+			title,
+			paid,
+			published,
+			content: {
+				body,
+				tasks
+			}
+		};
+		if (lesson_id) {
+			lesson.ID = Number(lesson_id);
+			lesson!.content!.ID = contentID;
+			dispatch(update_lesson(lesson, () => {
+				dispatch(popup_snack(`Раздел ${title} успешно обновлен`));
+				history.push(getCourseUrl(course_id));
+			}));
+			return;
+		}
+		dispatch(create_lesson(lesson, (lesson) => {
+			dispatch(popup_snack(`Раздел ${lesson.title} успешно создан`));
 			history.push(getCourseUrl(course_id));
-			console.log(111)
 		}));
 	};
 	
@@ -149,7 +180,7 @@ const LessonPage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) => {
 					</Typography>
 					<HtmlEditor
 						name="content-editor"
-						content={content}
+						content={body}
 						onChange={onContentChange}
 						options={{
 							minLines: 15,
@@ -196,14 +227,21 @@ const LessonPage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) => {
 					type="submit"
 					startIcon={<Save/>}
 					variant="contained"
-					color="primary">Создать</Button>
+					color="primary">
+				{lesson_id ? "Сохранить" : "Создать"}
+			</Button>
 		</div>
 	</>
 	
 	const tabContentTasks = <>
-		<Typography>
-			Менеджер заданий
-		</Typography>
+		
+		{tasks && tasks.map((task) => {
+			return (
+				<>
+					<TaskPreview task={task}/>
+				</>
+			)
+		})}
 	</>
 	
 	return (

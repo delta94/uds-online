@@ -9,7 +9,7 @@ import {getAddLessonUrl, getEditCourseUrl} from "../helpers/getUrl";
 import {Add, Edit} from "@material-ui/icons";
 import {ComponentSpinner} from "../components/spinner";
 import {Alert, AlertTitle} from "@material-ui/lab";
-import {get_course} from "../actions";
+import {get_course, set_lessons} from "../actions";
 
 const LessonTable = lazy(() => import("../components/lessonTable"));
 
@@ -41,6 +41,7 @@ interface IRouteProps {
 export const CoursePage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) => {
     const classes = useStyles();
     const dispatch = useDispatch();
+    const [fetching, setFetching] = useState<boolean>(true);
     const [title, setTitle] = useState<string>("");
     const [published, setPublished] = useState<boolean>(true);
     const lessonState = useSelector((state: IReducerState) => state.lessons);
@@ -50,6 +51,7 @@ export const CoursePage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) =>
         dispatch(get_course(id, ((c) => {
             setTitle(`"${c.title}"`);
             setPublished(c.published);
+            setFetching(false);
         })));
     }, []);
     
@@ -90,7 +92,7 @@ export const CoursePage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) =>
             </Alert>}
             
             <Suspense fallback={<ComponentSpinner/>}>
-                <LessonTable
+                {fetching ? <ComponentSpinner/> : <LessonTable
                     course_id={id}
                     total={lessonState.total}
                     size={lessonState.size}
@@ -99,7 +101,7 @@ export const CoursePage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) =>
                     onChangePage={
                         (e: React.ChangeEvent<unknown>, v: number) => handlePageChange(v)
                     }
-                />
+                />}
             </Suspense>
         </PageWrapper>
     );

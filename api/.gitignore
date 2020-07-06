@@ -14,7 +14,10 @@ vendor
 .env.development
 
 # Uploads
-static
+/static/*
 
 # Compiled
 /main
+
+# Git keep files (dummy)
+!.gitkeep

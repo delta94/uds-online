@@ -93,49 +93,50 @@ var GetCoursesAdmin = func(w http.ResponseWriter, r *http.Request) {
 }
 
 var CreateLesson = func(w http.ResponseWriter, r *http.Request) {
-	type Body struct {
-		Title      string          `json:"title"`
-		Annotation string          `json:"annotation"`
-		Paid       bool            `json:"paid"`
-		Content    string          `json:"content"`
-		CourseID   uint            `json:"course_id"`
-		Tasks      []*m.LessonTask `json:"tasks"`
-	}
-
-	body := &Body{}
-	err := json.NewDecoder(r.Body).Decode(body)
+	lesson := &m.Lesson{}
+	err := json.NewDecoder(r.Body).Decode(lesson)
 	if err != nil {
 		log.Print(err.Error())
 		u.RespondJson(w, u.Response{Message: "Invalid request", ErrorCode: u.ErrGeneral}, http.StatusOK)
 		return
 	}
 	// get rid of IDs in case they are given
-	for _, t := range body.Tasks {
+	lesson.Content.ID = 0
+	for _, t := range lesson.Content.Tasks {
 		t.ID = 0
 	}
-	lesson := &m.Lesson{
-		CourseID:   body.CourseID,
-		Title:      body.Title,
-		Annotation: body.Annotation,
-		Paid:       body.Paid,
-		Content: &m.LessonContent{
-			Body: body.Content,
-			Tasks: body.Tasks,
-		},
-	}
+
 	err = srv.LessonService.Create(lesson)
 	if err != nil {
 		log.Print(err.Error())
 		u.RespondJson(w, u.Response{Message: err.Error(), ErrorCode: u.ErrGeneral}, http.StatusOK)
 		return
 	}
-
 	p := make(map[string]interface{})
 	p["ID"] = lesson.ID
 	p["title"] = lesson.Title
 	u.RespondJson(w, u.Response{Payload: p}, http.StatusOK)
 }
 
+var UpdateLesson = func(w http.ResponseWriter, r *http.Request) {
+	lesson := &m.Lesson{}
+	err := json.NewDecoder(r.Body).Decode(lesson)
+	if err != nil {
+		log.Print(err.Error())
+		u.RespondJson(w, u.Response{Message: "Invalid request", ErrorCode: u.ErrGeneral}, http.StatusOK)
+		return
+	}
+	err = m.GetDB().Save(lesson).Error
+	if err != nil {
+		log.Print(err.Error())
+		u.RespondJson(w, u.Response{Message: err.Error(), ErrorCode: u.ErrGeneral}, http.StatusOK)
+		return
+	}
+	p := make(map[string]interface{})
+	p["ID"] = lesson.ID
+	p["title"] = lesson.Title
+	u.RespondJson(w, u.Response{Payload: p}, http.StatusOK)
+}
 
 var GetLessonAdmin = func(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)

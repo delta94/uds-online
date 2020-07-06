@@ -60,7 +60,11 @@ func (s *courseService) Find(offset int, limit int) ([]*m.Course, uint, error) {
 
 func (s *courseService) GetForAdmin(id uint) (*m.Course, error) {
 	o := &m.Course{}
-	err := m.GetDB().Table(s.TableName).Take(o, "id = ?", id).Error
+	err := m.GetDB().
+		Table(s.TableName).
+		Preload("Lessons").
+		Take(o, "id = ?", id).
+		Error
 	if err != nil {
 		return nil, err
 	}

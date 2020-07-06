@@ -1,5 +1,15 @@
 import React, {FC, ReactNode, useState} from "react";
 import {Tabs, Tab} from "@material-ui/core";
+import {createStyles, makeStyles, Theme} from "@material-ui/core/styles";
+
+const useStyles = makeStyles((theme: Theme) =>
+	createStyles({
+		tabPanel: {
+			paddingTop: 10,
+			paddingBottom: 10,
+		},
+	})
+);
 
 interface TabPanelProps {
 	children?: ReactNode;
@@ -20,9 +30,10 @@ interface ITabLayoutProps {
 }
 
 function TabPanel(props: TabPanelProps) {
+	const classes = useStyles();
 	const {children, value, index, ...other} = props;
 	return (
-		<div role="tabpanel" hidden={value !== index}{...other}>
+		<div role="tabpanel" hidden={value !== index}{...other} className={classes.tabPanel}>
 			{value === index && <>{children}</>}
 		</div>
 	);

@@ -1,6 +1,7 @@
 import {AnyAction} from "redux";
 import {SET_COURSES} from "../actions/types";
 import {IAction, IPaginatablePayload} from "../helpers/models";
+import {ILesson} from "./lessonsReducer";
 
 
 export interface ICourse {
@@ -10,6 +11,7 @@ export interface ICourse {
 	published: boolean,
 	price: number,
 	assistant_id: string,
+	lessons: ILesson[],
 	CreatedAt: string,
 	UpdatedAt: string
 }

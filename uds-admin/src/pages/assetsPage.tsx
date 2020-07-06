@@ -1,4 +1,4 @@
-import React, {FC, FormEvent, useRef, useState} from "react";
+import React, {FC, FormEvent, useEffect, useRef, useState} from "react";
 import {PageWrapper} from "../components/pageWrapper";
 import axios from "axios";
 import {PaperComponent} from "../components/confirmDialog";
@@ -12,7 +12,7 @@ import {
 	DialogActions,
 	DialogContent,
 	DialogContentText,
-	DialogTitle,
+	DialogTitle, FormControl, TextField,
 	Typography
 } from "@material-ui/core";
 import {Add} from "@material-ui/icons";
@@ -25,9 +25,11 @@ interface IFileUploadDialogProps {
 
 //const kbSize = /mac/ig.test(navigator.appVersion || '') ? 1000 : 1024;
 const kbSize = 1000;
-const maxSizeMB = 1000 * 1000 * 500;
-const mimeTypes: string[] = ["video/mpeg","video/mp4","video/quicktime", "image/png", "image/jpg", "image/jpeg"];
-const accept: string = ".mpeg,.mp4,.mov,.png,.jpg,.jpeg";
+const maxSizeMB = 500;
+const maxSize = 1000 * 1000 * maxSizeMB;
+const mimeTypes: string[] = ["video/mpeg","video/mp4","video/quicktime", "image/png", "image/jpg", "image/jpeg", "audio/mpeg", "audio/wav"];
+const accept: string = ".mpeg,.mp4,.mov,.png,.jpg,.jpeg,.mp3,.wav";
+const MAX_LENGTH_COMMENT = 80;
 
 const FileUploadDialog: FC<IFileUploadDialogProps> = ({text, open, onClose}) => {
 	const dispatch = useDispatch();
@@ -36,6 +38,11 @@ const FileUploadDialog: FC<IFileUploadDialogProps> = ({text, open, onClose}) => 
 	const [progress, setProgress] = useState<number>(0);
 	const [file, setFile] = useState<File | null>(null);
 	const fileRef = useRef<HTMLInputElement>(null);
+	const [comment, setComment] = useState<string>("");
+	
+	useEffect(() => {
+		resetFile();
+	}, [open]);
 	
 	const onSubmit = (e: FormEvent) => {
 		e.preventDefault();
@@ -53,6 +60,7 @@ const FileUploadDialog: FC<IFileUploadDialogProps> = ({text, open, onClose}) => 
 		const url = `/v1/uploads`;
 		const formData = new FormData();
 		formData.append('file', file);
+		formData.append('comment', comment);
 		axios.post(url, formData, {
 			onUploadProgress: progressEvent => setProgress(Math.ceil(100 * progressEvent.loaded / progressEvent.total)),
 		})
@@ -93,11 +101,12 @@ const FileUploadDialog: FC<IFileUploadDialogProps> = ({text, open, onClose}) => 
 	};
 	
 	const isSizeValid = (file: File): boolean => {
-		return file.size < maxSizeMB;
+		return file.size < maxSize;
 	};
 	
 	const resetFile = (): void => {
 		setFile(null);
+		setComment("");
 		if (fileRef.current !== null) {
 			fileRef.current.value = '';
 		}
@@ -124,10 +133,25 @@ const FileUploadDialog: FC<IFileUploadDialogProps> = ({text, open, onClose}) => 
 						<>
 							<input type="file" onChange={onFileChange} ref={fileRef} accept={accept}/>
 							<br/>
+							<br/>
 							{file && <>
 								<Typography>
-									<strong>Размер</strong>: {file.size > 0 ? Number(file.size / kbSize / kbSize).toFixed(3) : 0} MB<br />
+									<strong>Размер</strong>: {file.size > 0 ? Number(file.size / kbSize / kbSize).toFixed(2) : 0} / {maxSizeMB} MB<br />
 								</Typography>
+								<FormControl fullWidth>
+									<TextField
+										autoComplete="off"
+										id="input-comment"
+										value={comment}
+										label="Комментарий"
+										helperText={` Краткий комментарий к файлу. ${comment.length}/${MAX_LENGTH_COMMENT} символов.`}
+										fullWidth
+										inputProps={{
+											maxLength: MAX_LENGTH_COMMENT
+										}}
+										onChange={(e) => setComment(e.target.value)}
+									/>
+								</FormControl>
 							</>}
 						</>
 					}

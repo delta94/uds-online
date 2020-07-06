@@ -2,14 +2,18 @@ package controllers
 
 import (
 	"fmt"
+	uuid "github.com/satori/go.uuid"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 	"path"
+	"path/filepath"
 	"strconv"
 	"strings"
+	m "uds-online/api/models"
 	u "uds-online/api/utils"
+	"unicode/utf8"
 )
 
 var StaticServe = func(w http.ResponseWriter, r *http.Request) {
@@ -26,7 +30,11 @@ var Neuter = func(next http.Handler) http.Handler {
 	})
 }
 
+var tmpPath = filepath.Join(".", "tmp")
+
 var HandleLocalUpload = func(w http.ResponseWriter, r *http.Request) {
+	os.MkdirAll(tmpPath, os.ModePerm)
+
 	maxSizeMB, err := strconv.Atoi(os.Getenv("MAX_UPLOAD_SIZE_MB"))
 	if err != nil {
 		log.Println("Wrong file size limit", err.Error())
@@ -39,25 +47,28 @@ var HandleLocalUpload = func(w http.ResponseWriter, r *http.Request) {
 		u.RespondJson(w, u.Response{Message: fmt.Sprintf("File too large. Max Size: %v MB", maxSizeMB), ErrorCode: u.ErrGeneral}, http.StatusOK)
 		return
 	}
+	comment := r.FormValue("comment")
 	file, fileHeader, err := r.FormFile("file")
 	if err != nil {
 		log.Println("Could not upload file!", err.Error())
 		u.RespondJson(w, u.Response{Message: "Could not upload file", ErrorCode: u.ErrGeneral}, http.StatusOK)
 		return
 	}
-
+	if utf8.RuneCountInString(fileHeader.Filename) > 80 {
+		log.Println("Filename is too long")
+		u.RespondJson(w, u.Response{Message: "Filename is too long", ErrorCode: u.ErrGeneral}, http.StatusOK)
+		return
+	}
 	mimeType := fileHeader.Header.Get("Content-Type")
 	err = CheckMimeType(mimeType)
 	if err != nil {
+		log.Println(err.Error())
 		u.RespondJson(w, u.Response{Message: err.Error(), ErrorCode: u.ErrGeneral}, http.StatusOK)
 		return
 	}
 	defer file.Close()
-	folder := "videos"
-	if strings.Contains(mimeType, "image/") {
-		folder = "images"
-	}
-	tempFile, err := ioutil.TempFile("static/"+folder, "upload-*"+path.Ext(fileHeader.Filename))
+
+	tempFile, err := ioutil.TempFile(tmpPath, "tmp-*")
 	if err != nil {
 		log.Println(err.Error())
 		u.RespondJson(w, u.Response{Message: err.Error(), ErrorCode: u.ErrGeneral}, http.StatusOK)
@@ -76,13 +87,55 @@ var HandleLocalUpload = func(w http.ResponseWriter, r *http.Request) {
 		u.RespondJson(w, u.Response{Message: err.Error(), ErrorCode: u.ErrGeneral}, http.StatusOK)
 		return
 	}
+
+	uuid, _ := uuid.NewV4()
+	newPath := filepath.Join(".", "static", strings.ToLower(fmt.Sprintf("%s%s", uuid.String(), path.Ext(fileHeader.Filename))))
+
+	err = os.Rename(tempFile.Name(), newPath)
+	if err != nil {
+		log.Println("Cannot move file", err.Error())
+		u.RespondJson(w, u.Response{Message: err.Error(), ErrorCode: u.ErrGeneral}, http.StatusOK)
+		return
+	}
+	record := &m.Upload{Path: newPath, OriginalName: fileHeader.Filename, Comment: comment}
+	err = m.GetDB().Create(record).Error
+	if err != nil {
+		log.Println(err.Error())
+		u.RespondJson(w, u.Response{Message: err.Error(), ErrorCode: u.ErrGeneral}, http.StatusOK)
+		return
+	}
+
 	payload := make(map[string]interface{})
 	payload["originalName"] = fileHeader.Filename
+	payload["alias"] = record.Alias
+	payload["comment"] = record.Comment
+	payload["path"] = record.Path
+
 	u.RespondJson(w, u.Response{Payload: payload, Message: fmt.Sprintf("File uploaded successfully [%v]", fileHeader.Filename)}, http.StatusOK)
 }
 
+
+
+var GetFilePath = func(w http.ResponseWriter, r *http.Request) {
+
+	payload := make(map[string]interface{})
+	payload["path"] = ""
+	u.RespondJson(w, u.Response{Payload: payload}, http.StatusOK)
+
+}
+
+
 func CheckMimeType(mimeType string) error {
-	mimeTypes := [...]string{"video/quicktime","video/mpeg","video/mp4","image/png","image/jpg","image/jpeg"}
+	mimeTypes := [...]string{
+		"video/quicktime",
+		"video/mpeg",
+		"video/mp4",
+		"image/png",
+		"image/jpg",
+		"image/jpeg",
+		"audio/mpeg",
+		"audio/wav",
+	}
 	for _, b := range mimeTypes {
 		if b == mimeType {
 			return nil

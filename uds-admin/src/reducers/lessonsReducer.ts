@@ -1,5 +1,6 @@
 import {AnyAction} from "redux";
-import {IPagination} from "../helpers/models";
+import {IAction, IPagination} from "../helpers/models";
+import {SET_LESSONS} from "../actions/types";
 
 export interface ILessonTask {
 	ID?: number,
@@ -8,16 +9,18 @@ export interface ILessonTask {
 }
 
 export interface ILessonContent {
-	content: string,
+	ID?: number,
+	body: string,
 	tasks: ILessonTask[]
 }
 
 export interface ILesson {
-	ID: number,
 	title: string,
 	annotation: string,
 	published: boolean,
 	paid: boolean,
+	course_id: number,
+	ID?: number,
 	content?: ILessonContent
 }
 
@@ -34,8 +37,9 @@ export const defaultState: ILessonsState = {
 
 export const reducer = (state: ILessonsState = defaultState, action: AnyAction): ILessonsState => {
 	switch (action.type) {
-		case '': {
-			
+		case SET_LESSONS: {
+			const a = action as IAction<ILesson[]>;
+			state = {...state, items: a.payload};
 			break;
 		}
 	}

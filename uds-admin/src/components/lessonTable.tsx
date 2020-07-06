@@ -16,7 +16,7 @@ import {
 import {Pagination} from "@material-ui/lab";
 import {Link} from "react-router-dom";
 import {getCourseUrl, getEditLessonUrl} from "../helpers/getUrl";
-import {Edit} from "@material-ui/icons";
+import {Close, Done, Edit, Visibility, VisibilityOff} from "@material-ui/icons";
 
 
 const ITEM_HEIGHT = 48;
@@ -58,17 +58,20 @@ interface ILessonRowProps {
 }
 
 export const LessonRow: FC<ILessonRowProps> = ({course_id, lesson}) => {
-	const {ID} = lesson;
+	const {ID, title, paid, published} = lesson;
 	return (
 		<>
 			<TableRow>
 				<TableCell component="th" scope="row">
-				
+					{title}
 				</TableCell>
-				<TableCell align="right"> </TableCell>
-				<TableCell align="right"> </TableCell>
-				<TableCell align="right"> </TableCell>
-				<TableCell align="right">
+				<TableCell align="center">
+					{paid ? <Done /> : <Close />}
+				</TableCell>
+				<TableCell align="center">
+					{published ? <Visibility /> : <VisibilityOff />}
+				</TableCell>
+				<TableCell align="center">
 					<IconButton component={Link} to={getEditLessonUrl(course_id, String(ID))}>
 						<Edit />
 					</IconButton>
@@ -90,10 +93,9 @@ const LessonTable: FC<ILessonTableProps> = (props) => {
 					<TableHead>
 						<TableRow>
 							<TableCell>Название</TableCell>
-							<TableCell align="right">Платный</TableCell>
-							<TableCell align="right">Опубликован</TableCell>
-							<TableCell align="right">Заданий</TableCell>
-							<TableCell align="right" className={classes.actionColumn}> </TableCell>
+							<TableCell align="center">Платный</TableCell>
+							<TableCell align="center">Опубликован</TableCell>
+							<TableCell align="center" className={classes.actionColumn}> </TableCell>
 						</TableRow>
 					</TableHead>
 					<TableBody>

@@ -141,7 +141,7 @@ const UserRow: FC<IUserRowProps> = ({user, role}) => {
 					{!user.confirmed && <Chip className={classes.chip} label="Не подтвержден" size="small" />}
 					{user.is_blocked && <Chip className={classes.chip} label="Заблокирован" size="small"/>}
 				</TableCell>
-				<TableCell align="right">{created}</TableCell>
+				<TableCell align="center">{created}</TableCell>
 				<TableCell align="right" className={classes.actionColumn}>
 					<IconButton
 						aria-label="more"
@@ -221,8 +221,8 @@ const UserTable: FC<IUserTableProps> = (props) => {
 					<TableHead>
 						<TableRow>
 							<TableCell>Email</TableCell>
-							<TableCell align="right">Создан</TableCell>
-							<TableCell align="right" className={classes.actionColumn}> </TableCell>
+							<TableCell align="center">Создан</TableCell>
+							<TableCell align="center" className={classes.actionColumn}> </TableCell>
 						</TableRow>
 					</TableHead>
 					<TableBody>

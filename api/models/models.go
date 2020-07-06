@@ -41,33 +41,18 @@ func init() {
 		&LessonTask{},
 		&Course{},
 		&Purchase{},
+		&Upload{},
 	)
 	// Foreign Keys
 	db.Model(&Password{}).AddForeignKey("account_id", "accounts(id)", "CASCADE", "NO ACTION")
 	db.Model(&Token{}).AddForeignKey("account_id", "accounts(id)", "CASCADE", "NO ACTION")
 	db.Model(&LessonContent{}).AddForeignKey("lesson_id", "lessons(id)", "CASCADE", "NO ACTION")
 	db.Model(&LessonTask{}).AddForeignKey("lesson_content_id", "lesson_contents(id)", "CASCADE", "NO ACTION")
+	db.Model(&Lesson{}).AddForeignKey("course_id", "courses(id)", "CASCADE", "NO ACTION")
 	db.Model(&Course{}).AddForeignKey("assistant_id", "accounts(id)", "SET NULL", "NO ACTION")
 	db.Model(&Purchase{}).AddForeignKey("account_id", "accounts(id)", "SET NULL", "NO ACTION")
 	db.Model(&Purchase{}).AddForeignKey("course_id", "courses(id)", "SET NULL", "NO ACTION")
 
-	//v4, _ := uuid.NewV4()
-	//lessons := []*Lesson{
-	//	&Lesson{Title: "lesson 1", Annotation: "ann for 1"},
-	//	&Lesson{Title: "lesson 2", Annotation: "ann for 2"},
-	//}
-	//courses := []*Course{&Course{Title: "A course for beginners", Annotation: "Wow!", Price: 1000, Lessons: lessons}}
-	//
-	//acc := &Account{ID: v4}
-	//acc.Role = 1
-	//acc.Email = "sfsd@rwh.ytk"
-	//
-	//err = GetDB().Save(acc).Error
-	//if err != nil {
-	//	fmt.Println("Error", err)
-	//}
-	//acc.AssignedCourses = courses
-	//GetDB().Save(acc)
 }
 
 func GetDB() *gorm.DB {

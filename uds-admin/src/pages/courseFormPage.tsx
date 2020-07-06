@@ -126,13 +126,13 @@ const CourseFormPage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) => {
                 dispatch(popup_snack(`Курс "${title}" успешно обновлен`));
                 history.push(getCourseUrl(course_id));
             }));
-        } else {
-            // create post
-            dispatch(create_course(title, annotation, price, assistantID, (course) => {
-                dispatch(popup_snack(`Курс "${course.title}" был успешно создан`));
-                history.push(ROUTES.COURSES);
-            }));
+            return;
         }
+        // create post
+        dispatch(create_course(title, annotation, price, assistantID, (course) => {
+            dispatch(popup_snack(`Курс "${course.title}" был успешно создан`));
+            history.push(ROUTES.COURSES);
+        }));
     };
 
     return (
@@ -252,7 +252,10 @@ const CourseFormPage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) => {
                 <Divider/>
 
                 <div className={classes.buttonBar}>
-                    <Button component={Link} to={ROUTES.COURSES} className={classes.cancelBtn}>Отмена</Button>
+                    <Button component={Link}
+                            to={course_id ? getCourseUrl(course_id) : ROUTES.COURSES}
+                            className={classes.cancelBtn}>Отмена
+                    </Button>
 
                     <Button disabled={!isFormValid()}
                             type="submit"
