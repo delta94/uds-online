@@ -9,7 +9,9 @@ interface IVideoProps {
 const useStyles = makeStyles((theme: Theme) =>
 	createStyles({
 		wrap: {
-			margin: '1rem 0',
+			margin: '1rem auto',
+			width: 500,
+			maxWidth: '100%',
 		},
 		video: {
 			maxHeight: '300px',
@@ -40,13 +42,12 @@ export const Video: FC<IVideoProps> = ({src}) => {
 	
 	return (
 		<div className={classes.wrap}>
-			{/*<video onClick={handleClick} onContextMenu={handleClick} className={classes.video} src={process.env.REACT_APP_S3_VIDEO_ROOT + '/' + src} controls>*/}
-			{/*	<source/>*/}
-			{/*</video>*/}
 			<ReactPlayer ref={ref}
 						 onContextMenu={handleClick}
 						 playing={playing}
+						 width='100%'
 						 controls={true}
+						 height={200}
 						 onProgress={(data: any) => {console.log({data})}}
 						 url={src}
 			/>

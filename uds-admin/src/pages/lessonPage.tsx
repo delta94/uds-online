@@ -13,8 +13,8 @@ import {
 	Typography
 } from "@material-ui/core";
 import {ComponentSpinner} from "../components/spinner";
-import {getCourseUrl} from "../helpers/getUrl";
-import {Save} from "@material-ui/icons";
+import {getCourseUrl, getPreviewLessonUrl} from "../helpers/getUrl";
+import {Save, OpenInNew} from "@material-ui/icons";
 import {TabLayout} from "../components/tabLayout";
 import {useDispatch} from "react-redux";
 import {create_lesson, get_lesson, popup_snack, update_lesson} from "../actions";
@@ -34,11 +34,15 @@ const useStyles = makeStyles((theme: Theme) =>
 			height: 20,
 		},
 		buttonBar: {
-			padding: '10px 0'
+			padding: '10px 0',
+			display: 'flex'
 		},
 		cancelBtn: {
 			color: 'red',
 			marginRight: 10
+		},
+		grow: {
+			flexGrow: 1,
 		},
 		editorWrap: {
 			padding: '5px 3px'
@@ -183,8 +187,8 @@ const LessonPage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) => {
 						content={body}
 						onChange={onContentChange}
 						options={{
-							minLines: 15,
-							maxLines: 15,
+							minLines: 25,
+							maxLines: 25,
 							showPrintMargin: false,
 							enableLiveAutocompletion: true,
 							enableBasicAutocompletion: false,
@@ -230,6 +234,16 @@ const LessonPage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) => {
 					color="primary">
 				{lesson_id ? "Сохранить" : "Создать"}
 			</Button>
+			
+			<div className={classes.grow} />
+			
+			{lesson_id && <Button component={Link}
+								  target="_blank"
+								  to={getPreviewLessonUrl(course_id, lesson_id)}
+								  variant="contained"
+								  startIcon={<OpenInNew />}
+								  color="default">Предпросмотр</Button>
+			}
 		</div>
 	</>
 	

@@ -4,12 +4,18 @@ export function getMessageUrl(id: number): string {
 	return ROUTES.MESSAGE.replace(/:id/, String(id));
 }
 
-export function getAddLessonUrl(course_id: string): string{
+export function getAddLessonUrl(course_id: string): string {
 	return ROUTES.LESSON_ADD.replace(/:course_id/, course_id);
 }
 
-export function getEditLessonUrl(course_id: string, lesson_id: string): string{
+export function getEditLessonUrl(course_id: string, lesson_id: string): string {
 	return ROUTES.LESSON_EDIT
+		.replace(/:course_id/, course_id)
+		.replace(/:lesson_id/, lesson_id);
+}
+
+export function getPreviewLessonUrl(course_id: string, lesson_id: string): string {
+	return ROUTES.LESSON_PREVIEW
 		.replace(/:course_id/, course_id)
 		.replace(/:lesson_id/, lesson_id);
 }

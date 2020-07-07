@@ -27,6 +27,7 @@ const CourseFormPage = lazy(() => import("./pages/courseFormPage"));
 const LessonPage = lazy(() => import("./pages/lessonPage"));
 const AssetsPage = lazy(() => import("./pages/assetsPage"));
 const TradePage = lazy(() => import("./pages/tradePage"));
+const PreviewPage = lazy(() => import("./pages/previewPage"));
 const NotFoundPage = lazy(() => import("./pages/notFoundPage"));
 
 const {ROLE_ADMIN, ROLE_ASSISTANT} = ROLES;
@@ -117,6 +118,11 @@ function App() {
 									  roles={[ROLE_ADMIN]}
 									  path={ROUTES.LESSON_EDIT}
 									  component={() => <Layout><LessonPage /></Layout>}
+						/>
+						<PrivateRoute exact
+									  roles={[ROLE_ADMIN]}
+									  path={ROUTES.LESSON_PREVIEW}
+									  component={() => <PreviewPage />}
 						/>
 						<PrivateRoute exact
 									  roles={[ROLE_ADMIN]}
