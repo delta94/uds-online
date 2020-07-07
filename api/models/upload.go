@@ -9,6 +9,7 @@ type Upload struct {
 	gorm.Model
 	Alias        string `json:"alias" gorm:"size:12;unique_index;"`
 	OriginalName string `json:"original_name" gorm:"size:80;"`
+	Type         string `json:"type" gorm:"size:32"`
 	Comment      string `json:"comment" gorm:"size:80;"`
 	Path         string `json:"path"`
 }

@@ -100,8 +100,12 @@ var CreateLesson = func(w http.ResponseWriter, r *http.Request) {
 		u.RespondJson(w, u.Response{Message: "Invalid request", ErrorCode: u.ErrGeneral}, http.StatusOK)
 		return
 	}
+	if lesson.ID != 0 || lesson.Content.ID != 0 {
+		log.Print("Some id provided for creating lesson")
+		u.RespondJson(w, u.Response{Message: "Invalid request", ErrorCode: u.ErrGeneral}, http.StatusOK)
+		return
+	}
 	// get rid of IDs in case they are given
-	lesson.Content.ID = 0
 	for _, t := range lesson.Content.Tasks {
 		t.ID = 0
 	}
@@ -123,6 +127,17 @@ var UpdateLesson = func(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(lesson)
 	if err != nil {
 		log.Print(err.Error())
+		u.RespondJson(w, u.Response{Message: "Invalid request", ErrorCode: u.ErrGeneral}, http.StatusOK)
+		return
+	}
+	err = lesson.Validate()
+	if err != nil {
+		log.Print(err.Error())
+		u.RespondJson(w, u.Response{Message: err.Error(), ErrorCode: u.ErrGeneral}, http.StatusOK)
+		return
+	}
+	if lesson.ID == 0 || lesson.Content.ID == 0 || lesson.CourseID == 0 {
+		log.Print("No id provided for updating lesson")
 		u.RespondJson(w, u.Response{Message: "Invalid request", ErrorCode: u.ErrGeneral}, http.StatusOK)
 		return
 	}

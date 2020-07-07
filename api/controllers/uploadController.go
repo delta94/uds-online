@@ -98,7 +98,12 @@ var HandleLocalUpload = func(w http.ResponseWriter, r *http.Request) {
 		u.RespondJson(w, u.Response{Message: err.Error(), ErrorCode: u.ErrGeneral}, http.StatusOK)
 		return
 	}
-	record := &m.Upload{Path: newPath, OriginalName: fileHeader.Filename, Comment: comment}
+	record := &m.Upload{
+		Path: newPath,
+		OriginalName: fileHeader.Filename,
+		Comment: comment,
+		Type: strings.Split(mimeType, "/")[0],
+	}
 	err = m.GetDB().Create(record).Error
 	if err != nil {
 		log.Println(err.Error())
@@ -131,6 +136,7 @@ var GetFilePath = func(w http.ResponseWriter, r *http.Request) {
 	}
 	payload := make(map[string]interface{})
 	payload["path"] = upload.Path
+	payload["type"] = upload.Type
 	u.RespondJson(w, u.Response{Payload: payload}, http.StatusOK)
 }
 
