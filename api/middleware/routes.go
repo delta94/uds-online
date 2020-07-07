@@ -19,5 +19,6 @@ var Routes = map[string]map[string]string{
 		"adminLessons":  apiPrefix + "/v1/admin/lessons",
 		"resetPassword": apiPrefix + "/v1/issue-password-reset",
 		"purchases":     apiPrefix + "/v1/purchases",
+		"uploads":       apiPrefix + "/v1/uploads",
 	},
 }

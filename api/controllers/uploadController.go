@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"fmt"
+	"github.com/gorilla/mux"
 	uuid "github.com/satori/go.uuid"
 	"io/ioutil"
 	"log"
@@ -114,16 +115,24 @@ var HandleLocalUpload = func(w http.ResponseWriter, r *http.Request) {
 	u.RespondJson(w, u.Response{Payload: payload, Message: fmt.Sprintf("File uploaded successfully [%v]", fileHeader.Filename)}, http.StatusOK)
 }
 
-
-
 var GetFilePath = func(w http.ResponseWriter, r *http.Request) {
-
+	params := mux.Vars(r)
+	alias := params["alias"]
+	if alias == "" {
+		u.RespondJson(w, u.Response{Message: "Invalid request"}, http.StatusOK)
+		return
+	}
+	upload := &m.Upload{}
+	err := m.GetDB().Take(upload, "alias = ?", alias).Error
+	if err != nil {
+		log.Println(err.Error())
+		u.RespondJson(w, u.Response{Message: "Path not found", ErrorCode: u.ErrNotFound}, http.StatusNotFound)
+		return
+	}
 	payload := make(map[string]interface{})
-	payload["path"] = ""
+	payload["path"] = upload.Path
 	u.RespondJson(w, u.Response{Payload: payload}, http.StatusOK)
-
 }
-
 
 func CheckMimeType(mimeType string) error {
 	mimeTypes := [...]string{

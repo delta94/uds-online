@@ -32,7 +32,7 @@ func (s *accountService) Create(model *m.Account) error {
 		[]byte(model.Password.Raw), bcrypt.DefaultCost,
 	)
 	model.Password.Hash = string(hashedPassword)
-	model.ConfirmationToken = m.Token{
+	model.ConfirmationToken = &m.Token{
 		Type:      TypeConfirmation,
 		ExpiresAt: time.Now().Add(time.Hour * time.Duration(24)),
 		Value:     u.TokenGenerator(32),

@@ -59,14 +59,14 @@ func main() {
 	// get lesson (Admin)
 	router.Handle(mw.Routes["v1"]["adminLessons"]+"/{id}", mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.GetLessonAdmin), []int{mw.RoleAdmin}))).Methods("GET", "OPTIONS")
 
-
 	// get purchases
 	router.Handle(mw.Routes["v1"]["purchases"], mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.GetPurchases), []int{mw.RoleAdmin}))).Methods("GET", "OPTIONS")
 	// create purchase
 	router.Handle(mw.Routes["v1"]["purchases"], mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.CreatePurchase), []int{mw.RoleAdmin}))).Methods("POST", "OPTIONS")
 
 	// Upload
-	router.HandleFunc("/api/v1/uploads", controllers.HandleLocalUpload).Methods("POST", "OPTIONS")
+	router.Handle(mw.Routes["v1"]["uploads"], mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.HandleLocalUpload), []int{mw.RoleAdmin}))).Methods("POST", "OPTIONS")
+	router.Handle(mw.Routes["v1"]["uploads"]+"/{alias}", mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.GetFilePath), []int{mw.RoleAdmin, mw.RoleUser, mw.RoleAssistant}))).Methods("GET", "OPTIONS")
 
 	// Port
 	port := os.Getenv("PORT")

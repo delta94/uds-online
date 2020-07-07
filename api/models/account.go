@@ -21,9 +21,9 @@ type Account struct {
 	ID                uuid.UUID `gorm:"primary_key;type:char(36);"`
 	Email             string    `gorm:"size:80;unique_index;not null" json:"email"`
 	IsConfirmed       bool      `json:"confirmed"`
-	ConfirmationToken Token     `gorm:"foreignkey:AccountID" json:"-"`
-	ResetToken        Token     `gorm:"foreignkey:AccountID" json:"-"`
-	Password          Password  `json:"password" gorm:"foreignkey:AccountID"`
+	ConfirmationToken *Token    `gorm:"foreignkey:AccountID" json:"-"`
+	ResetToken        *Token    `gorm:"foreignkey:AccountID" json:"-"`
+	Password          *Password `json:"password" gorm:"foreignkey:AccountID"`
 	Role              int       `json:"role"`
 	CreatedAt         time.Time
 	UpdatedAt         time.Time
