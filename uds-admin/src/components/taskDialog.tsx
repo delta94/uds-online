@@ -157,7 +157,7 @@ export const TaskDialog: FC<ITaskDialogProps> = ({open, onClose, onSave, task}) 
 				PaperComponent={PaperComponent}
 				aria-labelledby={"draggable-dialog-title"}>
 			<DialogTitle style={{cursor: 'move'}} id={"draggable-dialog-title"}>
-				Добавить задание
+				{task ? "Редактировать задание" : "Добавить задание"}
 			</DialogTitle>
 			<DialogContent>
 				<DialogContentText>
@@ -166,6 +166,9 @@ export const TaskDialog: FC<ITaskDialogProps> = ({open, onClose, onSave, task}) 
 				
 				<InputLabel id="select-type">Тип задания</InputLabel>
 				<Select fullWidth
+						inputProps={{
+							disabled: !!task
+						}}
 						labelId="select-type"
 						onChange={({target: {value}}) => onTypeChange(value as number)}
 						value={type}

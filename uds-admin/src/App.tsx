@@ -15,6 +15,7 @@ import history from "./history";
 import {ITokenPayload} from "./reducers/authReducer";
 import AlertModal from "./components/alertModal";
 import {log_out} from "./actions";
+import {useTranslation} from 'react-i18next';
 
 const LoginPage = lazy(() => import("./pages/loginPage"));
 const HomePage = lazy(() => import("./pages/homePage"));
@@ -34,7 +35,8 @@ const {ROLE_ADMIN, ROLE_ASSISTANT} = ROLES;
 const CHECK_EXPIRATION_INTERVAL_SEC = 5;
 
 function App() {
-	const t = useRef<unknown>();
+	const ti = useRef<unknown>();
+	const [t, i18n] = useTranslation();
 	const dispatch = useDispatch();
 	const authState = useSelector((state: IReducerState) => state.auth);
 	const [logged, setLogged] = useState<boolean>(!!authState.token);
@@ -48,7 +50,7 @@ function App() {
 	
 	// Notify user when token expired
 	useEffect(() => {
-		t.current = setInterval(() => {
+		ti.current = setInterval(() => {
 			if (logged) {
 				const decodedToken = jwtDecode(authState.token || "");
 				if (!decodedToken || (decodedToken as ITokenPayload).exp * 1000 < Date.now()) {
@@ -59,8 +61,8 @@ function App() {
 			}
 		}, CHECK_EXPIRATION_INTERVAL_SEC * 1000);
 		return () => {
-			if (t && t.current) {
- 				clearInterval(t.current as number);
+			if (ti && ti.current) {
+ 				clearInterval(ti.current as number);
 			}
 		};
 	}, [logged]);
@@ -78,6 +80,7 @@ function App() {
 			/>
 			
 			<Router history={history}>
+				
 				<Suspense fallback={<PageSpinner/>}>
 					<Switch>
 						<Route exact

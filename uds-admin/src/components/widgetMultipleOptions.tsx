@@ -62,7 +62,6 @@ export const WidgetMultipleOptions: FC<ITaskWidget> = ({data, onJsonUpdate}) => 
             control: control!,
             options
         };
-        console.log("onJsonUpdate", t);
         onJsonUpdate(encodeObjectToBase64(t));
     }, [control, text, options]);
 
@@ -178,7 +177,7 @@ export const WidgetMultipleOptions: FC<ITaskWidget> = ({data, onJsonUpdate}) => 
 
                         <Checkbox
                             title={"Правильный вариант"}
-                            checked={control && control.includes(id)}
+                            checked={Array.isArray(control) && control.includes(id)}
                             onChange={({currentTarget: {checked}}) => onControlChange(checked, id)}
                             inputProps={{ 'aria-label': 'primary checkbox' }}
                         />

@@ -16,6 +16,7 @@ import {
 	Typography
 } from "@material-ui/core";
 import {Add} from "@material-ui/icons";
+import {useTranslation} from "react-i18next";
 
 interface IFileUploadDialogProps {
 	text: string,
@@ -33,6 +34,7 @@ const MAX_LENGTH_COMMENT = 80;
 
 const FileUploadDialog: FC<IFileUploadDialogProps> = ({text, open, onClose}) => {
 	const dispatch = useDispatch();
+	const [t, i18n] = useTranslation();
 	const [result, setResult] = useState<boolean | null>(null);
 	const [uploading, setUploading] = useState<boolean>(false);
 	const [progress, setProgress] = useState<number>(0);
@@ -178,6 +180,7 @@ const FileUploadDialog: FC<IFileUploadDialogProps> = ({text, open, onClose}) => 
 };
 
 const AssetsPage: FC = () => {
+	const [t, i18n] = useTranslation();
 	const [uploadDialogOpen, setUploadDialogOpen] = useState<boolean>(false);
 	
 	const uploadButton = <Button
@@ -187,7 +190,7 @@ const AssetsPage: FC = () => {
 		onClick={() => setUploadDialogOpen(true)}>Загрузить файл</Button>;
 	
 	return (
-		<PageWrapper heading="Ресурсы" actionArea={uploadButton}>
+		<PageWrapper heading={t('TITLES.ASSETS')} actionArea={uploadButton}>
 			
 			<FileUploadDialog
 				text={"Выберите файл с видео/изображением для загрузки."}

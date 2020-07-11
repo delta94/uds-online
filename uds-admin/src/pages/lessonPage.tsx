@@ -12,6 +12,8 @@ import history from "../history";
 import {ILesson, ILessonTask} from "../reducers/lessonsReducer";
 import {TaskPreview} from "../components/taskPreview";
 import {TaskDialog} from "../components/taskDialog";
+import {DragDropContext, Droppable, Draggable, DragUpdate, DropResult} from "react-beautiful-dnd";
+
 import clsx from "clsx";
 import {
 	Button,
@@ -23,6 +25,7 @@ import {
 	TextField,
 	Typography
 } from "@material-ui/core";
+import {Sortable} from "../helpers/models";
 
 const HtmlEditor = lazy(() => import("../components/htmlEditor"));
 const MAX_LENGTH_TITLE = 80;
@@ -135,10 +138,6 @@ const LessonPage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) => {
 		setTaskDialogOpen(false);
 	};
 	
-	// useEffect(() => {
-	// 	console.log("NEW TASKS:", tasks);
-	// }, [tasks]);
-	
 	const onSubmit = (e: FormEvent, stay?: boolean) => {
 		e.preventDefault();
 		if (!isFormValid()) {
@@ -184,6 +183,30 @@ const LessonPage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) => {
 			}
 			return 0;
 		});
+	}
+	
+	function reorder<T>(list: Sortable<T>[], startIndex: number, endIndex: number): T[] {
+		const result: Sortable<T>[] = Array.from(list);
+		const [removed] = result.splice(startIndex, 1);
+		result.splice(endIndex, 0, removed);
+		let sort = 0
+		result.forEach(r => {
+			r.sort = sort;
+			sort += 10;
+		});
+		return result;
+	}
+	
+	const onDragEnd = (result: DropResult) => {
+		if (!result.destination) {
+			return;
+		}
+		const items = reorder<ILessonTask>(
+			sortedTasks(tasks),
+			result.source.index,
+			result.destination.index
+		);
+		setTasks(items);
 	}
 	
 	const tabContentMain = <>
@@ -286,11 +309,32 @@ const LessonPage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) => {
 		
 		<Divider />
 		
-		{tasks && sortedTasks(tasks).map((task, i) => {
-			return (
-				<TaskPreview key={i + String(task.ID)} task={task} onSave={handleSave}/>
-			)
-		})}
+		<DragDropContext onDragEnd={onDragEnd}>
+			<Droppable droppableId="droppable">
+				{(provided) => (
+					<div
+						{...provided.droppableProps}
+						ref={provided.innerRef}
+					>
+						{tasks && sortedTasks(tasks).map((task, i) => {
+							return (
+								<Draggable key={i + String(task.ID)} draggableId={i + String(task.ID)} index={i}>
+									{(provided) => (
+										<div ref={provided.innerRef}
+											  {...provided.draggableProps}
+											  {...provided.dragHandleProps}>
+											<TaskPreview task={task} onSave={handleSave}/>
+										</div>
+									)}
+								</Draggable>
+							)
+						})}
+						{provided.placeholder}
+					</div>
+				)}
+			</Droppable>
+		</DragDropContext>
+		
 		
 		<TaskDialog open={taskDialogOpen}
 					onClose={() => setTaskDialogOpen(false)}
@@ -345,7 +389,7 @@ const LessonPage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) => {
 						startIcon={<Save/>}
 						variant="contained"
 						color="primary">
-						Сохранить и продолжить
+						Применить
 					</Button>}
 					
 					<div className={classes.grow} />

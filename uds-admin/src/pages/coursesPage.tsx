@@ -9,6 +9,7 @@ import {Link} from "react-router-dom";
 import {ROUTES} from "../constants";
 import {get_courses} from "../actions";
 import {ComponentSpinner} from "../components/spinner";
+import {useTranslation} from "react-i18next";
 
 const CourseTable = lazy(() => import("../components/courseTable"));
 
@@ -24,6 +25,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const CoursesPage: FC = () => {
 	const classes = useStyles();
+	const [t, i18n] = useTranslation();
 	const dispatch = useDispatch();
 	const courseState = useSelector((state: IReducerState) => state.course);
 	
@@ -32,7 +34,7 @@ const CoursesPage: FC = () => {
 	}, []);
 	
 	return (
-		<PageWrapper heading="Курсы"
+		<PageWrapper heading={t('TITLES.COURSES')}
 					 actionArea={<Button
 						 color="primary"
 						 variant="contained"

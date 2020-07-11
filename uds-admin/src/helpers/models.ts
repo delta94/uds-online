@@ -1,6 +1,9 @@
 import {ILessonTask} from "../reducers/lessonsReducer";
 
 export type Modify<T, R> = Omit<T, keyof R> & R;
+
+export type Sortable<T> = T & {sort: number};
+
 export interface IPagination {
 	total: number,
 	page: number,

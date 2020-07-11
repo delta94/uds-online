@@ -1,10 +1,11 @@
 import React, {FC, useState} from "react";
-import {Card, CardActionArea, CardContent} from "@material-ui/core";
+import {Card, CardActionArea, CardContent, IconButton} from "@material-ui/core";
 import {createStyles, makeStyles, Theme} from "@material-ui/core/styles";
 import {ILessonTask} from "../reducers/lessonsReducer";
 import {TaskDialog} from "./taskDialog";
 import moment from "moment";
 import clsx from "clsx";
+import {Edit} from "@material-ui/icons";
 
 const useStyles = makeStyles((theme: Theme) =>
 	createStyles({
@@ -15,18 +16,22 @@ const useStyles = makeStyles((theme: Theme) =>
 			marginTop: 10,
 			marginBottom: 10,
 		},
+		grow: {
+			flexGrow: 1
+		},
 		content: {
 			display: 'flex',
-			alignItems: 'center',
-			justifyContent: 'space-between'
+			alignItems: 'center'
 		},
 		createdAt: {
 			color: '#828282',
 			marginLeft: 10,
+			marginRight: 10,
 		},
 		saveRequired: {
 			color: '#148E00',
 			marginLeft: 10,
+			marginRight: 10,
 		},
 		unpublished: {
 			textDecoration: 'line-through'
@@ -44,7 +49,6 @@ export const TaskPreview: FC<ITaskPreviewProps> = ({task, onSave}) => {
 	const [taskDialogOpen, setTaskDialogOpen] = useState<boolean>(false);
 	
 	const handleSave = (t: ILessonTask) => {
-		console.log("TaskDialog save:", t);
 		onSave(t);
 		setTaskDialogOpen(false);
 	};
@@ -54,15 +58,20 @@ export const TaskPreview: FC<ITaskPreviewProps> = ({task, onSave}) => {
 	return (
 		<>
 			<Card className={classes.task}>
-				<CardActionArea onClick={() => setTaskDialogOpen(true)}>
-					<CardContent className={classes.content}>
-						<span className={clsx({[classes.unpublished]: !task.published})}>{task.description}</span>
-						{createdAt ?
-							<small className={classes.createdAt}>Дата создания: {createdAt}</small>
-							:
-							<small className={classes.saveRequired}>Требует сохранения</small>}
-					</CardContent>
-				</CardActionArea>
+				<CardContent className={classes.content}>
+					<span className={clsx({[classes.unpublished]: !task.published})}>{task.description}</span>
+					
+					<div className={classes.grow}/>
+					
+					{createdAt ?
+						<small className={classes.createdAt}>Дата создания: {createdAt}</small>
+						:
+						<small className={classes.saveRequired}>Требует сохранения</small>
+					}
+					<IconButton onClick={() => setTaskDialogOpen(true)}>
+						<Edit />
+					</IconButton>
+				</CardContent>
 			</Card>
 			
 			<TaskDialog open={taskDialogOpen}

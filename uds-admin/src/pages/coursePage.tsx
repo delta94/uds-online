@@ -10,6 +10,7 @@ import {Add, Edit} from "@material-ui/icons";
 import {ComponentSpinner} from "../components/spinner";
 import {Alert, AlertTitle} from "@material-ui/lab";
 import {get_course, set_lessons} from "../actions";
+import {useTranslation} from "react-i18next";
 
 const LessonTable = lazy(() => import("../components/lessonTable"));
 
@@ -40,6 +41,7 @@ interface IRouteProps {
 
 export const CoursePage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) => {
     const classes = useStyles();
+    const [t, i18n] = useTranslation();
     const dispatch = useDispatch();
     const [fetching, setFetching] = useState<boolean>(true);
     const [title, setTitle] = useState<string>("");
@@ -80,7 +82,7 @@ export const CoursePage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) =>
     
     return (
         <PageWrapper
-            heading={"Курс " + title}
+            heading={t('TITLES.COURSE', {name: title})}
             actionArea={buttonArea}
         >
             {!published && <Alert severity="warning" className={classes.publishAlert}>
