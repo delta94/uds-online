@@ -37,7 +37,10 @@ type LessonContent struct {
 type LessonTask struct {
 	gorm.Model
 	Type            int    `json:"type"`
-	Data            string `json:"data" gorm:"size:6000;"`
+	Description     string `json:"description"`
+	Json            string `json:"json" gorm:"size:6000;"`
+	Sort            int    `json:"sort"`
+	Published       bool   `json:"published"`
 	LessonContentID uint   `json:"-"`
 }
 
@@ -65,5 +68,10 @@ func (course *Course) Validate() error {
 	if course.AssistantID.String() == "00000000-0000-0000-0000-000000000000" {
 		return fmt.Errorf("assistant id is not defined")
 	}
+	return nil
+}
+
+func (lesson *Lesson) Validate() error {
+
 	return nil
 }

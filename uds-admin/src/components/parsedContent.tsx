@@ -10,7 +10,8 @@ const useStyles = makeStyles((theme: Theme) =>
 		imageWrap: {
 			display: 'block',
 			height: 200,
-			textAlign: 'center'
+			textAlign: 'center',
+			margin: '10px 0'
 		},
 		image: {
 			maxWidth: '100%',

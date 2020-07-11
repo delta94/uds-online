@@ -2,6 +2,17 @@ import React, {FC, FormEvent, lazy, Suspense, useEffect, useState} from "react";
 import {PageWrapper} from "../components/pageWrapper";
 import {Link, RouteComponentProps, withRouter} from "react-router-dom";
 import {createStyles, makeStyles, Theme} from "@material-ui/core/styles";
+import {ComponentSpinner} from "../components/spinner";
+import {getCourseUrl, getPreviewLessonUrl} from "../helpers/getUrl";
+import {Save, OpenInNew} from "@material-ui/icons";
+import {TabLayout} from "../components/tabLayout";
+import {useDispatch} from "react-redux";
+import {create_lesson, get_lesson, popup_snack, update_lesson} from "../actions";
+import history from "../history";
+import {ILesson, ILessonTask} from "../reducers/lessonsReducer";
+import {TaskPreview} from "../components/taskPreview";
+import {TaskDialog} from "../components/taskDialog";
+import clsx from "clsx";
 import {
 	Button,
 	Checkbox,
@@ -12,15 +23,6 @@ import {
 	TextField,
 	Typography
 } from "@material-ui/core";
-import {ComponentSpinner} from "../components/spinner";
-import {getCourseUrl, getPreviewLessonUrl} from "../helpers/getUrl";
-import {Save, OpenInNew} from "@material-ui/icons";
-import {TabLayout} from "../components/tabLayout";
-import {useDispatch} from "react-redux";
-import {create_lesson, get_lesson, popup_snack, update_lesson} from "../actions";
-import history from "../history";
-import {ILesson, ILessonTask} from "../reducers/lessonsReducer";
-import {TaskPreview} from "../components/taskPreview";
 
 const HtmlEditor = lazy(() => import("../components/htmlEditor"));
 const MAX_LENGTH_TITLE = 80;
@@ -39,6 +41,8 @@ const useStyles = makeStyles((theme: Theme) =>
 		},
 		cancelBtn: {
 			color: 'red',
+		},
+		button: {
 			marginRight: 10
 		},
 		grow: {
@@ -72,26 +76,32 @@ const LessonPage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) => {
 	const [paid, setPaid] = useState<boolean>(true);
 	const [contentID, setContentID] = useState<number>();
 	const [tasks, setTasks] = useState<ILessonTask[]>([]);
+	const [taskDialogOpen, setTaskDialogOpen] = useState<boolean>(false);
 	const dispatch = useDispatch();
-
+	
 	useEffect(() => {
 		if (lesson_id) {
-			dispatch(get_lesson(Number(lesson_id), (lesson) => {
-				const {title, content, annotation, paid, published} = lesson;
-				setTitle(title);
-				setAnnotation(annotation);
-				setPaid(paid);
-				setPublished(published);
-				setBody(content!.body);
-				setTasks(content!.tasks);
-				setContentID(content!.ID)
-			}));
+			preload();
 		}
 	}, []);
+	
+	const preload = () => {
+		dispatch(get_lesson(Number(lesson_id), (lesson) => {
+			const {title, content, annotation, paid, published} = lesson;
+			setTitle(title);
+			setAnnotation(annotation);
+			setPaid(paid);
+			setPublished(published);
+			setBody(content!.body);
+			setTasks(content!.tasks);
+			setContentID(content!.ID)
+		}));
+	};
 	
 	const onContentChange = (value: string) => {
 		setBody(value);
 	};
+	
 	const isFormValid = (): boolean => {
 		let isValid = true;
 		if (!title.trim() || title.length < MIN_LENGTH_TITLE || title.length > MAX_LENGTH_TITLE) {
@@ -103,8 +113,33 @@ const LessonPage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) => {
 		
 		return isValid;
 	};
-
-	const onSubmit = (e: FormEvent) => {
+	
+	const handleSave = (task: ILessonTask) => {
+		if (!Number.isInteger(task.ID)) {
+			// New task
+			const max = Math.max(...tasks.map(t => t.sort));
+			//console.log("new task", () + 10);
+			task.ID = 0;
+			task.sort = Number.isInteger(max) ? max + 10 : 0;
+			setTasks([...tasks, task]);
+		} else {
+			// Existing task
+			const _tasks = [...tasks];
+			let o = _tasks.find(t => t.ID === task.ID)!;
+			if (!o) {
+				return;
+			}
+			_tasks.splice(_tasks.indexOf(o), 1);
+			setTasks([..._tasks, {...task}]);
+		}
+		setTaskDialogOpen(false);
+	};
+	
+	// useEffect(() => {
+	// 	console.log("NEW TASKS:", tasks);
+	// }, [tasks]);
+	
+	const onSubmit = (e: FormEvent, stay?: boolean) => {
 		e.preventDefault();
 		if (!isFormValid()) {
 			return;
@@ -125,7 +160,11 @@ const LessonPage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) => {
 			lesson!.content!.ID = contentID;
 			dispatch(update_lesson(lesson, () => {
 				dispatch(popup_snack(`Раздел ${title} успешно обновлен`));
-				history.push(getCourseUrl(course_id));
+				if (!stay) {
+					history.push(getCourseUrl(course_id));
+				} else {
+					preload();
+				}
 			}));
 			return;
 		}
@@ -134,6 +173,18 @@ const LessonPage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) => {
 			history.push(getCourseUrl(course_id));
 		}));
 	};
+	
+	const sortedTasks = (tasks: ILessonTask[]): ILessonTask[] => {
+		return tasks.sort((a, b) => {
+			if (a.sort > b.sort) {
+				return 1;
+			}
+			if (a.sort < b.sort) {
+				return -1;
+			}
+			return 0;
+		});
+	}
 	
 	const tabContentMain = <>
 		<FormControl fullWidth>
@@ -223,44 +274,33 @@ const LessonPage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) => {
 			}
 			label="Платный раздел"
 		/>
-		<div className={classes.spacer}/>
-		<Divider/>
-		<div className={classes.buttonBar}>
-			<Button component={Link} to={getCourseUrl(course_id)} className={classes.cancelBtn}>Отмена</Button>
-			<Button disabled={!isFormValid()}
-					type="submit"
-					startIcon={<Save/>}
-					variant="contained"
-					color="primary">
-				{lesson_id ? "Сохранить" : "Создать"}
-			</Button>
-			
-			<div className={classes.grow} />
-			
-			{lesson_id && <Button component={Link}
-								  target="_blank"
-								  to={getPreviewLessonUrl(course_id, lesson_id)}
-								  variant="contained"
-								  startIcon={<OpenInNew />}
-								  color="default">Предпросмотр</Button>
-			}
-		</div>
 	</>
 	
 	const tabContentTasks = <>
+		<Button variant="contained"
+				color="primary"
+				onClick={() => setTaskDialogOpen(true)}
+				fullWidth>
+			Добавить задание
+		</Button>
 		
-		{tasks && tasks.map((task) => {
+		<Divider />
+		
+		{tasks && sortedTasks(tasks).map((task, i) => {
 			return (
-				<>
-					<TaskPreview task={task}/>
-				</>
+				<TaskPreview key={i + String(task.ID)} task={task} onSave={handleSave}/>
 			)
 		})}
+		
+		<TaskDialog open={taskDialogOpen}
+					onClose={() => setTaskDialogOpen(false)}
+					onSave={handleSave}
+		/>
 	</>
 	
 	return (
 		<PageWrapper heading={lesson_id ? "Редактирование раздела" : "Добавить раздел"}>
-			<form autoComplete="off" spellCheck="false" onSubmit={onSubmit}>
+			<form autoComplete="off" spellCheck="false" onSubmit={(e) => onSubmit(e)}>
 				<TabLayout
 					selected={TAB_MAIN}
 					tabs={[
@@ -278,6 +318,47 @@ const LessonPage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) => {
 						}
 					]}
 				/>
+				
+				<div className={classes.spacer}/>
+				
+				<Divider/>
+				
+				<div className={classes.buttonBar}>
+					<Button component={Link}
+							to={getCourseUrl(course_id)}
+							className={clsx(classes.cancelBtn, classes.button)}>Отмена</Button>
+					
+					<Button disabled={!isFormValid()}
+							type="submit"
+							className={clsx(classes.button)}
+							startIcon={<Save/>}
+							variant="contained"
+							color="primary">
+						{lesson_id ? "Сохранить" : "Создать"}
+					</Button>
+					
+					{lesson_id && <Button
+						disabled={!isFormValid()}
+						type="button"
+						className={clsx(classes.button)}
+						onClick={(e) => onSubmit(e, true)}
+						startIcon={<Save/>}
+						variant="contained"
+						color="primary">
+						Сохранить и продолжить
+					</Button>}
+					
+					<div className={classes.grow} />
+					
+					{lesson_id && <Button component={Link}
+										  target="_blank"
+										  to={getPreviewLessonUrl(course_id, lesson_id)}
+										  variant="contained"
+										  startIcon={<OpenInNew />}
+										  color="default">Предпросмотр</Button>
+					}
+				</div>
+				
 			</form>
 		</PageWrapper>
 	);

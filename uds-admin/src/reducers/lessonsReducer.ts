@@ -1,11 +1,15 @@
 import {AnyAction} from "redux";
-import {IAction, IPagination} from "../helpers/models";
+import {IAction, IPagination, ITaskType} from "../helpers/models";
 import {SET_LESSONS} from "../actions/types";
 
 export interface ILessonTask {
-	ID?: number,
-	type: number,
-	data: string
+	ID?: number;
+	type: ITaskType;
+	description: string;
+	json: string;
+	published: boolean;
+	sort: number;
+	CreatedAt?: string;
 }
 
 export interface ILessonContent {

@@ -22,6 +22,7 @@ export const ConfirmDialog: FC<IConfirmDialogProps> = ({children, text, heading,
 	return (
 		<Dialog
 			open={open}
+			fullWidth
 			PaperComponent={PaperComponent}
 			aria-labelledby="draggable-dialog-title"
 		>
