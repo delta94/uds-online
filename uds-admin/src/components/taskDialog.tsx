@@ -1,4 +1,4 @@
-import React, {FC, useEffect, useState} from "react";
+import React, {FC, useEffect, useState, Suspense, lazy} from "react";
 import {
 	Button,
 	Checkbox,
@@ -7,37 +7,29 @@ import {
 	DialogContent,
 	DialogContentText,
 	DialogTitle,
-	Divider,
-	FormControl, FormControlLabel,
-	IconButton,
+	FormControl,
+	FormControlLabel,
 	InputLabel,
 	MenuItem,
 	Select,
 	TextField
 } from "@material-ui/core";
 import {PaperComponent} from "./confirmDialog";
-import clsx from 'clsx';
 import {
-	ITaskCompareOptions,
-	ITaskFillGaps,
-	ITaskMultipleOptions,
-	ITaskOption,
-	ITaskSingleOption,
-	ITaskType,
-	ITaskWidget
+	ITaskType
 } from "../helpers/models";
 import {createStyles, makeStyles, Theme} from "@material-ui/core/styles";
-import {decodeBase64ToObject, delay, encodeObjectToBase64, getNewOptionId} from "../helpers";
-import {Delete, Save} from "@material-ui/icons";
+import {Save} from "@material-ui/icons";
 import {ILessonTask} from "../reducers/lessonsReducer";
+import {ComponentSpinner} from "./spinner";
+
+const WidgetSingleOption = lazy(() => import("./widgetSingleOption"));
+const WidgetMultipleOptions = lazy(() => import("./widgetMultipleOptions"));
+const WidgetCompareOptions = lazy(() => import("./widgetCompareOptions"));
+const WidgetFillGaps = lazy(() => import("./widgetFillGaps"));
 
 
 const MAX_LENGTH_DESCRIPTION = 300;
-const MAX_LENGTH_TEXT = 500;
-const MAX_LENGTH_OPTION = 80;
-const MAX_OPTIONS = 8;
-
-
 const useStyles = makeStyles((theme: Theme) =>
 	createStyles({
 		spacer: {
@@ -136,27 +128,35 @@ export const TaskDialog: FC<ITaskDialogProps> = ({open, onClose, onSave, task}) 
 	
 	switch (type) {
 		case ITaskType.PICK_SINGLE_ANSWER:
-			widget = <WidgetSingleOption data={json} onJsonUpdate={(str) => setJson(str)}/>;
+			widget = <Suspense fallback={<ComponentSpinner />}>
+				<WidgetSingleOption data={json} onJsonUpdate={(str) => setJson(str)}/>
+			</Suspense>;
 			break;
 		case ITaskType.PICK_MULTIPLE_ANSWERS:
-			widget = <WidgetMultipleOptions data={json} onJsonUpdate={(str) => setJson(str)}/>;
+			widget = <Suspense fallback={<ComponentSpinner />}>
+				<WidgetMultipleOptions data={json} onJsonUpdate={(str) => setJson(str)}/>
+			</Suspense>;
 			break;
 		case ITaskType.FILL_GAPS:
-			widget = <WidgetFillGaps data={json} onJsonUpdate={(str) => setJson(str)}/>;
+			widget = <Suspense fallback={<ComponentSpinner />}>
+				<WidgetFillGaps data={json} onJsonUpdate={(str) => setJson(str)}/>
+			</Suspense>;
 			break;
 		case ITaskType.COMPARE_OPTIONS:
-			widget = <WidgetCompareOptions data={json} onJsonUpdate={(str) => setJson(str)}/>;
+			widget = <Suspense fallback={<ComponentSpinner />}>
+				<WidgetCompareOptions data={json} onJsonUpdate={(str) => setJson(str)}/>
+			</Suspense>;
 			break;
 		default:
 			widget = null;
 	}
-	
+
 	return (
 		<Dialog open={open}
 				fullWidth
 				PaperComponent={PaperComponent}
-				aria-labelledby="draggable-task-dialog-title">
-			<DialogTitle style={{cursor: 'move'}} id="draggable-task-dialog-title">
+				aria-labelledby={"draggable-dialog-title"}>
+			<DialogTitle style={{cursor: 'move'}} id={"draggable-dialog-title"}>
 				Добавить задание
 			</DialogTitle>
 			<DialogContent>
@@ -231,200 +231,5 @@ export const TaskDialog: FC<ITaskDialogProps> = ({open, onClose, onSave, task}) 
 						color="primary">Сохранить</Button>
 			</DialogActions>
 		</Dialog>
-	);
-};
-
-const WidgetSingleOption: FC<ITaskWidget> = ({data, onJsonUpdate}) => {
-	const classes = useStyles();
-	const [options, setOptions] = useState<ITaskOption[]>([
-		{id: 1, option: ""},
-		{id: 2, option: ""},
-		{id: 3, option: ""},
-		{id: 4, option: ""},
-	]);
-	const [control, setControl] = useState<number>();
-	const [text, setText] = useState<string>("");
-	
-	useEffect(() => {
-		if (data) {
-			const parsed = decodeBase64ToObject<ITaskSingleOption>(data);
-			setOptions(parsed.options);
-			setControl(parsed.control);
-			setText(parsed.text);
-		}
-	}, []);
-	
-	useEffect(() => {
-		if (!validate()) {
-			onJsonUpdate("");
-			return;
-		}
-		const t: ITaskSingleOption = {
-			text,
-			control: control!,
-			options
-		};
-		console.log("onJsonUpdate", t);
-		onJsonUpdate(encodeObjectToBase64(t));
-	}, [control, text, options]);
-	
-	const validate = (): boolean => {
-		let valid = true;
-		if (options.length < 4 || options.length > MAX_OPTIONS) {
-			valid = false;
-		}
-		if (!Number.isInteger(control)) {
-			valid = false;
-		}
-		if (!text.trim().length || text.length > MAX_LENGTH_TEXT) {
-			valid = false;
-		}
-		options.forEach((o) => {
-			if (!o.option.trim()) {
-				valid = false;
-			}
-		});
-		return valid;
-	};
-	
-	const deleteOption = (id: number) => {
-		const _options = [...options];
-		const o = _options.find(option => option.id === id);
-		if (!o) {
-			return;
-		}
-		_options.splice(_options.indexOf(o), 1);
-		setOptions([..._options]);
-		if (control === id) {
-			setControl(undefined);
-		}
-	}
-	
-	const addOption = () => {
-		if (options.length >= MAX_OPTIONS) {
-			return;
-		}
-		setOptions([...options, {
-			id: getNewOptionId(options),
-			option: ""
-		}]);
-	};
-	
-	const onOptionChange = (value: string, id: number) => {
-		const _options = [...options];
-		const o = _options.find(option => option.id === id);
-		if (!o) {
-			return;
-		}
-		o.option = value;
-		setOptions([..._options]);
-	};
-	
-	return (
-		<>
-			<FormControl fullWidth>
-				<TextField
-					id="input-text"
-					label="Текст"
-					fullWidth
-					required
-					autoComplete="off"
-					inputProps={{
-						maxLength: MAX_LENGTH_TEXT,
-					}}
-					value={text}
-					onChange={(e) => setText(e.target.value)}
-					variant="outlined"
-				/>
-			</FormControl>
-			
-			<div className={classes.spacer} />
-			
-			<Divider/>
-			
-			<div className={classes.spacer} />
-			
-			{options.map(({id, option}, i) => {
-				return (
-					<div key={id} className={classes.optionWrap}>
-						<TextField
-							className={clsx(classes.grow, classes.optionInput)}
-							id={"input-option-" + (id + 1)}
-							label={"Вариант" + (i + 1)}
-							fullWidth
-							required
-							autoComplete="off"
-							inputProps={{
-									maxLength: MAX_LENGTH_OPTION
-							}}
-							value={option}
-							onChange={(e) => onOptionChange(e.target.value, id)}
-							variant="outlined"
-						/>
-						
-						{i > 3 && <IconButton onClick={() => deleteOption(id)} className={classes.delete} aria-label="delete">
-							<Delete fontSize="small" />
-						</IconButton>}
-						
-						<Checkbox
-							title={"Правильный вариант"}
-							checked={id === control}
-							onChange={() => setControl(id)}
-							inputProps={{ 'aria-label': 'primary checkbox' }}
-						/>
-					</div>
-				);
-			})}
-			
-			<div className={classes.spacer} />
-			
-			<Button color="primary"
-					size="small"
-					onClick={addOption}
-					disabled={options.length >= MAX_OPTIONS}
-			>Добавить вариант</Button>
-			
-			
-		</>
-	);
-};
-
-const WidgetMultipleOptions: FC<ITaskWidget> = ({data}) => {
-	
-	useEffect(() => {
-		if (data) {
-			const parsed = decodeBase64ToObject<ITaskMultipleOptions>(data);
-		}
-	}, []);
-	
-	return (
-		<div>Multiple </div>
-	);
-};
-
-const WidgetCompareOptions: FC<ITaskWidget> = ({data}) => {
-	
-	useEffect(() => {
-		if (data) {
-			const parsed = decodeBase64ToObject<ITaskCompareOptions>(data);
-		}
-	}, []);
-	
-	return (
-		<div>Compare </div>
-	);
-};
-
-const WidgetFillGaps: FC<ITaskWidget> = ({data}) => {
-	
-	useEffect(() => {
-		if (data) {
-			const parsed = decodeBase64ToObject<ITaskFillGaps>(data);
-		}
-	}, []);
-	
-	
-	return (
-		<div>Fill gaps </div>
 	);
 };

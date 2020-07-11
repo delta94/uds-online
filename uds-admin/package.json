@@ -1,7 +1,7 @@
 {
 	"name": "uds-admin",
 	"author": "Max Isaev",
-	"version": "0.5.1",
+	"version": "0.6.1",
 	"private": true,
 	"dependencies": {
 		"@material-ui/core": "4.11.0",

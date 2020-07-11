@@ -4,6 +4,7 @@ import {createStyles, makeStyles, Theme} from "@material-ui/core/styles";
 import {ILessonTask} from "../reducers/lessonsReducer";
 import {TaskDialog} from "./taskDialog";
 import moment from "moment";
+import clsx from "clsx";
 
 const useStyles = makeStyles((theme: Theme) =>
 	createStyles({
@@ -26,6 +27,9 @@ const useStyles = makeStyles((theme: Theme) =>
 		saveRequired: {
 			color: '#148E00',
 			marginLeft: 10,
+		},
+		unpublished: {
+			textDecoration: 'line-through'
 		}
 	})
 );
@@ -46,13 +50,13 @@ export const TaskPreview: FC<ITaskPreviewProps> = ({task, onSave}) => {
 	};
 	
 	const createdAt = task.CreatedAt ? moment(task.CreatedAt).format("DD.MM.YYYY HH:mm") : "";
-	
+
 	return (
 		<>
 			<Card className={classes.task}>
 				<CardActionArea onClick={() => setTaskDialogOpen(true)}>
 					<CardContent className={classes.content}>
-						{task.description}
+						<span className={clsx({[classes.unpublished]: !task.published})}>{task.description}</span>
 						{createdAt ?
 							<small className={classes.createdAt}>Дата создания: {createdAt}</small>
 							:
