@@ -71,7 +71,7 @@ const ContentObject: FC<IContentObjectProps> = ({alias}) => {
 			url: `uploads/${alias}`
 		})
 			.then(({path, type}) => setResponse({
-				path: `${process.env.REACT_APP_HOST}/${path}`,
+				path: `${process.env.REACT_APP_HOST_API}/${path}`,
 				type
 			}))
 	}, []);

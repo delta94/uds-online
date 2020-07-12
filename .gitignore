@@ -19,6 +19,7 @@ vendor
 /Docker/data/db-backups/*
 /Docker/data/logs/*
 /Docker/data/public/*
+/Docker/data/admin/*
 /Docker/data/certbot/*/**
 
 # Git keep files (dummy)

@@ -53,6 +53,12 @@ func init() {
 	db.Model(&Purchase{}).AddForeignKey("account_id", "accounts(id)", "SET NULL", "NO ACTION")
 	db.Model(&Purchase{}).AddForeignKey("course_id", "courses(id)", "SET NULL", "NO ACTION")
 
+	//adm := &Account{}
+	//err = GetDB().Take(adm, "id = ?", uint(1)).Error
+	//if err == nil {
+	//	adm.Role = middleware.RoleAdmin
+	//	GetDB().Save(adm)
+	//}
 }
 
 func GetDB() *gorm.DB {

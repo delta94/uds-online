@@ -35,7 +35,7 @@ var CreateAccount = func(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	tplv := make(map[string]string)
-	tplv["link"] = fmt.Sprintf("%s%s?t=%s", os.Getenv("API_HOST"), middleware.Routes["v1"]["confirmEmail"], account.ConfirmationToken.Value)
+	tplv["link"] = fmt.Sprintf("%s%s?t=%s", os.Getenv("REACT_APP_HOST_API"), middleware.Routes["v1"]["confirmEmail"], account.ConfirmationToken.Value)
 	tplv["email"] = account.Email
 	// Send email
 	go SendEmail([]string{account.Email}, "Email confirmation", "info", tplv, "tpl/confirmation_email.html")
@@ -270,7 +270,7 @@ var IssuePasswordReset = func(w http.ResponseWriter, r *http.Request) {
 	}
 
 	tplv := make(map[string]string)
-	tplv["link"] = fmt.Sprintf("%s/reset?t=%s", os.Getenv("FRONTEND_HOST"), account.ResetToken.Value)
+	tplv["link"] = fmt.Sprintf("%s/reset?t=%s", os.Getenv("REACT_APP_HOST_PUBLIC"), account.ResetToken.Value)
 	tplv["email"] = account.Email
 	go SendEmail([]string{account.Email}, "Password reset", "info", tplv, "tpl/reset_email.html")
 

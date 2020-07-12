@@ -84,3 +84,65 @@ server {
         expires               4d;
     }
 }
+
+
+###############################################################################
+##########################      Administration       ##########################
+###############################################################################
+
+
+server {
+    listen                    80;
+    charset                   utf-8;
+    server_name               admin.yourdomain.com;
+    error_log                 /var/log/nginx/f/nginx-errors.log;
+    root                      /var/www/html/app-admin/;
+    index                     index.html;
+
+    #### CERTBOT #####
+    location /.well-known/acme-challenge/ {
+        root                  /var/www/certbot;
+    }
+    location / {
+        return                301 https://$host$request_uri;
+    }
+}
+
+
+server {
+    listen                    443 ssl;
+    charset                   utf-8;
+    server_name               admin.yourdomain.com;
+    error_log                 /var/log/nginx/f/nginx-errors.log;
+    root                      /var/www/html/app-admin/;
+    index                     index.html;
+
+    ###############################################################################
+    ### SSL Keys ##                                       PATH MUST BE ADJUSTED ###
+    ###############################################################################
+    #########################  AS FOR PUBLIC  #####################################
+
+    ssl_certificate           /etc/letsencrypt/live/yourdomain.com/fullchain.pem;
+    ssl_certificate_key       /etc/letsencrypt/live/yourdomain.com/privkey.pem;
+    ###############################################################################
+    include                   /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam               /etc/letsencrypt/ssl-dhparams.pem;
+
+    # Admin application (public)
+    location / {
+        try_files             $uri /index.html =404;
+    }
+    # Static files (public)
+    location /static/ {
+        root                  /var/www/html/app-admin/static/;
+        try_files             $uri =404;
+    }
+
+    location = /robots.txt {
+        alias                 /var/www/html/app/robots.txt;
+    }
+
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico|woff|woff2|svg|ttf|eot|map)$ {
+        expires               4d;
+    }
+}
