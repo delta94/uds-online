@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"fmt"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
 	uuid "github.com/satori/go.uuid"
 	"io/ioutil"
@@ -27,6 +28,41 @@ var Neuter = func(next http.Handler) http.Handler {
 			http.NotFound(w, r)
 			return
 		}
+		cookies := r.Header.Get("Cookie")
+		if cookies == "" {
+			u.RespondJson(w, u.Response{Message: "Not authorized", ErrorCode: u.ErrForbidden}, http.StatusForbidden)
+			return
+		}
+		cookieParts := strings.Split(cookies, ";")
+		//	re :=  regexp.MustCompile("_token=(a-zA-Z0-9\\.)")
+		tokenPart := ""
+		for _, cp := range cookieParts {
+			kv := strings.Split(cp, "=")
+			for _, v := range kv {
+				if strings.Trim(v, "") == "_token" {
+					tokenPart = kv[1]
+				}
+			}
+		}
+		if tokenPart == "" {
+			u.RespondJson(w, u.Response{Message: "Invalid credentials", ErrorCode: u.ErrForbidden}, http.StatusForbidden)
+			return
+		}
+		tk := &m.JWTToken{}
+		token, err := jwt.ParseWithClaims(tokenPart, tk, func(token *jwt.Token) (interface{}, error) {
+			return []byte(os.Getenv("SECRET")), nil
+		})
+		// Malformed token
+		if err != nil {
+			u.RespondJson(w, u.Response{Message: "Invalid credentials", ErrorCode: u.ErrMalformedToken}, http.StatusForbidden)
+			return
+		}
+		// Token is invalid
+		if !token.Valid {
+			u.RespondJson(w, u.Response{Message: "Invalid credentials", ErrorCode: u.ErrAuth}, http.StatusBadRequest)
+			return
+		}
+		log.Println("Serving content...")
 		next.ServeHTTP(w, r)
 	})
 }
@@ -42,7 +78,7 @@ var HandleLocalUpload = func(w http.ResponseWriter, r *http.Request) {
 		u.RespondJson(w, u.Response{Message: "Could not upload file. File size limit is wrong", ErrorCode: u.ErrGeneral}, http.StatusOK)
 		return
 	}
-	err = r.ParseMultipartForm(int64(1024 * 1024 * maxSizeMB))
+	err = r.ParseMultipartForm(int64(1000 * 1000 * maxSizeMB))
 	if err != nil {
 		log.Println("Could not upload file!", err.Error())
 		u.RespondJson(w, u.Response{Message: fmt.Sprintf("File too large. Max Size: %v MB", maxSizeMB), ErrorCode: u.ErrGeneral}, http.StatusOK)
@@ -140,6 +176,45 @@ var GetFilePath = func(w http.ResponseWriter, r *http.Request) {
 	u.RespondJson(w, u.Response{Payload: payload}, http.StatusOK)
 }
 
+
+var DeleteUpload = func(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	id, err := strconv.Atoi(params["id"])
+	if err != nil {
+		u.RespondJson(w, u.Response{Message: "Invalid request"}, http.StatusOK)
+		return
+	}
+
+	upload := &m.Upload{}
+	err = m.GetDB().Take(upload, "id = ?", uint(id)).Error
+	if err != nil {
+		log.Println("Upload not found")
+		u.RespondJson(w, u.Response{Message: fmt.Sprint("Upload not found"), ErrorCode: u.ErrGeneral}, http.StatusConflict)
+		return
+	}
+
+	p := filepath.Join(".", upload.Path)
+	log.Printf("Trying to delete file '%s'from FS...", p)
+	if _, err1 := os.Stat(p); err1 == nil {
+		err = os.Remove(p)
+		if err != nil {
+			log.Printf("Coult not delete file '%s' after removing it's record in DB\n", upload.Path)
+			u.RespondJson(w, u.Response{Message: fmt.Sprintf("Coult not delete file '%s' after removing it's record in DB\n", upload.Path), ErrorCode: u.ErrGeneral}, http.StatusConflict)
+			return
+		}
+		log.Printf("Successfully deleted file '%s'\n from FS", upload.Path)
+	} else {
+		log.Println("Could not locate file for deleting", err1)
+	}
+	err = m.GetDB().Unscoped().Delete(upload).Error
+	if err != nil {
+		log.Println(err.Error())
+		u.RespondJson(w, u.Response{Message: err.Error(), ErrorCode: u.ErrGeneral}, http.StatusConflict)
+		return
+	}
+	u.RespondJson(w, u.Response{Message: "ok"}, http.StatusOK)
+}
+
 func CheckMimeType(mimeType string) error {
 	mimeTypes := [...]string{
 		"video/quicktime",
@@ -158,6 +233,9 @@ func CheckMimeType(mimeType string) error {
 	}
 	return fmt.Errorf("not supported mimetype")
 }
+
+
+
 
 //var GetCredentials = func(w http.ResponseWriter, r *http.Request) {
 //	maxSizeMB, err := strconv.Atoi(os.Getenv("MAX_UPLOAD_SIZE_MB"))

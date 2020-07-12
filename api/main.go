@@ -66,6 +66,7 @@ func main() {
 
 	// Upload
 	router.Handle(mw.Routes["v1"]["uploads"], mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.HandleLocalUpload), []int{mw.RoleAdmin}))).Methods("POST", "OPTIONS")
+	router.Handle(mw.Routes["v1"]["uploads"]+"/{id}", mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.DeleteUpload), []int{mw.RoleAdmin}))).Methods("DELETE", "OPTIONS")
 	router.Handle(mw.Routes["v1"]["uploads"]+"/{alias}", mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.GetFilePath), []int{mw.RoleAdmin, mw.RoleUser, mw.RoleAssistant}))).Methods("GET", "OPTIONS")
 
 	// Port
