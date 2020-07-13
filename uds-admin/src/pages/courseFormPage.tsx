@@ -1,4 +1,4 @@
-import React, {FC, useEffect, useRef, useState} from "react";
+import React, {FC, useEffect, useState} from "react";
 import {PageWrapper} from "../components/pageWrapper";
 import {
     Button,
@@ -17,7 +17,7 @@ import {Link, RouteComponentProps, withRouter} from "react-router-dom";
 import {ROUTES} from "../constants";
 import {Save, Info} from "@material-ui/icons";
 import {Alert} from "@material-ui/lab";
-import {useDispatch, useSelector} from "react-redux";
+import {useDispatch} from "react-redux";
 import {create_course, get_assistants_plain, get_course, popup_snack, update_course} from "../actions";
 import history from "../history";
 import {IUser} from "../reducers/usersReducer";

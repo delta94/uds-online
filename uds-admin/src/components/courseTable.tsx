@@ -19,7 +19,9 @@ import {getCourseUrl} from "../helpers/getUrl";
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         table: {
-            minWidth: 650,
+            [theme.breakpoints.down(theme.breakpoints.values.md)]: {
+                width: 600
+            }
         },
         tableContainer: {
             marginBottom: 20,
@@ -42,7 +44,6 @@ interface ICourseRowProps {
 }
 
 const CourseRow: FC<ICourseRowProps> = ({course}) => {
-    const classes = useStyles();
     const {ID, title, published, price, CreatedAt} = course;
 
     const created = Moment(CreatedAt).format("DD-MM-YYYY HH:mm");

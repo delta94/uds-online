@@ -5,9 +5,10 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/jinzhu/gorm"
 	uuid "github.com/satori/go.uuid"
-	"regexp"
 	"strings"
 	"time"
+	u "uds-online/api/utils"
+	"unicode/utf8"
 )
 
 type JWTToken struct {
@@ -20,6 +21,7 @@ type JWTToken struct {
 type Account struct {
 	ID                uuid.UUID `gorm:"primary_key;type:char(36);"`
 	Email             string    `gorm:"size:80;unique_index;not null" json:"email"`
+	Name              string    `gorm:"size:20" json:"name"`
 	IsConfirmed       bool      `json:"confirmed"`
 	ConfirmationToken *Token    `gorm:"foreignkey:AccountID" json:"-"`
 	ResetToken        *Token    `gorm:"foreignkey:AccountID" json:"-"`
@@ -63,16 +65,23 @@ func (account *Account) Validate() error {
 		return fmt.Errorf("email address is required")
 	}
 
-	re := regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
-	if !re.MatchString(account.Email) {
+	if !u.ValidateEmail(account.Email) {
 		return fmt.Errorf("invalid email")
+	}
+
+	if utf8.RuneCountInString(account.Name) > 20 {
+		return fmt.Errorf("name is too long")
+	}
+
+	if strings.Trim(account.Name, " ") == "" {
+		return fmt.Errorf("name is required")
 	}
 
 	if account.Password.Raw == "" {
 		return fmt.Errorf("password is required")
 	}
 
-	if len(account.Password.Raw) < 6 {
+	if utf8.RuneCountInString(account.Password.Raw) < 6 {
 		return fmt.Errorf("password is too short")
 	}
 

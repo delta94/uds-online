@@ -32,6 +32,7 @@ server {
     error_log                 /var/log/nginx/f/nginx-errors.log;
     root                      /var/www/html/app/;
     index                     index.html;
+    client_max_body_size      700m;
 
     ###############################################################################
     ### SSL Keys ##                                       PATH MUST BE ADJUSTED ###
@@ -50,6 +51,30 @@ server {
     location /static/ {
         root                  /var/www/html/app/static/;
         try_files             $uri =404;
+    }
+
+    # Uploads
+    location /uploaded/ {
+        proxy_pass            http://api_server;
+        proxy_http_version    1.1;
+        proxy_redirect        off;
+        proxy_cache_bypass    $http_upgrade;
+        #add_header            Cache-Control no-cache;
+
+        proxy_set_header      Host $host;
+        proxy_set_header      X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header      X-Real-IP  $remote_addr;
+        proxy_set_header      X-Real-Scheme $scheme;
+        proxy_set_header      X-Real-Host $host;
+        proxy_set_header      X-Real-Uri $request_uri;
+        proxy_set_header      User-Agent $http_user_agent;
+        proxy_set_header      Referer $http_referer;
+        proxy_pass_header     Authorization;
+        proxy_pass_header     x-request-client;
+        add_header            Access-Control-Allow-Credentials true;
+        add_header            Access-Control-Allow-Headers   'X-Requested-With, x-request-client, Content-Type, Authorization';
+        add_header            Access-Control-Allow-Methods   'GET, POST, OPTIONS, DELETE, PUT';
+        add_header            Access-Control-Allow-Origin    '*';
     }
 
     # API
@@ -71,7 +96,7 @@ server {
         proxy_pass_header     Authorization;
         proxy_pass_header     x-request-client;
         add_header            Access-Control-Allow-Credentials true;
-        add_header            Access-Control-Allow-Headers   'X-Requested-With, x-request-client, Content-Type';
+        add_header            Access-Control-Allow-Headers   'X-Requested-With, x-request-client, Content-Type, Authorization';
         add_header            Access-Control-Allow-Methods   'GET, POST, OPTIONS, DELETE, PUT';
         add_header            Access-Control-Allow-Origin    '*';
     }

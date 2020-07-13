@@ -1,9 +1,9 @@
 import React, {useEffect, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
-import {Redirect, Link} from "react-router-dom";
+import {Redirect} from "react-router-dom";
 import {ROUTES} from "../constants";
 import {InputLabel, FormControl, Input, InputAdornment, Button, Typography} from "@material-ui/core";
-import {Email, Lock, Phone} from "@material-ui/icons";
+import {Email, Lock} from "@material-ui/icons";
 import {createStyles, makeStyles, Theme} from "@material-ui/core/styles";
 import {authenticate} from "../actions";
 import {IReducerState} from "../reducers";

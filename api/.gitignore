@@ -14,7 +14,7 @@ vendor
 .env.development
 
 # Uploads
-/static/*
+/uploaded/*
 
 # Compiled
 /main

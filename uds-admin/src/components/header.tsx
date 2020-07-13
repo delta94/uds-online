@@ -4,16 +4,13 @@ import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
-import Badge from '@material-ui/core/Badge';
 import MenuItem from '@material-ui/core/MenuItem';
 import Menu from '@material-ui/core/Menu';
-import {Mail, Menu as MenuIcon, MoreVert, ExitToAppOutlined} from '@material-ui/icons';
+import {Menu as MenuIcon, MoreVert, ExitToAppOutlined} from '@material-ui/icons';
 import {Button} from "@material-ui/core";
 import {log_out} from "../actions";
 import {useDispatch} from "react-redux";
 import red from '@material-ui/core/colors/red';
-import {ROUTES} from "../constants";
-import {Link} from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
 	grow: {
@@ -79,7 +76,6 @@ export const Header: FC<IHeaderProps> = ({onBurgerClick}) => {
 	const dispatch = useDispatch();
 	const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState<EventTarget & Element | null>(null);
 	const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
-	const unreadMessages = 0;
 	
 	const handleMobileMenuClose = () => {
 		setMobileMoreAnchorEl(null);

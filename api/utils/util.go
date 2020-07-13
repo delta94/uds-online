@@ -8,6 +8,8 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"regexp"
+	"strings"
 )
 
 type IRespondData interface{}
@@ -51,6 +53,26 @@ func LoadEnv() {
 			break
 		}
 	}
+}
+
+func ValidateEmail(email string) bool {
+	re := regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
+	if !re.MatchString(email) {
+		return false
+	}
+	forbiddenChars := []string{"'", "\"", "#"}
+	for _, char := range forbiddenChars {
+		if strings.Contains(email, char) {
+			return false
+		}
+	}
+	for pos, _ := range email {
+		ch := fmt.Sprintf("%c", email[pos])
+		if pos > 0 && ch == "." && ch == fmt.Sprintf("%c", email[pos-1]) {
+			return false
+		}
+	}
+	return true
 }
 
 func TokenGenerator(bytes int) string {

@@ -10,3 +10,13 @@ code {
 	font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
 	monospace;
 }
+
+body, * {
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+.MuiDialogTitle-root {
+	background: #0064b9;
+	color: #ffffff;
+}

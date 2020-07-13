@@ -14,11 +14,9 @@ import {Add} from "@material-ui/icons";
 import {PaperComponent} from "../components/confirmDialog";
 import {createStyles, makeStyles, Theme} from "@material-ui/core/styles";
 import {IUser} from "../reducers/usersReducer";
-import {ICourse} from "../reducers/courseReducer";
 import {useDispatch, useSelector} from "react-redux";
 import {create_purchase, get_courses, get_users_plain, popup_snack} from "../actions";
 import {IReducerState} from "../reducers";
-import {ROLES} from "../constants";
 
 const useStyles = makeStyles((theme: Theme) =>
 	createStyles({
@@ -39,7 +37,7 @@ const AddPurchaseDialog: FC<AddPurchaseDialogProps> = ({open, onClose}) => {
 	const classes = useStyles();
 	const dispatch = useDispatch();
 	const formRef = useRef<HTMLFormElement>(null);
-	const [loading, setLoading] = useState<boolean>(false);
+	const [loading] = useState<boolean>(false);
 	const [accountID, setAccountID] = useState<string>("");
 	const [courseID, setCourseID] = useState<string>("");
 	const [accounts, setAccounts] = useState<IUser[]>([]);

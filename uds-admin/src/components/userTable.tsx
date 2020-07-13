@@ -14,7 +14,7 @@ import {
 	TableRow
 } from "@material-ui/core";
 
-import {MoreVert, NotInterested, Done, Check} from "@material-ui/icons";
+import {MoreVert, NotInterested, Done} from "@material-ui/icons";
 import {createStyles, makeStyles, Theme} from "@material-ui/core/styles";
 import {IUser} from "../reducers/usersReducer";
 import Moment from 'moment';
@@ -33,7 +33,9 @@ const MSG_CONF_EMAIL = "Указанный для данной учетной з
 const useStyles = makeStyles((theme: Theme) =>
 	createStyles({
 		table: {
-			minWidth: 650,
+			[theme.breakpoints.down(theme.breakpoints.values.md)]: {
+				width: 600
+			}
 		},
 		tableContainer: {
 			marginBottom: 20,

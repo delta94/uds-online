@@ -7,7 +7,6 @@ This project consists of 2 frontend parts (public and admin) and API.
 * Typescript
 * Golang
 * MySQL
-* AWS S3 SDK
 * Docker
 
 ### Requirements
@@ -22,10 +21,14 @@ home directory.
 * Copy `nginx/nginx._conf` file as `nginx/nginx.conf`. Configure it.
 * Let's Encrypt: configure `letsencrypt.sh` by editing it and entering 
 your email and domains. To debug it, use staging option (see the file's 
-contents). When ready, launch the script:
+contents). Make sure that you commented out the SSL parts of nginx config, inlucding
+redirects in HTTP parts of the config file.
+When ready, launch the script:
 ```shell script
 sudo bash letsencrypt.sh
 ```
+Once Letsencrypt finishes its job, restore the commented parts mentioned above.
+
 ### To start:
 ```shell script
 sudo docker-compose up -d

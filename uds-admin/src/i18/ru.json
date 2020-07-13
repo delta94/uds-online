@@ -1,7 +1,41 @@
 {
+	"COMMON": {
+		"SIZE": "Размер",
+		"COMMENT": "Комментарий",
+		"WARNING": "Внимание",
+		"EMAIL": "Email",
+		"NAME": "Имя",
+		"CHARACTERS_LEFT": "{{ratio}} символов использовано."
+	},
 	"TITLES": {
 		"ASSETS": "Ресурсы",
 		"COURSES": "Курсы",
 		"COURSE": "Курс {{name}}"
+	},
+	"PAGE_USERS": {
+		"ASSISTANT_DIALOG_TITLE": "Добавить ассистента",
+		"ASSISTANT_DIALOG_TEXT": "Пароль будет автоматически сгенерирован и отправлен вместе с подтверждением на указанный адрес."
+	},
+	"PAGE_ASSETS": {
+		"LOADING": "Идет загрузка",
+		"PROCESSING_FILE": "Подождите, файл обрабатывается",
+		"COMMENT_CHARACTERS_LEFT": "Краткий комментарий к файлу. {{ratio}} символов",
+		"UPLOAD_BUTTON": "Загрузить файл",
+		"UPLOAD_DIALOG_TEXT": "Выберите файл с видео/изображением для загрузки."
+	},
+	"BUTTONS": {
+		"CLOSE": "Закрыть",
+		"CANCEL": "Отмена",
+		"CONFIRM": "Подтвердить",
+		"APPLY": "Применить",
+		"UPLOAD": "Загрузить"
+	},
+	"MESSAGES": {
+		"WRONG_EXTENSION": "Расширение файла не поддерживается",
+		"TOO_LARGE_FILE": "Файл слишком большой",
+		"FILE_UPLOAD_FAILED": "Не удалось загрузить файл",
+		"FILE_UPLOAD_SUCCESSFUL": "Файл был успешно загружен",
+		"SESSION_EXPIRED": "Ваша сессия по работе с приложением истекла. Пожалуйста, войдите в систему повторно.",
+		"ASSISTANT_CREATED": "Новый ассистент успешно добавлен"
 	}
 }

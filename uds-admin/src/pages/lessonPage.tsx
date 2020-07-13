@@ -12,7 +12,7 @@ import history from "../history";
 import {ILesson, ILessonTask} from "../reducers/lessonsReducer";
 import {TaskPreview} from "../components/taskPreview";
 import {TaskDialog} from "../components/taskDialog";
-import {DragDropContext, Droppable, Draggable, DragUpdate, DropResult} from "react-beautiful-dnd";
+import {DragDropContext, Droppable, Draggable, DropResult} from "react-beautiful-dnd";
 
 import clsx from "clsx";
 import {

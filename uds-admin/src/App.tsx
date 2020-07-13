@@ -36,7 +36,7 @@ const CHECK_EXPIRATION_INTERVAL_SEC = 5;
 
 function App() {
 	const ti = useRef<unknown>();
-	const [t, i18n] = useTranslation();
+	const [t] = useTranslation();
 	const dispatch = useDispatch();
 	const authState = useSelector((state: IReducerState) => state.auth);
 	const [logged, setLogged] = useState<boolean>(!!authState.token);
@@ -75,8 +75,8 @@ function App() {
 					dispatch(log_out());
 				}}
 				open={expiredAlertOpen}
-				heading="Внимание!"
-				text="Ваша сессия по работе с приложением истекла. Пожалуйста, войдите в систему повторно."
+				heading={t('COMMON.WARNING')}
+				text={t('MESSAGES.SESSION_EXPIRED')}
 			/>
 			
 			<Router history={history}>

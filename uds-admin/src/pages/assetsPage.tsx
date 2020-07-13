@@ -34,7 +34,7 @@ const MAX_LENGTH_COMMENT = 80;
 
 const FileUploadDialog: FC<IFileUploadDialogProps> = ({text, open, onClose}) => {
 	const dispatch = useDispatch();
-	const [t, i18n] = useTranslation();
+	const [t] = useTranslation();
 	const [result, setResult] = useState<boolean | null>(null);
 	const [uploading, setUploading] = useState<boolean>(false);
 	const [progress, setProgress] = useState<number>(0);
@@ -43,6 +43,10 @@ const FileUploadDialog: FC<IFileUploadDialogProps> = ({text, open, onClose}) => 
 	const [comment, setComment] = useState<string>("");
 	
 	useEffect(() => {
+		if (!open) {
+			return;
+		}
+		setResult(null);
 		resetFile();
 	}, [open]);
 	
@@ -86,12 +90,12 @@ const FileUploadDialog: FC<IFileUploadDialogProps> = ({text, open, onClose}) => 
 		}
 		const file: File = e.currentTarget.files[0];
 		if (!isMimeTypeValid(file)) {
-			dispatch(popup_snack("Ошибка: расширение файла не поддерживается"));
+			dispatch(popup_snack(t('MESSAGES.WRONG_EXTENSION')));
 			resetFile();
 			return;
 		}
 		if (!isSizeValid(file)) {
-			dispatch(popup_snack("Ошибка: файл слишком большой"));
+			dispatch(popup_snack(t('MESSAGES.TOO_LARGE_FILE')));
 			resetFile();
 			return;
 		}
@@ -127,7 +131,7 @@ const FileUploadDialog: FC<IFileUploadDialogProps> = ({text, open, onClose}) => 
 			<DialogContent>
 				{result === null &&	<form onSubmit={onSubmit}>
 					<DialogContentText>
-						{!uploading ? text : progress < 100 ? "Идет загрузка..." : "Подождите, файл обрабатывается"}
+						{!uploading ? text : progress < 100 ? t('PAGE_ASSETS.LOADING') : t('PAGE_ASSETS.PROCESSING_FILE')}
 					</DialogContentText>
 					{uploading ?
 						<LinearProgressWithLabel value={progress}/>
@@ -138,15 +142,15 @@ const FileUploadDialog: FC<IFileUploadDialogProps> = ({text, open, onClose}) => 
 							<br/>
 							{file && <>
 								<Typography>
-									<strong>Размер</strong>: {file.size > 0 ? Number(file.size / kbSize / kbSize).toFixed(2) : 0} / {maxSizeMB} MB<br />
+									<strong>{t('COMMON.SIZE')}</strong>: {file.size > 0 ? Number(file.size / kbSize / kbSize).toFixed(2) : 0} / {maxSizeMB} MB<br />
 								</Typography>
 								<FormControl fullWidth>
 									<TextField
 										autoComplete="off"
 										id="input-comment"
 										value={comment}
-										label="Комментарий"
-										helperText={` Краткий комментарий к файлу. ${comment.length}/${MAX_LENGTH_COMMENT} символов.`}
+										label={t('COMMON.COMMENT')}
+										helperText={t('PAGE_ASSETS.COMMENT_CHARACTERS_LEFT', {ratio: `${comment.length}/${MAX_LENGTH_COMMENT}`})}
 										fullWidth
 										inputProps={{
 											maxLength: MAX_LENGTH_COMMENT
@@ -158,21 +162,18 @@ const FileUploadDialog: FC<IFileUploadDialogProps> = ({text, open, onClose}) => 
 						</>
 					}
 				</form>}
-				{result === false && <Alert severity="error">Не удалось загрузить файл</Alert>}
-				{result === true && <Alert severity="success">Файл был успешно загружен</Alert>}
+				{result === false && <Alert severity="error">{t('MESSAGES.FILE_UPLOAD_FAILED')}</Alert>}
+				{result === true && <Alert severity="success">{t('MESSAGES.FILE_UPLOAD_SUCCESSFUL')}</Alert>}
 			</DialogContent>
 			<DialogActions>
-				<Button type="button" color="default" disabled={uploading} onClick={() => {
-					onClose();
-					setTimeout(() => setResult(null), 1000);
-				}}>Закрыть</Button>&nbsp;
+				<Button type="button" color="default" disabled={uploading} onClick={onClose}>{t('BUTTONS.CLOSE')}</Button>&nbsp;
 				
 				{result === null && <Button
 					type="button"
 					disabled={uploading || !file}
 					onClick={onSubmit}
 					variant="contained"
-					color="primary">Загрузить</Button>
+					color="primary">{t('BUTTONS.UPLOAD')}</Button>
 				}
 			</DialogActions>
 		</Dialog>
@@ -180,20 +181,20 @@ const FileUploadDialog: FC<IFileUploadDialogProps> = ({text, open, onClose}) => 
 };
 
 const AssetsPage: FC = () => {
-	const [t, i18n] = useTranslation();
+	const [t] = useTranslation();
 	const [uploadDialogOpen, setUploadDialogOpen] = useState<boolean>(false);
 	
 	const uploadButton = <Button
 		variant="contained"
 		color="primary"
 		startIcon={<Add/>}
-		onClick={() => setUploadDialogOpen(true)}>Загрузить файл</Button>;
+		onClick={() => setUploadDialogOpen(true)}>{t('PAGE_ASSETS.UPLOAD_BUTTON')}</Button>;
 	
 	return (
 		<PageWrapper heading={t('TITLES.ASSETS')} actionArea={uploadButton}>
 			
 			<FileUploadDialog
-				text={"Выберите файл с видео/изображением для загрузки."}
+				text={t('PAGE_ASSETS.UPLOAD_DIALOG_TEXT')}
 				open={uploadDialogOpen}
 				onClose={() => setUploadDialogOpen(false)}
 			/>

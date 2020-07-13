@@ -56,11 +56,16 @@ export const defaultState: IAuthState = {
 
 const secure = process.env.NODE_ENV === 'production';
 
+const public_domain = String(process.env.REACT_APP_HOST_PUBLIC)
+	.replace("https://", "")
+	.replace("http://", "");
+
 export const reducer = (state: IAuthState = defaultState, action: AnyAction): IAuthState => {
 	switch (action.type) {
 		case LOG_IN: {
 			const a = action as IAction<ILoginPayload>;
 			Cookies.set(TOKEN, a.payload.token, {expires: 14, secure});
+			Cookies.set(TOKEN, a.payload.token, {expires: 14, secure, domain: public_domain});
 			state = {
 				...state,
 				token: a.payload.token,

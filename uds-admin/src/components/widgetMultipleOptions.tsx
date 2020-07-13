@@ -1,5 +1,5 @@
 import React, {FC, useEffect, useState} from "react";
-import {ITaskMultipleOptions, ITaskOption, ITaskSingleOption, ITaskWidget} from "../helpers/models";
+import {ITaskMultipleOptions, ITaskOption, ITaskWidget} from "../helpers/models";
 import {decodeBase64ToObject, encodeObjectToBase64, getNewOptionId} from "../helpers";
 import {createStyles, makeStyles, Theme} from "@material-ui/core/styles";
 import {Button, Checkbox, Divider, FormControl, IconButton, TextField} from "@material-ui/core";

@@ -3,7 +3,6 @@ import {createStyles, makeStyles, Theme} from "@material-ui/core/styles";
 import {IPagination} from "../helpers/models";
 import {ILesson} from "../reducers/lessonsReducer";
 import {
-	Button,
 	IconButton,
 	Paper,
 	Table,
@@ -15,16 +14,15 @@ import {
 } from "@material-ui/core";
 import {Pagination} from "@material-ui/lab";
 import {Link} from "react-router-dom";
-import {getCourseUrl, getEditLessonUrl} from "../helpers/getUrl";
+import {getEditLessonUrl} from "../helpers/getUrl";
 import {Close, Done, Edit, Visibility, VisibilityOff} from "@material-ui/icons";
-
-
-const ITEM_HEIGHT = 48;
 
 const useStyles = makeStyles((theme: Theme) =>
 	createStyles({
 		table: {
-			minWidth: 650,
+			[theme.breakpoints.down(theme.breakpoints.values.md)]: {
+				width: 600
+			}
 		},
 		tableContainer: {
 			marginBottom: 20,

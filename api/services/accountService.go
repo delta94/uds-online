@@ -21,9 +21,7 @@ type accountService struct {
 const TypeConfirmation = 1
 const TypeReset = 2
 
-/**
-Create an entry in DB
-*/
+// Create new Account
 func (s *accountService) Create(model *m.Account) error {
 	if err := model.Validate(); err != nil {
 		return err

@@ -20,6 +20,7 @@ vendor
 /Docker/data/logs/*
 /Docker/data/public/*
 /Docker/data/admin/*
+/Docker/data/uploads/*
 /Docker/data/certbot/*/**
 /Docker/data/certbot/*
 

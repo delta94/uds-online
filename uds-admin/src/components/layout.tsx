@@ -1,9 +1,9 @@
 import React, {FC, useState} from 'react';
 import {Header} from "./header";
-import {BrowserRouter as Router} from "react-router-dom";
 import {makeStyles} from "@material-ui/core/styles";
 import {Sidebar} from "./sidebar";
 
+const SIDEBAR_WIDTH = 225;
 
 const useStyles = makeStyles((theme) => ({
 	body: {
@@ -15,7 +15,9 @@ const useStyles = makeStyles((theme) => ({
 	},
 	content: {
 		padding: "1rem 1rem 2rem 1rem",
-		flexGrow: 1
+		flexGrow: 1,
+		maxWidth: '100%',
+		width: `calc(100% - ${SIDEBAR_WIDTH}px)`
 	},
 }));
 
@@ -26,7 +28,7 @@ export const Layout: FC = ({children}) => {
 		<>
 			<Header onBurgerClick={() => setSidebarOpen(!isSidebarOpen)}/>
 			<section className={classes.body}>
-				<Sidebar isOpen={isSidebarOpen}/>
+				<Sidebar isOpen={isSidebarOpen} width={SIDEBAR_WIDTH}/>
 				<div className={classes.content}>
 					{children}
 				</div>

@@ -1,6 +1,6 @@
 import {AnyAction} from "redux";
 import {SET_COURSES} from "../actions/types";
-import {IAction, IPaginatablePayload} from "../helpers/models";
+import {IAction} from "../helpers/models";
 import {ILesson} from "./lessonsReducer";
 
 

@@ -9,7 +9,7 @@ import {getAddLessonUrl, getEditCourseUrl} from "../helpers/getUrl";
 import {Add, Edit} from "@material-ui/icons";
 import {ComponentSpinner} from "../components/spinner";
 import {Alert, AlertTitle} from "@material-ui/lab";
-import {get_course, set_lessons} from "../actions";
+import {get_course} from "../actions";
 import {useTranslation} from "react-i18next";
 
 const LessonTable = lazy(() => import("../components/lessonTable"));
@@ -20,6 +20,10 @@ const useStyles = makeStyles((theme: Theme) =>
             flexShrink: 0,
             ['& > *']: {
                 marginLeft: 5,
+                marginBottom: 5,
+                [theme.breakpoints.down(theme.breakpoints.values.sm)]: {
+                    width: '100%'
+                }
             }
         },
         publishAlert: {
@@ -41,7 +45,7 @@ interface IRouteProps {
 
 export const CoursePage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) => {
     const classes = useStyles();
-    const [t, i18n] = useTranslation();
+    const [t] = useTranslation();
     const dispatch = useDispatch();
     const [fetching, setFetching] = useState<boolean>(true);
     const [title, setTitle] = useState<string>("");

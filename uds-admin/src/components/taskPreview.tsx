@@ -1,5 +1,5 @@
 import React, {FC, useState} from "react";
-import {Card, CardActionArea, CardContent, IconButton} from "@material-ui/core";
+import {Card, CardContent, IconButton} from "@material-ui/core";
 import {createStyles, makeStyles, Theme} from "@material-ui/core/styles";
 import {ILessonTask} from "../reducers/lessonsReducer";
 import {TaskDialog} from "./taskDialog";

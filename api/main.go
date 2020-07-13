@@ -17,8 +17,8 @@ func main() {
 		router.Use(mw.CorsMiddleware)
 	}
 
-	fileServer := http.FileServer(http.Dir("./static"))
-	router.PathPrefix("/static/").Handler(http.StripPrefix("/static", controllers.Neuter(fileServer))).Methods("GET", "OPTIONS")
+	fileServer := http.FileServer(http.Dir("./uploaded"))
+	router.PathPrefix("/uploaded/").Handler(http.StripPrefix("/uploaded", controllers.Neuter(fileServer))).Methods("GET", "OPTIONS")
 
 	// Handle Routes
 	// Public Routes
@@ -30,6 +30,7 @@ func main() {
 	router.HandleFunc(mw.Routes["v1"]["confirmEmail"], controllers.ConfirmEmail).Methods("GET", "OPTIONS")
 
 	// Secure Routes
+	router.Handle(mw.Routes["v1"]["register"]+"/assistant", mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.CreateAssistant), []int{mw.RoleAdmin}))).Methods("POST", "OPTIONS")
 	router.Handle(mw.Routes["v1"]["accounts"], mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.GetAccounts), []int{mw.RoleAdmin}))).Methods("GET", "OPTIONS")
 	router.Handle(mw.Routes["v1"]["accounts"]+"/users", mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.GetUsersPlain), []int{mw.RoleAdmin}))).Methods("GET", "OPTIONS")
 	router.Handle(mw.Routes["v1"]["accounts"]+"/assistants", mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.GetAssistantsPlain), []int{mw.RoleAdmin}))).Methods("GET", "OPTIONS")

@@ -1,7 +1,6 @@
-import React, {FC, useState} from "react";
+import React, {FC} from "react";
 import Draggable from 'react-draggable';
 import {
-	Button,
 	Dialog,
 	DialogActions,
 	DialogContent,

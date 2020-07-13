@@ -1,6 +1,6 @@
 import React, {FC, useState} from "react";
 import clsx from 'clsx';
-import {Divider, List as ListComp , ListItem, ListItemIcon, ListItemText, useTheme} from "@material-ui/core";
+import {List as ListComp , ListItem, ListItemIcon, ListItemText} from "@material-ui/core";
 import {MenuBook, Person, Message, Dashboard, PermMedia, MonetizationOn, SvgIconComponent} from "@material-ui/icons";
 import {makeStyles} from "@material-ui/core/styles";
 import {Link} from "react-router-dom";
@@ -9,29 +9,30 @@ import {useSelector} from "react-redux";
 import {IReducerState} from "../reducers";
 
 const {ROLE_ADMIN, ROLE_ASSISTANT} = ROLES;
-const sidebarWidth = 240;
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = (sidebar_width: number) => makeStyles((theme) => ({
 	root: {
 		position: 'relative',
-		width: sidebarWidth,
+		width: sidebar_width,
 		background: '#FFFFFF',
 		flexShrink: 0,
+		zIndex: 10,
 		transition: 'ease 300ms',
 		[theme.breakpoints.down('xs')]: {
-			marginLeft: `-${sidebarWidth}px`
+			marginLeft: `-${sidebar_width}px`
 		}
 	},
 	isOpen: {
 		[theme.breakpoints.down('xs')]: {
-			transform: `translateX(${sidebarWidth}px)`
+			transform: `translateX(${sidebar_width}px)`
 		}
 		
 	}
 }));
 
 export interface ISidebarProps {
-	isOpen: boolean
+	isOpen: boolean,
+	width: number
 }
 
 interface IOptionalListItemProps {
@@ -55,9 +56,8 @@ const OptionalListItem: FC<IOptionalListItemProps> = (props) => {
 		</ListItem>
 	)
 }
-export const Sidebar: FC<ISidebarProps> = ({isOpen}) => {
-	const classes = useStyles();
-	const theme = useTheme();
+export const Sidebar: FC<ISidebarProps> = ({isOpen, width}) => {
+	const classes = useStyles(width)();
 	const authState = useSelector((state: IReducerState) => state.auth);
 	const [role] = useState(authState.role);
 	

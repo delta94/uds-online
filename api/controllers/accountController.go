@@ -37,8 +37,50 @@ var CreateAccount = func(w http.ResponseWriter, r *http.Request) {
 	tplv := make(map[string]string)
 	tplv["link"] = fmt.Sprintf("%s%s?t=%s", os.Getenv("REACT_APP_HOST_API"), middleware.Routes["v1"]["confirmEmail"], account.ConfirmationToken.Value)
 	tplv["email"] = account.Email
+	tplv["name"] = account.Name
 	// Send email
-	go SendEmail([]string{account.Email}, "Email confirmation", "info", tplv, "tpl/confirmation_email.html")
+	go SendEmail([]string{account.Email}, "Создание учетной записи - Подтверждение Email", "info", tplv, "tpl/confirmation_email.html")
+
+	p := make(map[string]interface{})
+	p["id"] = account.ID
+	p["email"] = account.Email
+	u.RespondJson(w, u.Response{Payload: p}, http.StatusCreated)
+}
+
+var CreateAssistant = func(w http.ResponseWriter, r *http.Request) {
+	type Body struct {
+		Email string `json:"email"`
+		Name  string `json:"name"`
+	}
+	body := &Body{}
+	err := json.NewDecoder(r.Body).Decode(body)
+	if err != nil {
+		u.RespondJson(w, u.Response{Message: "Invalid request", ErrorCode: u.ErrGeneral}, http.StatusOK)
+		return
+	}
+	// Generate random password
+	password := u.TokenGenerator(5)
+	account := &m.Account{
+		Email: body.Email,
+		Name: body.Name,
+		Role:  middleware.RoleAssistant,
+		Password: &m.Password{
+			Raw: password,
+			Confirmation: password,
+		},
+	}
+	err = s.AccountService.Create(account)
+	if err != nil {
+		u.RespondJson(w, u.Response{Message: err.Error(), ErrorCode: u.ErrGeneral}, http.StatusOK)
+		return
+	}
+	tplv := make(map[string]string)
+	tplv["link"] = fmt.Sprintf("%s%s?t=%s", os.Getenv("REACT_APP_HOST_API"), middleware.Routes["v1"]["confirmEmail"], account.ConfirmationToken.Value)
+	tplv["email"] = account.Email
+	tplv["password"] = password
+	tplv["name"] = account.Name
+	// Send email
+	go SendEmail([]string{account.Email}, "Создание учетной записи ассистента - Подтверждение Email", "info", tplv, "tpl/confirmation_email_assistant.html")
 
 	p := make(map[string]interface{})
 	p["id"] = account.ID
@@ -192,6 +234,7 @@ var ManualEmailConfirm = func(w http.ResponseWriter, r *http.Request) {
 	}
 	u.RespondJson(w, u.Response{Message: "Email successfully confirmed"}, http.StatusOK)
 }
+
 var ChangeAccountBlockState = func(w http.ResponseWriter, r *http.Request) {
 	type Body struct {
 		ID      string `json:"id"`

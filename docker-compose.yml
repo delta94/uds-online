@@ -51,7 +51,7 @@ services:
     env_file:
       - .env
     volumes:
-      - ./Docker/data/uploads:/go/src/uds-online/api/static
+      - ./Docker/data/uploads:/go/src/uds-online/api/uploaded
     depends_on:
       - db
   mysql-cron-backup:

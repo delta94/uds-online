@@ -1,8 +1,8 @@
 import React, {FC, useEffect, useRef, useState} from "react";
-import ReactPlayer, {ReactPlayerProps} from 'react-player';
+import ReactPlayer from 'react-player';
 import {createStyles, makeStyles, Theme} from "@material-ui/core/styles";
 import {Fullscreen, Pause, PlayArrow, VolumeMute, VolumeOff} from "@material-ui/icons";
-import {Grid, IconButton, Slider} from "@material-ui/core";
+import {IconButton, Slider} from "@material-ui/core";
 
 interface IVideoProps {
     src: string

@@ -19,7 +19,7 @@ import history from "../history";
 import {ROLES, ROUTES} from "../constants";
 import store from "../store";
 import {CreateCourseResponse, GetCoursesResponse, ICourse} from "../reducers/courseReducer";
-import {ILesson, ILessonTask} from "../reducers/lessonsReducer";
+import {ILesson} from "../reducers/lessonsReducer";
 
 export const log_in = (token: string, userID: string, role: number): IAction<ILoginPayload> => {
 	return {
@@ -154,6 +154,23 @@ export const manual_email_confirm = (id: string, callback?: () => void) => {
 				if (callback) {
 					callback();
 				}
+			});
+	};
+};
+
+export const create_assistant = (name: string, email: string, callback: (result: boolean) => void) => {
+	return (dispatch: Dispatch) => {
+		return api_request({
+			method: "POST",
+			version: 1,
+			url: `register/assistant`,
+			data: {name, email}
+		})
+			.then(() => {
+				callback(true);
+			})
+			.catch(() => {
+				callback(false);
 			});
 	};
 };
