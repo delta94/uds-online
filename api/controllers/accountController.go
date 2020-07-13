@@ -62,10 +62,10 @@ var CreateAssistant = func(w http.ResponseWriter, r *http.Request) {
 	password := u.TokenGenerator(5)
 	account := &m.Account{
 		Email: body.Email,
-		Name: body.Name,
+		Name:  body.Name,
 		Role:  middleware.RoleAssistant,
 		Password: &m.Password{
-			Raw: password,
+			Raw:          password,
 			Confirmation: password,
 		},
 	}
@@ -302,14 +302,22 @@ var IssuePasswordReset = func(w http.ResponseWriter, r *http.Request) {
 	if err != nil { // Ignore error and respond with success to avoid sniffing
 		log.Printf("An attempt to reset password for not existing account [%s]\n", account.Email)
 		u.RespondJson(w, u.Response{Message: "OK! Please check your your email!"}, http.StatusOK)
+		return
 	}
-	account.ResetToken.Value = u.TokenGenerator(32)
-	account.ResetToken.ExpiresAt = time.Now().Add(time.Hour * time.Duration(24))
-	account.ResetToken.Type = s.TypeReset
-	account.ResetToken.Expired = false
+	token := &m.Token{
+		Value:     u.TokenGenerator(32),
+		ExpiresAt: time.Now().Add(time.Hour * time.Duration(24)),
+		Type:      s.TypeReset,
+		Expired:   false,
+	}
+	if account.ResetToken != nil {
+		token.ID = account.ResetToken.ID
+	}
+	account.ResetToken = token
 	err = m.GetDB().Save(account).Error
 	if err != nil { // Ignore error and respond with success to avoid sniffing
 		log.Printf("Cannot set new reset password")
+		return
 	}
 
 	tplv := make(map[string]string)
