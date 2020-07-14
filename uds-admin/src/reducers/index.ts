@@ -4,6 +4,7 @@ import {ISnackState, reducer as snackReducer, defaultState as snackDState} from 
 import {IUsersState, reducer as usersReducer, defaultState as usersDState} from "./usersReducer";
 import {ICourseState, reducer as courseReducer, defaultState as courseDState} from "./courseReducer";
 import {ILessonsState, reducer as lessonsReducer, defaultState as lessonsDState} from "./lessonsReducer";
+import {IUploadState, reducer as uploadReducer, defaultState as uploadDState} from "./uploadReducer";
 
 export interface IReducerState {
 	auth: IAuthState,
@@ -11,6 +12,7 @@ export interface IReducerState {
 	users: IUsersState,
 	course: ICourseState,
 	lessons: ILessonsState,
+	uploads: IUploadState
 }
 
 export const initialReducerState: IReducerState = {
@@ -19,6 +21,7 @@ export const initialReducerState: IReducerState = {
 	users: usersDState,
 	course: courseDState,
 	lessons: lessonsDState,
+	uploads: uploadDState
 };
 
 const reducers = combineReducers<IReducerState>({
@@ -27,6 +30,7 @@ const reducers = combineReducers<IReducerState>({
 	users: usersReducer,
 	course: courseReducer,
 	lessons: lessonsReducer,
+	uploads: uploadReducer
 });
 
 export default reducers;

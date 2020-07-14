@@ -8,3 +8,4 @@ export const SET_LESSONS = '@lessons/SET_LESSONS';
 export const SET_USERS = '@users/SET_USERS';
 export const SET_ASSISTANTS = '@users/SET_ASSISTANTS';
 export const SET_PURCHASES = '@purchases/SET_PURCHASES';
+export const SET_UPLOADS = '@uploads/SET_UPLOADS';

@@ -43,7 +43,6 @@ const PreviewPage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) => {
 	
 	const {params: {lesson_id}} = match!;
 	const [body, setBody] = useState<string>("");
-	// @ts-ignore
 	const [tasks, setTasks] = useState<ILessonTask[]>([]);
 	const dispatch = useDispatch();
 	
@@ -72,6 +71,9 @@ const PreviewPage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) => {
 			</header>
 			<div className={classes.wrap}>
 				{body && <ParsedContent content={body}/>}
+				{tasks.map(() => {
+					return null;
+				})}
 			</div>
 		</div>
 	);

@@ -32,6 +32,7 @@ export const reducer = (state = defaultState, action: AnyAction): IPurchaseState
 				total: a.payload.total,
 				data: a.payload.data
 			}
+			break;
 		}
 	}
 	

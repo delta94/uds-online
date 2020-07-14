@@ -1,11 +1,14 @@
-import React, {FC, FormEvent, useEffect, useRef, useState} from "react";
+import React, {FC, Suspense, lazy, FormEvent, useEffect, useRef, useState} from "react";
 import {PageWrapper} from "../components/pageWrapper";
-import axios from "axios";
 import {PaperComponent} from "../components/confirmDialog";
 import {Alert} from "@material-ui/lab";
 import {LinearProgressWithLabel} from "../components/linearProgressWithLabel";
-import {popup_snack} from "../actions";
-import {useDispatch} from "react-redux";
+import {get_uploads, popup_snack, upload_file} from "../actions";
+import {useDispatch, useSelector} from "react-redux";
+import {Add} from "@material-ui/icons";
+import {useTranslation} from "react-i18next";
+import {ComponentSpinner} from "../components/spinner";
+import {IReducerState} from "../reducers";
 import {
 	Button,
 	Dialog,
@@ -15,8 +18,8 @@ import {
 	DialogTitle, FormControl, TextField,
 	Typography
 } from "@material-ui/core";
-import {Add} from "@material-ui/icons";
-import {useTranslation} from "react-i18next";
+
+const UploadTable = lazy(() => import("../components/uploadTable"));
 
 interface IFileUploadDialogProps {
 	text: string,
@@ -28,7 +31,7 @@ interface IFileUploadDialogProps {
 const kbSize = 1000;
 const maxSizeMB = 500;
 const maxSize = 1000 * 1000 * maxSizeMB;
-const mimeTypes: string[] = ["video/mpeg","video/mp4","video/quicktime", "image/png", "image/jpg", "image/jpeg", "audio/mpeg", "audio/wav"];
+const mimeTypes: string[] = ["video/mpeg", "video/mp4", "video/quicktime", "image/png", "image/jpg", "image/jpeg", "audio/mpeg", "audio/wav"];
 const accept: string = ".mpeg,.mp4,.mov,.png,.jpg,.jpeg,.mp3,.wav";
 const MAX_LENGTH_COMMENT = 80;
 
@@ -62,25 +65,26 @@ const FileUploadDialog: FC<IFileUploadDialogProps> = ({text, open, onClose}) => 
 			return;
 		}
 		setUploading(true);
-		
-		const url = `/v1/uploads`;
 		const formData = new FormData();
 		formData.append('file', file);
 		formData.append('comment', comment);
-		axios.post(url, formData, {
-			onUploadProgress: progressEvent => setProgress(Math.ceil(100 * progressEvent.loaded / progressEvent.total)),
-		})
-			.then(() => {
+		const config = {
+			onUploadProgress: (progressEvent: ProgressEvent) => {
+				console.log(Math.ceil(100 * progressEvent.loaded / progressEvent.total));
+				setProgress(Math.ceil(100 * progressEvent.loaded / progressEvent.total))
+			},
+		};
+		dispatch(upload_file(formData, config, (result) => {
+			if (result) {
 				setResult(true);
-			})
-			.catch(() => {
+				dispatch(get_uploads());
+			} else {
 				setResult(false);
-			})
-			.finally(() => {
-				setUploading(false);
-				setProgress(0);
-				resetFile();
-			});
+			}
+			setUploading(false);
+			setProgress(0);
+			resetFile();
+		}));
 	};
 	
 	const onFileChange = (e: React.FormEvent<HTMLInputElement>) => {
@@ -129,7 +133,7 @@ const FileUploadDialog: FC<IFileUploadDialogProps> = ({text, open, onClose}) => 
 				Загрузка файла
 			</DialogTitle>
 			<DialogContent>
-				{result === null &&	<form onSubmit={onSubmit}>
+				{result === null && <form onSubmit={onSubmit}>
 					<DialogContentText>
 						{!uploading ? text : progress < 100 ? t('PAGE_ASSETS.LOADING') : t('PAGE_ASSETS.PROCESSING_FILE')}
 					</DialogContentText>
@@ -142,7 +146,7 @@ const FileUploadDialog: FC<IFileUploadDialogProps> = ({text, open, onClose}) => 
 							<br/>
 							{file && <>
 								<Typography>
-									<strong>{t('COMMON.SIZE')}</strong>: {file.size > 0 ? Number(file.size / kbSize / kbSize).toFixed(2) : 0} / {maxSizeMB} MB<br />
+									<strong>{t('COMMON.SIZE')}</strong>: {file.size > 0 ? Number(file.size / kbSize / kbSize).toFixed(2) : 0} / {maxSizeMB} MB<br/>
 								</Typography>
 								<FormControl fullWidth>
 									<TextField
@@ -166,7 +170,8 @@ const FileUploadDialog: FC<IFileUploadDialogProps> = ({text, open, onClose}) => 
 				{result === true && <Alert severity="success">{t('MESSAGES.FILE_UPLOAD_SUCCESSFUL')}</Alert>}
 			</DialogContent>
 			<DialogActions>
-				<Button type="button" color="default" disabled={uploading} onClick={onClose}>{t('BUTTONS.CLOSE')}</Button>&nbsp;
+				<Button type="button" color="default" disabled={uploading}
+						onClick={onClose}>{t('BUTTONS.CLOSE')}</Button>&nbsp;
 				
 				{result === null && <Button
 					type="button"
@@ -183,6 +188,16 @@ const FileUploadDialog: FC<IFileUploadDialogProps> = ({text, open, onClose}) => 
 const AssetsPage: FC = () => {
 	const [t] = useTranslation();
 	const [uploadDialogOpen, setUploadDialogOpen] = useState<boolean>(false);
+	const dispatch = useDispatch();
+	const uploadState = useSelector((state: IReducerState) => state.uploads);
+	
+	const handlePageChange = (value: number) => {
+		dispatch(get_uploads(value - 1));
+	}
+	
+	useEffect(() => {
+		dispatch(get_uploads());
+	}, []);
 	
 	const uploadButton = <Button
 		variant="contained"
@@ -190,8 +205,21 @@ const AssetsPage: FC = () => {
 		startIcon={<Add/>}
 		onClick={() => setUploadDialogOpen(true)}>{t('PAGE_ASSETS.UPLOAD_BUTTON')}</Button>;
 	
+	
 	return (
 		<PageWrapper heading={t('TITLES.ASSETS')} actionArea={uploadButton}>
+			
+			<Suspense fallback={<ComponentSpinner/>}>
+				<UploadTable
+					uploads={uploadState.data}
+					page={uploadState.page}
+					total={uploadState.total}
+					size={uploadState.size}
+					onChangePage={
+						(e: React.ChangeEvent<unknown>, v: number) => handlePageChange(v)
+					}
+				/>
+			</Suspense>
 			
 			<FileUploadDialog
 				text={t('PAGE_ASSETS.UPLOAD_DIALOG_TEXT')}
@@ -199,6 +227,8 @@ const AssetsPage: FC = () => {
 				onClose={() => setUploadDialogOpen(false)}
 			/>
 			
+			
+		
 		</PageWrapper>
 	);
 };

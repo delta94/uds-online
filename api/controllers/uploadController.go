@@ -15,6 +15,7 @@ import (
 	"strconv"
 	"strings"
 	m "uds-online/api/models"
+	srv "uds-online/api/services"
 	u "uds-online/api/utils"
 	"unicode/utf8"
 )
@@ -35,7 +36,6 @@ var Neuter = func(next http.Handler) http.Handler {
 			return
 		}
 		cookieParts := strings.Split(cookies, ";")
-		//	re :=  regexp.MustCompile("_token=(a-zA-Z0-9\\.)")
 		tokenPart := ""
 		for _, cp := range cookieParts {
 			kv := strings.Split(cp, "=")
@@ -136,13 +136,13 @@ var HandleLocalUpload = func(w http.ResponseWriter, r *http.Request) {
 		u.RespondJson(w, u.Response{Message: err.Error(), ErrorCode: u.ErrGeneral}, http.StatusOK)
 		return
 	}
-	record := &m.Upload{
-		Path: newPath,
+	upload := &m.Upload{
+		Path:         newPath,
 		OriginalName: fileHeader.Filename,
-		Comment: comment,
-		Type: strings.Split(mimeType, "/")[0],
+		Comment:      comment,
+		Type:         strings.Split(mimeType, "/")[0],
 	}
-	err = m.GetDB().Create(record).Error
+	err = srv.UploadService.Create(upload)
 	if err != nil {
 		log.Println(err.Error())
 		u.RespondJson(w, u.Response{Message: err.Error(), ErrorCode: u.ErrGeneral}, http.StatusOK)
@@ -151,9 +151,9 @@ var HandleLocalUpload = func(w http.ResponseWriter, r *http.Request) {
 
 	payload := make(map[string]interface{})
 	payload["originalName"] = fileHeader.Filename
-	payload["alias"] = record.Alias
-	payload["comment"] = record.Comment
-	payload["path"] = record.Path
+	payload["alias"] = upload.Alias
+	payload["comment"] = upload.Comment
+	payload["path"] = upload.Path
 
 	u.RespondJson(w, u.Response{Payload: payload, Message: fmt.Sprintf("File uploaded successfully [%v]", fileHeader.Filename)}, http.StatusOK)
 }
@@ -178,6 +178,26 @@ var GetFilePath = func(w http.ResponseWriter, r *http.Request) {
 	u.RespondJson(w, u.Response{Payload: payload}, http.StatusOK)
 }
 
+var GetUploads = func(w http.ResponseWriter, r *http.Request) {
+	offset, err1 := strconv.Atoi(r.URL.Query().Get("p"))
+	limit, err2 := strconv.Atoi(r.URL.Query().Get("s"))
+	if err1 != nil {
+		offset = 0
+	}
+	if err2 != nil {
+		limit = 10
+	}
+	if limit == 0 || limit > 50 {
+		limit = 10
+	}
+	uploads, total, err := srv.UploadService.Find(offset, limit)
+	if err != nil {
+		log.Printf("Error! Cound not fetch accounts")
+		u.RespondJson(w, u.Response{Message: err.Error(), ErrorCode: u.ErrGeneral}, http.StatusOK)
+		return
+	}
+	u.RespondJson(w, u.PaginatedResponse{Payload: u.PaginatedResponsePayload{Size: limit, Page: offset, Total: total, Data: uploads}}, http.StatusOK)
+}
 
 var DeleteUpload = func(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
@@ -187,10 +207,9 @@ var DeleteUpload = func(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	upload := &m.Upload{}
-	err = m.GetDB().Take(upload, "id = ?", uint(id)).Error
+	upload, err := srv.UploadService.Get(uint(id))
 	if err != nil {
-		log.Println("Upload not found")
+		log.Println(err.Error())
 		u.RespondJson(w, u.Response{Message: fmt.Sprint("Upload not found"), ErrorCode: u.ErrGeneral}, http.StatusConflict)
 		return
 	}
@@ -208,7 +227,7 @@ var DeleteUpload = func(w http.ResponseWriter, r *http.Request) {
 	} else {
 		log.Println("Could not locate file for deleting", err1)
 	}
-	err = m.GetDB().Unscoped().Delete(upload).Error
+	err = srv.UploadService.Delete(uint(id))
 	if err != nil {
 		log.Println(err.Error())
 		u.RespondJson(w, u.Response{Message: err.Error(), ErrorCode: u.ErrGeneral}, http.StatusConflict)

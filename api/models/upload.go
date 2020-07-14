@@ -18,3 +18,8 @@ func (upload *Upload) BeforeCreate() (err error) {
 	upload.Alias = utl.TokenGenerator(6)
 	return nil
 }
+
+func (upload *Upload) Validate() error {
+
+	return nil
+}

@@ -40,15 +40,15 @@ const useStyles = makeStyles((theme: Theme) =>
 		tableContainer: {
 			marginBottom: 20,
 		},
+		actionColumn: {
+			width: '55px'
+		},
 		btnBlock: {
 			color: 'red',
 		},
 		btnUnbLock: {},
 		textCenter: {
 			textAlign: 'center'
-		},
-		actionColumn: {
-			width: '55px'
 		},
 		chip: {
 			margin: '2px 2px',

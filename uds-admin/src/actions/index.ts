@@ -8,10 +8,17 @@ import {
 	SET_ASSISTANTS,
 	SET_COURSES,
 	SET_LESSONS,
+	SET_UPLOADS,
 	SET_USERS,
 	SHOW_POPUP_MESSAGE
 } from "./types";
-import {AuthResponse, GetAccountsPlainResponse, IAuthRequest, ILoginPayload, ITokenPayload} from "../reducers/authReducer";
+import {
+	AuthResponse,
+	GetAccountsPlainResponse,
+	IAuthRequest,
+	ILoginPayload,
+	ITokenPayload
+} from "../reducers/authReducer";
 import {api_request} from "../helpers/api";
 import {IUser} from "../reducers/usersReducer";
 import {IAction, IPaginatablePayload} from "../helpers/models";
@@ -20,6 +27,8 @@ import {ROLES, ROUTES} from "../constants";
 import store from "../store";
 import {CreateCourseResponse, GetCoursesResponse, ICourse} from "../reducers/courseReducer";
 import {ILesson} from "../reducers/lessonsReducer";
+import {IUpload} from "../reducers/uploadReducer";
+import axios from "axios";
 
 export const log_in = (token: string, userID: string, role: number): IAction<ILoginPayload> => {
 	return {
@@ -57,7 +66,7 @@ export const popup_snack = (message: string): AnyAction => {
 
 export const set_users = (isAssistants: boolean, users: IUser[], page: number, total: number, size: number): IAction<IPaginatablePayload<IUser>> => {
 	return {
-		type: isAssistants ? SET_ASSISTANTS: SET_USERS,
+		type: isAssistants ? SET_ASSISTANTS : SET_USERS,
 		payload: {
 			data: users,
 			page,
@@ -253,7 +262,7 @@ export const get_course = (id: string, callback: (course: ICourse) => void) => {
 export const get_courses = () => {
 	return (dispatch: Dispatch) => {
 		return api_request<GetCoursesResponse>({
-			method:  "GET",
+			method: "GET",
 			url: `admin/courses`,
 			version: 1
 		})
@@ -263,7 +272,7 @@ export const get_courses = () => {
 	};
 }
 
-export const get_lesson = (id: number, callback : (lesson: ILesson) => void) => {
+export const get_lesson = (id: number, callback: (lesson: ILesson) => void) => {
 	return (dispatch: Dispatch) => {
 		return api_request<ILesson>({
 			method: "GET",
@@ -320,5 +329,62 @@ export const create_purchase = (course_id: number, account_id: string, sum: numb
 			.then((response) => {
 				callback();
 			});
+	};
+};
+
+export const set_uploads = (uploads: IUpload[], page: number, total: number, size: number): IAction<IPaginatablePayload<IUpload>> => {
+	return {
+		type: SET_UPLOADS,
+		payload: {
+			data: uploads,
+			page,
+			size,
+			total
+		}
+	};
+};
+
+export const get_uploads = (page?: number) => {
+	if (page === undefined) {
+		page = store.getState().uploads.page;
+	}
+	return (dispatch: Dispatch) => {
+		return api_request<IPaginatablePayload<IUpload>>({
+			method: "GET",
+			url: `uploads`,
+			params: {p: page},
+			version: 1
+		})
+			.then(({data, total, size, page}) => {
+				dispatch(set_uploads(data, page, total, size));
+			});
+	};
+};
+
+interface IUploadFileConfig {
+	onUploadProgress?: (progressEvent: ProgressEvent) => void
+}
+
+export const upload_file = (formData: FormData, config: IUploadFileConfig, callback: (result: boolean) => void) => {
+	return (dispatch: Dispatch) => {
+		return axios.post("/v1/uploads", formData, config)
+			.then(() => {
+				callback(true);
+			})
+			.catch(() => callback(false));
+	};
+};
+
+export const delete_upload = (id: number, callback: (result: boolean) => void) => {
+	return (dispatch: Dispatch) => {
+		return api_request({
+			method: "DELETE",
+			url: `uploads/${id}`,
+			version: 1
+		})
+			.then(() => {
+				callback(true);
+			})
+			.catch(() => callback(false));
 	};
 };
