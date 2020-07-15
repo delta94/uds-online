@@ -52,7 +52,7 @@ func (us *uploadService) Find(offset int, limit int) ([]*m.Upload, uint, error) 
 
 func (us *uploadService) Delete(id uint) error {
 	o := &m.Upload{}
-	err := m.GetDB().Delete(o, "id = ?", id).Error
+	err := m.GetDB().Unscoped().Delete(o, "id = ?", id).Error
 	if err != nil {
 		return err
 	}

@@ -19,6 +19,7 @@ services:
         REACT_APP_HOST_API: ${REACT_APP_HOST_API}
         REACT_APP_HOST_PUBLIC: ${REACT_APP_HOST_PUBLIC}
         REACT_APP_HOST_COOKIE_DOMAIN: ${REACT_APP_HOST_COOKIE_DOMAIN}
+        REACT_APP_MAX_UPLOAD_SIZE: ${REACT_APP_MAX_UPLOAD_SIZE}
     restart: 'no'
     container_name: uds-frontend-admin
     volumes:

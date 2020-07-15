@@ -74,7 +74,7 @@ var tmpPath = filepath.Join(".", "tmp")
 var HandleLocalUpload = func(w http.ResponseWriter, r *http.Request) {
 	os.MkdirAll(tmpPath, os.ModePerm)
 
-	maxSizeMB, err := strconv.Atoi(os.Getenv("MAX_UPLOAD_SIZE_MB"))
+	maxSizeMB, err := strconv.Atoi(os.Getenv("REACT_APP_MAX_UPLOAD_SIZE"))
 	if err != nil {
 		log.Println("Wrong file size limit", err.Error())
 		u.RespondJson(w, u.Response{Message: "Could not upload file. File size limit is wrong", ErrorCode: u.ErrGeneral}, http.StatusOK)

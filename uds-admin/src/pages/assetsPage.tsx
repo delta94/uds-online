@@ -29,7 +29,7 @@ interface IFileUploadDialogProps {
 
 //const kbSize = /mac/ig.test(navigator.appVersion || '') ? 1000 : 1024;
 const kbSize = 1000;
-const maxSizeMB = 500;
+const maxSizeMB = parseInt(process.env.REACT_APP_MAX_UPLOAD_SIZE || "500", 10);
 const maxSize = 1000 * 1000 * maxSizeMB;
 const mimeTypes: string[] = ["video/mpeg", "video/mp4", "video/quicktime", "image/png", "image/jpg", "image/jpeg", "audio/mpeg", "audio/wav"];
 const accept: string = ".mpeg,.mp4,.mov,.png,.jpg,.jpeg,.mp3,.wav";
