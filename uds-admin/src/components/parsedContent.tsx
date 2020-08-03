@@ -9,15 +9,14 @@ const useStyles = makeStyles((theme: Theme) =>
 	createStyles({
 		imageWrap: {
 			display: 'block',
-			height: 200,
 			textAlign: 'center',
 			margin: '10px 0'
 		},
 		image: {
 			maxWidth: '100%',
-			maxHeight: '100%',
-			height: 'auto',
-			width: 'auto'
+			maxHeight: 480,
+			// height: 'auto',
+			// width: 'auto'
 		},
 		
 	})

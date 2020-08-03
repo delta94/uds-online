@@ -1,5 +1,15 @@
 import {AnyAction, Dispatch} from "redux";
 import {decode as jwtDecode} from "jsonwebtoken";
+import {api_request} from "../helpers/api";
+import {IUser} from "../reducers/usersReducer";
+import {IAction, IPaginatablePayload} from "../helpers/models";
+import history from "../history";
+import {ROLES, ROUTES} from "../constants";
+import store from "../store";
+import {CreateCourseResponse, GetCoursesResponse, ICourse} from "../reducers/courseReducer";
+import {ILesson} from "../reducers/lessonsReducer";
+import {IUpload} from "../reducers/uploadReducer";
+import axios from "axios";
 import {
 	CLOSE_MESSAGE,
 	EXIT_MESSAGE,
@@ -7,7 +17,7 @@ import {
 	LOG_OUT,
 	SET_ASSISTANTS,
 	SET_COURSES,
-	SET_LESSONS,
+	SET_LESSONS, SET_PURCHASES,
 	SET_UPLOADS,
 	SET_USERS,
 	SHOW_POPUP_MESSAGE
@@ -19,16 +29,7 @@ import {
 	ILoginPayload,
 	ITokenPayload
 } from "../reducers/authReducer";
-import {api_request} from "../helpers/api";
-import {IUser} from "../reducers/usersReducer";
-import {IAction, IPaginatablePayload} from "../helpers/models";
-import history from "../history";
-import {ROLES, ROUTES} from "../constants";
-import store from "../store";
-import {CreateCourseResponse, GetCoursesResponse, ICourse} from "../reducers/courseReducer";
-import {ILesson} from "../reducers/lessonsReducer";
-import {IUpload} from "../reducers/uploadReducer";
-import axios from "axios";
+import {IPurchase} from "../reducers/tradeReducer";
 
 export const log_in = (token: string, userID: string, role: number): IAction<ILoginPayload> => {
 	return {
@@ -64,24 +65,20 @@ export const popup_snack = (message: string): AnyAction => {
 	}
 };
 
-export const set_users = (isAssistants: boolean, users: IUser[], page: number, total: number, size: number): IAction<IPaginatablePayload<IUser>> => {
+export const set_pg_data = <T>(type: string, data: T[], page: number, total: number, size: number): IAction<IPaginatablePayload<T>> => {
 	return {
-		type: isAssistants ? SET_ASSISTANTS : SET_USERS,
+		type,
 		payload: {
-			data: users,
+			data,
 			page,
-			total,
-			size
+			size,
+			total
 		}
-	}
+	};
 };
-
-export const set_courses = (courses: ICourse[]): IAction<ICourse[]> => {
-	return {
-		type: SET_COURSES,
-		payload: courses
-	}
-};
+/*
+===================== General =====================
+*/
 
 /**
  * Sends a POST request to authenticate the user. Used to obtain JSON Web Token.
@@ -112,25 +109,6 @@ export const authenticate = (email: string, password: string) => {
 	};
 };
 
-export const get_users = (role: typeof ROLES.ROLE_USER | typeof ROLES.ROLE_ASSISTANT, page?: number) => {
-	if (page === undefined && role === ROLES.ROLE_USER) {
-		page = store.getState().users.users.page;
-	}
-	if (page === undefined && role === ROLES.ROLE_ASSISTANT) {
-		page = store.getState().users.assistants.page;
-	}
-	return (dispatch: Dispatch) => {
-		return api_request<IPaginatablePayload<IUser>>({
-			method: "GET",
-			url: `accounts`,
-			params: {p: page, r: role},
-			version: 1
-		})
-			.then(({data, page, size, total}) => {
-				dispatch(set_users(role === ROLES.ROLE_ASSISTANT, data, page, total, size));
-			});
-	}
-};
 
 export const change_block = (id: string, blocked: boolean, callback?: () => void) => {
 	return (dispatch: Dispatch) => {
@@ -166,6 +144,44 @@ export const manual_email_confirm = (id: string, callback?: () => void) => {
 			});
 	};
 };
+
+/*
+===================== Users =====================
+*/
+export const set_users = (isAssistants: boolean, users: IUser[], page: number, total: number, size: number): IAction<IPaginatablePayload<IUser>> => {
+	return {
+		type: isAssistants ? SET_ASSISTANTS : SET_USERS,
+		payload: {
+			data: users,
+			page,
+			total,
+			size
+		}
+	}
+};
+
+
+
+export const get_users = (role: typeof ROLES.ROLE_USER | typeof ROLES.ROLE_ASSISTANT, page?: number) => {
+	if (page === undefined && role === ROLES.ROLE_USER) {
+		page = store.getState().users.users.page;
+	}
+	if (page === undefined && role === ROLES.ROLE_ASSISTANT) {
+		page = store.getState().users.assistants.page;
+	}
+	return (dispatch: Dispatch) => {
+		return api_request<IPaginatablePayload<IUser>>({
+			method: "GET",
+			url: `accounts`,
+			params: {p: page, r: role},
+			version: 1
+		})
+			.then(({data, page, size, total}) => {
+				dispatch(set_users(role === ROLES.ROLE_ASSISTANT, data, page, total, size));
+			});
+	}
+};
+
 
 export const create_assistant = (name: string, email: string, callback: (result: boolean) => void) => {
 	return (dispatch: Dispatch) => {
@@ -210,6 +226,17 @@ export const get_users_plain = (callback: (users: IUser[]) => void) => {
 	};
 };
 
+/*
+===================== Courses =====================
+*/
+
+export const set_courses = (courses: ICourse[]): IAction<ICourse[]> => {
+	return {
+		type: SET_COURSES,
+		payload: courses
+	}
+};
+
 export const create_course = (title: string, annotation: string, price: number, assistant_id: string, callback: (course: CreateCourseResponse) => void) => {
 	return (dispatch: Dispatch) => {
 		return api_request<CreateCourseResponse>({
@@ -238,13 +265,6 @@ export const update_course = (id: number, title: string, annotation: string, pri
 	}
 }
 
-export const set_lessons = (lessons: ILesson[]): IAction<ILesson[]> => {
-	return {
-		type: SET_LESSONS,
-		payload: lessons
-	};
-};
-
 export const get_course = (id: string, callback: (course: ICourse) => void) => {
 	return (dispatch: Dispatch) => {
 		return api_request<ICourse>({
@@ -271,6 +291,29 @@ export const get_courses = () => {
 			});
 	};
 }
+
+export const clone_course = (id: number, callback: () => void) => {
+	return (dispatch: Dispatch) => {
+		return api_request({
+			method: "POST",
+			url: `admin/courses/${id}/copy`
+		})
+			.then(() => {
+				callback();
+			});
+	}
+}
+
+/*
+===================== Lessons =====================
+*/
+
+export const set_lessons = (lessons: ILesson[]): IAction<ILesson[]> => {
+	return {
+		type: SET_LESSONS,
+		payload: lessons
+	};
+};
 
 export const get_lesson = (id: number, callback: (lesson: ILesson) => void) => {
 	return (dispatch: Dispatch) => {
@@ -312,8 +355,12 @@ export const update_lesson = (lesson: ILesson, callback: () => void) => {
 	};
 };
 
+/*
+===================== Purchases =====================
+*/
+
 export const create_purchase = (course_id: number, account_id: string, sum: number, order: number, callback: () => void) => {
-	const data = {
+	const data: IPurchase = {
 		course_id,
 		account_id,
 		sum,
@@ -326,23 +373,32 @@ export const create_purchase = (course_id: number, account_id: string, sum: numb
 			data,
 			version: 1
 		})
-			.then((response) => {
+			.then(() => {
 				callback();
 			});
 	};
 };
 
-export const set_uploads = (uploads: IUpload[], page: number, total: number, size: number): IAction<IPaginatablePayload<IUpload>> => {
-	return {
-		type: SET_UPLOADS,
-		payload: {
-			data: uploads,
-			page,
-			size,
-			total
-		}
+export const get_purchases = (page?: number) => {
+	if (page === undefined) {
+		page = store.getState().purchases.page;
+	}
+	return (dispatch: Dispatch) => {
+		return api_request<IPaginatablePayload<IPurchase>>({
+			method: "GET",
+			url: `purchases`,
+			params: {p: page},
+			version: 1
+		})
+			.then(({data, total, size, page}) => {
+				dispatch(set_pg_data<IPurchase>(SET_PURCHASES, data, page, total, size));
+			});
 	};
 };
+
+/*
+===================== Uploads =====================
+*/
 
 export const get_uploads = (page?: number) => {
 	if (page === undefined) {
@@ -356,7 +412,7 @@ export const get_uploads = (page?: number) => {
 			version: 1
 		})
 			.then(({data, total, size, page}) => {
-				dispatch(set_uploads(data, page, total, size));
+				dispatch(set_pg_data<IUpload>(SET_UPLOADS, data, page, total, size));
 			});
 	};
 };

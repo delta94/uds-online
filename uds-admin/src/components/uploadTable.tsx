@@ -70,7 +70,7 @@ const UploadRow: FC<IUploadRowProps> = ({upload: {alias, ID, original_name, Crea
 	};
 	
 	const handleDelete = () => {
-		dispatch(delete_upload(ID, (result) => {
+		dispatch(delete_upload(ID!, (result) => {
 			if (result) {
 				dispatch(get_uploads());
 				dispatch(popup_snack(t('MESSAGES.FILE_DELETED_SUCCESSFUL')))
@@ -80,7 +80,13 @@ const UploadRow: FC<IUploadRowProps> = ({upload: {alias, ID, original_name, Crea
 	};
 	
 	const copyAlias = () => {
-	
+		const textField = document.createElement('textarea');
+		textField.innerText = alias;
+		document.body.appendChild(textField);
+		textField.select();
+		document.execCommand('copy');
+		textField.remove();
+		dispatch(popup_snack(t("MESSAGES.ALIAS_COPIED", {alias})));
 	};
 	
 	return (

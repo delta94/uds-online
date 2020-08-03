@@ -1,30 +1,26 @@
 import {AnyAction} from "redux";
-import {IAction, IPagination, ITaskType} from "../helpers/models";
+import {IAction, IPagination, ITaskType, Model} from "../helpers/models";
 import {SET_LESSONS} from "../actions/types";
 
-export interface ILessonTask {
-	ID?: number;
+export interface ILessonTask extends Model<number> {
 	type: ITaskType;
 	description: string;
 	json: string;
 	published: boolean;
 	sort: number;
-	CreatedAt?: string;
 }
 
-export interface ILessonContent {
-	ID?: number,
+export interface ILessonContent extends Model<number> {
 	body: string,
 	tasks: ILessonTask[]
 }
 
-export interface ILesson {
+export interface ILesson extends Model<number> {
 	title: string,
 	annotation: string,
 	published: boolean,
 	paid: boolean,
 	course_id: number,
-	ID?: number,
 	content?: ILessonContent
 }
 

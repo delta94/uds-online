@@ -1,14 +1,13 @@
 import {AnyAction} from "redux";
-import {IAction, IPaginatablePayload} from "../helpers/models";
+import {IAction, IPaginatablePayload, Model} from "../helpers/models";
 import {SET_PURCHASES} from "../actions/types";
 
 
-export interface IPurchase {
-	ID: string,
-	CreatedAt: string,
-	UpdatedAt: string,
-	sum: number,
-	issuer: number
+export interface IPurchase extends Model<string> {
+	account_id: string,
+	course_id: number,
+	order: number,
+	sum: number
 }
 
 export interface IPurchaseState extends IPaginatablePayload<IPurchase> {

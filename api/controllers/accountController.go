@@ -403,10 +403,15 @@ func RedeemReset(token string, password string) error {
 	if t.Value == "" { // Token not found
 		return fmt.Errorf("reset token not found")
 	}
+	pwd := &m.Password{}
 	hash, _ := bcrypt.GenerateFromPassword(
 		[]byte(password), bcrypt.DefaultCost,
 	)
-	t.Account.Password.Hash = string(hash)
+	if t.Account.Password != nil {
+		pwd.ID = t.Account.Password.ID
+	}
+	pwd.Hash = string(hash)
+	t.Account.Password = pwd
 	t.Expired = true
 	if err := tx.Save(t).Error; err != nil {
 		tx.Rollback()

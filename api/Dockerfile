@@ -1,4 +1,4 @@
-FROM golang:1.14.4
+FROM golang:1.14.6
 MAINTAINER ismak89@icloud.com
 RUN mkdir -p /go/src/uds-online/api
 WORKDIR /go/src/uds-online/api

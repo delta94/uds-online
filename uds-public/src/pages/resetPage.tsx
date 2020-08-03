@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import {Link, Redirect, RouteProps} from "react-router-dom";
 import {ROUTES} from "../constants";
-import {InputLabel, FormControl, Input, InputAdornment, Button, Typography} from "@material-ui/core";
+import {InputLabel, FormControl, Input, Button, Typography} from "@material-ui/core";
 import {createStyles, makeStyles, Theme} from "@material-ui/core/styles";
 import img from '../assets/img/background.jpg';
 import qs from "query-string";

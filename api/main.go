@@ -43,6 +43,8 @@ func main() {
 
 	// create course (Admin)
 	router.Handle(mw.Routes["v1"]["adminCourses"], mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.CreateCourse), []int{mw.RoleAdmin}))).Methods("POST", "OPTIONS")
+	// copy course (Admin)
+	router.Handle(mw.Routes["v1"]["adminCourses"]+"/{id}/copy", mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.CopyCourse), []int{mw.RoleAdmin}))).Methods("POST", "OPTIONS")
 	// update course (Admin)
 	router.Handle(mw.Routes["v1"]["adminCourses"], mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.UpdateCourse), []int{mw.RoleAdmin}))).Methods("PUT", "OPTIONS")
 	// get courses (Admin)

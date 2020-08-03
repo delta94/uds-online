@@ -166,18 +166,18 @@ const UserRow: FC<IUserRowProps> = ({user, role}) => {
 						}}
 					>
 						<MenuItem disabled={user.confirmed}
-								  onClick={(e) => onEmailConfirmClick(e, user.ID)}>
+								  onClick={(e) => onEmailConfirmClick(e, user.ID!)}>
 							<Done fontSize="small"/>&nbsp;Подтвердить Email
 						</MenuItem>
 						{user.is_blocked && <MenuItem
 							className={classes.btnUnbLock}
-							onClick={(e) => onUnblockClick(e, user.ID)}>
+							onClick={(e) => onUnblockClick(e, user.ID!)}>
 							Разблокировать
 						</MenuItem>}
 						
 						{!user.is_blocked && <MenuItem
 							className={classes.btnBlock}
-							onClick={(e) => onBlockClick(e, user.ID)}>
+							onClick={(e) => onBlockClick(e, user.ID!)}>
 							<NotInterested fontSize="small"/>&nbsp;Заблокировать
 						</MenuItem>}
 					</Menu>

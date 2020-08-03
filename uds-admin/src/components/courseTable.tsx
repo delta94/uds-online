@@ -62,7 +62,7 @@ const CourseRow: FC<ICourseRowProps> = ({course}) => {
             </TableCell>
             <TableCell align="center">{price}</TableCell>
             <TableCell align="right">
-                <Button component={Link} to={getCourseUrl(ID.toString())} variant="contained" color="primary">
+                <Button component={Link} to={getCourseUrl(ID!.toString())} variant="contained" color="primary">
                     Перейти
                 </Button>
             </TableCell>

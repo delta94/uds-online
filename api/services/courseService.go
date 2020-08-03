@@ -2,6 +2,7 @@ package services
 
 import (
 	"fmt"
+	"time"
 	m "uds-online/api/models"
 )
 
@@ -74,7 +75,7 @@ func (s *courseService) GetForAdmin(id uint) (*m.Course, error) {
 func (s *courseService) FindAllForAdmin() ([]*m.Course, error) {
 	objs := make([]*m.Course, 0)
 	query := m.GetDB().
-		Order("created_at desc").
+		Order("published desc, created_at desc").
 		Table(s.TableName).
 		Find(&objs)
 	if query.Error != nil && !query.RecordNotFound() {
@@ -85,5 +86,43 @@ func (s *courseService) FindAllForAdmin() ([]*m.Course, error) {
 	}
 	return objs, nil
 }
+
+func (s *courseService) Copy(id uint) (*m.Course, error) {
+	o := &m.Course{}
+	err := m.GetDB().
+		Table(s.TableName).
+		Preload("Lessons").
+		Preload("Lessons.Content").
+		Preload("Lessons.Content.Tasks").
+		Take(o, "id = ?", id).
+		Error
+	if err != nil {
+		return nil, err
+	}
+	o.ID = 0
+	o.CreatedAt = time.Now()
+	o.UpdatedAt = time.Now()
+	o.Published = false
+	for _, l := range o.Lessons {
+		l.ID  = 0
+		l.CreatedAt = time.Now()
+		l.UpdatedAt = time.Now()
+		l.CourseID = 0
+		l.Content.ID = 0
+		l.Content.LessonID = 0
+		for _, t := range l.Content.Tasks {
+			t.ID = 0
+			t.LessonContentID = 0
+			t.CreatedAt = time.Now()
+			t.UpdatedAt = time.Now()
+		}
+	}
+	err = m.GetDB().Save(o).Error
+	if err != nil {
+		return nil, err
+	}
+	return o, nil
+}
+
 
 var CourseService = courseService{TableName: "courses"}

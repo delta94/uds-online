@@ -15,14 +15,15 @@ import {
 import {createStyles, makeStyles, Theme} from "@material-ui/core/styles";
 import {Link, RouteComponentProps, withRouter} from "react-router-dom";
 import {ROUTES} from "../constants";
-import {Save, Info} from "@material-ui/icons";
+import {Save, Info, FileCopy} from "@material-ui/icons";
 import {Alert} from "@material-ui/lab";
 import {useDispatch} from "react-redux";
-import {create_course, get_assistants_plain, get_course, popup_snack, update_course} from "../actions";
+import {clone_course, create_course, get_assistants_plain, get_course, popup_snack, update_course} from "../actions";
 import history from "../history";
 import {IUser} from "../reducers/usersReducer";
 import {getCourseUrl} from "../helpers/getUrl";
 import {ICourse} from "../reducers/courseReducer";
+import {useTranslation} from "react-i18next";
 
 const MAX_LENGTH_TITLE = 80;
 const MIN_LENGTH_TITLE = 10;
@@ -36,8 +37,12 @@ const useStyles = makeStyles((theme: Theme) =>
         spacer: {
             height: 20,
         },
+        grow: {
+            flexGrow: 1
+        },
         buttonBar: {
-            padding: '10px 0'
+            padding: '10px 0',
+            display: 'flex'
         },
         cancelBtn: {
             color: 'red',
@@ -69,6 +74,7 @@ const CourseFormPage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) => {
     const [published, setPublished] = useState<boolean>(false);
     const dispatch = useDispatch();
     const [oldState, setOldState] = useState<ICourse | undefined>();
+    const [t] = useTranslation();
     
     useEffect(() => {
         dispatch(get_assistants_plain((assistants) => {
@@ -133,6 +139,15 @@ const CourseFormPage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) => {
             dispatch(popup_snack(`Курс "${course.title}" был успешно создан`));
             history.push(ROUTES.COURSES);
         }));
+    };
+    
+    const onClone = () => {
+        if (course_id) {
+            dispatch(clone_course(Number(course_id), () => {
+                dispatch(popup_snack(t("MESSAGES.COURSE_CLONED_SUCCESSFUL")));
+                history.push(ROUTES.COURSES);
+            }));
+        }
     };
 
     return (
@@ -254,7 +269,8 @@ const CourseFormPage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) => {
                 <div className={classes.buttonBar}>
                     <Button component={Link}
                             to={course_id ? getCourseUrl(course_id) : ROUTES.COURSES}
-                            className={classes.cancelBtn}>Отмена
+                            className={classes.cancelBtn}>
+                        {t("BUTTONS.CANCEL")}
                     </Button>
 
                     <Button disabled={!isFormValid()}
@@ -262,8 +278,20 @@ const CourseFormPage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) => {
                             startIcon={<Save/>}
                             variant="contained"
                             color="primary">
-                        {course_id ? "Сохранить": "Создать"}
+                        {course_id ? t("BUTTONS.SAVE"): t("BUTTONS.SAVE")}
                     </Button>
+                    
+                    {course_id && <>
+                        <div className={classes.grow}/>
+    
+                        <Button type="button"
+                                startIcon={<FileCopy/>}
+                                variant="contained"
+                                onClick={onClone}
+                                color="default">
+                            {t("BUTTONS.CLONE")}
+                        </Button>
+                    </>}
                 </div>
             </form>
 

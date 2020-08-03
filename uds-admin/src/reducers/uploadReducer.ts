@@ -1,16 +1,13 @@
-import {IAction, IPaginatablePayload} from "../helpers/models";
+import {IAction, IPaginatablePayload, Model} from "../helpers/models";
 import {AnyAction} from "redux";
 import {SET_UPLOADS} from "../actions/types";
 
-export interface IUpload {
-	ID: number;
+export interface IUpload extends Model<number> {
 	alias: string;
 	original_name: string;
 	type: string;
 	comment: string;
 	path: string;
-	CreatedAt: string;
-	UpdatedAt: string;
 }
 
 export interface IUploadState extends IPaginatablePayload<IUpload> {

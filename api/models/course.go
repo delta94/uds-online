@@ -9,7 +9,7 @@ import (
 
 type Course struct {
 	gorm.Model
-	Title       string    `json:"title" gorm:"size:120;unique_index;not null"`
+	Title       string    `json:"title" gorm:"size:120;not null"`
 	Annotation  string    `json:"annotation" gorm:"size:1000"`
 	Price       int       `json:"price"`
 	Lessons     []*Lesson `json:"lessons" gorm:"foreignkey:CourseID"`

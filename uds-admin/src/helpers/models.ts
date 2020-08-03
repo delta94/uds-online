@@ -14,6 +14,12 @@ export interface IPaginatablePayload<T> extends IPagination {
 	data: T[]
 }
 
+export interface Model<T> {
+	ID?: T,
+	CreatedAt?: string,
+	UpdatedAt?: string,
+}
+
 export interface IAction<T> {
 	type: string,
 	payload: T

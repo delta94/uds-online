@@ -1,19 +1,16 @@
 import {AnyAction} from "redux";
 import {SET_COURSES} from "../actions/types";
-import {IAction} from "../helpers/models";
+import {IAction, Model} from "../helpers/models";
 import {ILesson} from "./lessonsReducer";
 
 
-export interface ICourse {
-	ID: number,
+export interface ICourse extends Model<number> {
 	title: string,
 	annotation: string,
 	published: boolean,
 	price: number,
 	assistant_id: string,
-	lessons: ILesson[],
-	CreatedAt: string,
-	UpdatedAt: string
+	lessons: ILesson[]
 }
 
 export interface ICourseState {

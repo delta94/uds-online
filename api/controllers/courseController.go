@@ -92,6 +92,28 @@ var GetCoursesAdmin = func(w http.ResponseWriter, r *http.Request) {
 	u.RespondJson(w, u.Response{Payload: courses}, http.StatusOK)
 }
 
+var CopyCourse = func(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	id, err := strconv.Atoi(params["id"])
+	if err != nil {
+		log.Print(err.Error())
+		u.RespondJson(w, u.Response{Message: "Invalid request"}, http.StatusOK)
+		return
+	}
+	course, err := srv.CourseService.Copy(uint(id))
+	if err != nil {
+		log.Print(err.Error())
+		u.RespondJson(w, u.Response{Message: err.Error()}, http.StatusOK)
+		return
+	}
+	u.RespondJson(w, u.Response{Payload: course}, http.StatusOK)
+}
+
+var CopyLesson = func(w http.ResponseWriter, r *http.Request) {
+
+}
+
+
 var CreateLesson = func(w http.ResponseWriter, r *http.Request) {
 	lesson := &m.Lesson{}
 	err := json.NewDecoder(r.Body).Decode(lesson)

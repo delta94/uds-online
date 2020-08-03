@@ -35,7 +35,7 @@ const SnackbarProvider: FC = () => {
 			ContentProps={{
 				'aria-describedby': 'snack-message-id',
 			}}
-			message={<span className="snack-message-id">{capitalize(message)}</span>}
+			message={<span dangerouslySetInnerHTML={{__html: capitalize(message)}} className="snack-message-id" />}
 			action={
 				<IconButton component="span" key="close" aria-label="Close" color="inherit" onClick={handleClose}>
 					<Close/>

@@ -1,18 +1,15 @@
 import {AnyAction} from "redux";
-import {IAction, IPaginatablePayload, IPagination} from "../helpers/models";
+import {IAction, IPaginatablePayload, IPagination, Model} from "../helpers/models";
 import {
 	SET_ASSISTANTS,
 	SET_USERS,
 } from "../actions/types";
 
-export interface IUser {
-	ID: string,
+export interface IUser extends Model<string> {
 	email: string,
 	is_blocked: boolean,
 	role: number,
-	confirmed: boolean,
-	CreatedAt: string,
-	UpdatedAt: string
+	confirmed: boolean
 }
 
 interface IUserData extends IPagination {
