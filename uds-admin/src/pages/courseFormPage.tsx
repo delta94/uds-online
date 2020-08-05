@@ -38,7 +38,7 @@ const MAX_LENGTH_TITLE = 80;
 const MIN_LENGTH_TITLE = 10;
 const MAX_LENGTH_ANNOTATION = 700;
 const MIN_LENGTH_ANNOTATION = 10;
-const MAX_PRICE_VALUE = 9000;
+const MAX_PRICE_VALUE = 99999;
 const MIN_PRICE_VALUE = 100;
 
 const PICTURE_WIDTH = 200;
@@ -101,7 +101,6 @@ const CourseFormPage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) => {
     const [price, setPrice] = useState<number>(1000);
     const [published, setPublished] = useState<boolean>(false);
     const dispatch = useDispatch();
-    const [oldState, setOldState] = useState<ICourse | undefined>();
     const [t] = useTranslation();
     
     useEffect(() => {
@@ -116,7 +115,6 @@ const CourseFormPage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) => {
                     setPublished(c.published);
                     setPrice(c.price);
                     setPicture(c.picture);
-                    setOldState(c);
                 })));
             }
         }));
@@ -136,18 +134,6 @@ const CourseFormPage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) => {
         if (price < MIN_PRICE_VALUE || price > MAX_PRICE_VALUE) {
             isValid = false;
         }
-        // check if any change's been done
-        if (course_id
-            && oldState
-            && title.trim() === oldState.title
-            && price === oldState.price
-            && picture === oldState.picture
-            && annotation.trim() === oldState.annotation
-            && assistantID === oldState.assistant_id
-            && published === oldState.published
-        ) {
-            isValid = false;
-        }
         return isValid;
     };
 
@@ -156,16 +142,26 @@ const CourseFormPage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) => {
         if (!isFormValid()) {
            return;
         }
+        const c: ICourse = {
+            annotation,
+            assistant_id: assistantID,
+            published,
+            title,
+            picture,
+            price,
+            lessons: []
+        };
         if (course_id) {
             // update course
-            dispatch(update_course(Number(course_id), picture, title, annotation, price, assistantID, published, () => {
+            c.ID = Number(course_id);
+            dispatch(update_course(c, () => {
                 dispatch(popup_snack(`Курс "${title}" успешно обновлен`));
                 history.push(getCourseUrl(course_id));
             }));
             return;
         }
         // create post
-        dispatch(create_course(title, annotation, price, assistantID, (course) => {
+        dispatch(create_course(c, (course) => {
             dispatch(popup_snack(`Курс "${course.title}" был успешно создан`));
             history.push(ROUTES.COURSES);
         }));
@@ -188,8 +184,6 @@ const CourseFormPage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) => {
         formData.append('file', blob);
         formData.append('comment', 'Изображение для раздела (загружено автоматически)');
         dispatch(upload_file(formData, {}, (result, path) => {
-            console.log("result: ", result);
-            console.log("path: ", path);
             if (result) {
                 setPicture(path!);
             } else {
@@ -259,7 +253,7 @@ const CourseFormPage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) => {
                                         {assistants && assistants.map((a) => {
                                             return (
                                                 <MenuItem key={a.ID} value={a.ID}>
-                                                    {a.email} &bull; [ ID: {a.ID} ]
+                                                    {a.name} [{a.email}]
                                                 </MenuItem>
                                             )
                                         })}

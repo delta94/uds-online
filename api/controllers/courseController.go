@@ -43,20 +43,12 @@ var UpdateCourse = func(w http.ResponseWriter, r *http.Request) {
 		u.RespondJson(w, u.Response{Message: err.Error(), ErrorCode: u.ErrGeneral}, http.StatusOK)
 		return
 	}
-	fields := make(map[string]interface{})
-	fields["title"] = course.Title
-	fields["annotation"] = course.Annotation
-	fields["price"] = course.Price
-	fields["assistant_id"] = course.AssistantID
-	fields["published"] = course.Published
-	fields["picture"] = course.Picture
-	err = srv.CourseService.Update(course.ID, fields)
+	err = srv.CourseService.Update(course)
 	if err != nil {
 		u.RespondJson(w, u.Response{Message: "Could not update course", ErrorCode: u.ErrGeneral}, http.StatusOK)
 		return
 	}
 	u.RespondJson(w, u.Response{Message: "Update complete"}, http.StatusOK)
-
 }
 
 var GetCourse = func(w http.ResponseWriter, r *http.Request) {
@@ -163,7 +155,7 @@ var UpdateLesson = func(w http.ResponseWriter, r *http.Request) {
 		u.RespondJson(w, u.Response{Message: "Invalid request", ErrorCode: u.ErrGeneral}, http.StatusOK)
 		return
 	}
-	err = m.GetDB().Save(lesson).Error
+	err = srv.LessonService.Update(lesson)
 	if err != nil {
 		log.Print(err.Error())
 		u.RespondJson(w, u.Response{Message: err.Error(), ErrorCode: u.ErrGeneral}, http.StatusOK)

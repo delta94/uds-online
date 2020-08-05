@@ -63,7 +63,6 @@ export const WidgetSingleOption: FC<ITaskWidget> = ({data, onJsonUpdate}) => {
             control: control!,
             options
         };
-        console.log("onJsonUpdate", t);
         onJsonUpdate(encodeObjectToBase64(t));
     }, [control, text, options]);
 

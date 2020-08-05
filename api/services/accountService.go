@@ -30,6 +30,10 @@ func (s *accountService) Create(model *m.Account) error {
 		[]byte(model.Password.Raw), bcrypt.DefaultCost,
 	)
 	model.Password.Hash = string(hashedPassword)
+	err := model.Password.Validate()
+	if err != nil {
+		return err
+	}
 	model.ConfirmationToken = &m.Token{
 		Type:      TypeConfirmation,
 		ExpiresAt: time.Now().Add(time.Hour * time.Duration(24)),

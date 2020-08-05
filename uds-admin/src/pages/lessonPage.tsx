@@ -121,7 +121,6 @@ const LessonPage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) => {
 		if (!Number.isInteger(task.ID)) {
 			// New task
 			const max = Math.max(...tasks.map(t => t.sort));
-			//console.log("new task", () + 10);
 			task.ID = 0;
 			task.sort = Number.isInteger(max) ? max + 10 : 0;
 			setTasks([...tasks, task]);

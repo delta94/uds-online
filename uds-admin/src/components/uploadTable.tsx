@@ -1,4 +1,4 @@
-import React, {FC, useState} from "react";
+import React, {FC, useEffect, useState} from "react";
 import {
 	Paper,
 	Table,
@@ -162,7 +162,7 @@ const UploadRow: FC<IUploadRowProps> = ({upload: {alias, ID, original_name, Crea
 
 interface IUploadTableProps extends IPagination {
 	uploads: IUpload[];
-	onChangePage: (e: React.ChangeEvent<unknown>, v: number) => void;
+	onChangePage: (v: number) => void;
 }
 
 const UploadTable: FC<IUploadTableProps> = (props) => {
@@ -170,6 +170,11 @@ const UploadTable: FC<IUploadTableProps> = (props) => {
 	const [t] = useTranslation();
 	const {uploads, page, total, onChangePage, size} = props;
 	const count = Math.ceil(total / size) || 1;
+	useEffect(() => {
+		if (!uploads.length && page > 0) {
+			onChangePage(page - 1);
+		}
+	}, [uploads]);
 	return (
 		<div>
 			<TableContainer component={Paper} className={classes.tableContainer}>
@@ -202,7 +207,7 @@ const UploadTable: FC<IUploadTableProps> = (props) => {
 							page={page + 1}
 							hidePrevButton
 							hideNextButton
-							onChange={(e, i) => onChangePage(e, i)}
+							onChange={(e, i) => onChangePage(i)}
 				/>
 			</>}
 		

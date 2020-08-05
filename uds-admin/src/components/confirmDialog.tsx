@@ -39,7 +39,7 @@ export const ConfirmDialog: FC<IConfirmDialogProps> = ({children, text, heading,
 export function PaperComponent(props: PaperProps) {
 	const styles = {
 		width: 'auto',
-		minWidth: 370,
+		minWidth: 600,
 		maxWidth: 'calc(100% - 64px)',
 		
 	};

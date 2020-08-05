@@ -237,12 +237,12 @@ export const set_courses = (courses: ICourse[]): IAction<ICourse[]> => {
 	}
 };
 
-export const create_course = (title: string, annotation: string, price: number, assistant_id: string, callback: (course: CreateCourseResponse) => void) => {
+export const create_course = (course: ICourse, callback: (course: CreateCourseResponse) => void) => {
 	return (dispatch: Dispatch) => {
 		return api_request<CreateCourseResponse>({
 			method: "POST",
 			url: `admin/courses`,
-			data: {title, annotation, price, assistant_id},
+			data: course,
 			version: 1
 		})
 			.then((course) => {
@@ -251,12 +251,12 @@ export const create_course = (title: string, annotation: string, price: number, 
 	}
 }
 
-export const update_course = (id: number, picture: string, title: string, annotation: string, price: number, assistant_id: string, published: boolean, callback: () => void) => {
+export const update_course = (course: ICourse, callback: () => void) => {
 	return (dispatch: Dispatch) => {
 		return api_request<any>({
 			method: "PUT",
 			url: `admin/courses`,
-			data: {ID: id, picture, title, annotation, price, assistant_id, published},
+			data: course,
 			version: 1
 		})
 			.then(() => {
@@ -431,7 +431,6 @@ export const upload_file = (formData: FormData, config: IUploadFileConfig, callb
 	return (dispatch: Dispatch) => {
 		return axios.post("/v1/uploads", formData, config)
 			.then((response) => {
-				console.log("RESP:", response);
 				callback(true, (response as unknown as UploadResponse).path);
 			})
 			.catch(() => callback(false));

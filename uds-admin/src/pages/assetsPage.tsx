@@ -70,7 +70,6 @@ const FileUploadDialog: FC<IFileUploadDialogProps> = ({text, open, onClose}) => 
 		formData.append('comment', comment);
 		const config = {
 			onUploadProgress: (progressEvent: ProgressEvent) => {
-				console.log(Math.ceil(100 * progressEvent.loaded / progressEvent.total));
 				setProgress(Math.ceil(100 * progressEvent.loaded / progressEvent.total))
 			},
 		};
@@ -216,7 +215,7 @@ const AssetsPage: FC = () => {
 					total={uploadState.total}
 					size={uploadState.size}
 					onChangePage={
-						(e: React.ChangeEvent<unknown>, v: number) => handlePageChange(v)
+						(v: number) => handlePageChange(v)
 					}
 				/>
 			</Suspense>

@@ -76,17 +76,8 @@ func (account *Account) Validate() error {
 	if strings.Trim(account.Name, " ") == "" {
 		return fmt.Errorf("name is required")
 	}
-
-	if account.Password.Raw == "" {
+	if account.Password == nil {
 		return fmt.Errorf("password is required")
-	}
-
-	if utf8.RuneCountInString(account.Password.Raw) < 6 {
-		return fmt.Errorf("password is too short")
-	}
-
-	if account.Password.Raw != account.Password.Confirmation {
-		return fmt.Errorf("passwords do not match")
 	}
 	// Email must be unique
 	temp := &Account{}
@@ -98,6 +89,23 @@ func (account *Account) Validate() error {
 	}
 	if temp.Email != "" {
 		return fmt.Errorf("email is taken")
+	}
+
+	return nil
+}
+
+
+func (password *Password) Validate() error {
+	if password.Raw == "" {
+		return fmt.Errorf("name is required")
+	}
+
+	if utf8.RuneCountInString(password.Raw) < 6 {
+		return fmt.Errorf("password is too short")
+	}
+
+	if password.Raw != password.Confirmation {
+		return fmt.Errorf("passwords do not match")
 	}
 
 	return nil

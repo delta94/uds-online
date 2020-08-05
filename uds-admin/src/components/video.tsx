@@ -88,7 +88,6 @@ export const Video: FC<IVideoProps> = ({src}) => {
 
     const onProgress = ({playedSeconds, ...rest}: IOnProgress) => {
         setCurrentPos(playedSeconds);
-        console.log(rest);
     };
 
     const onReady = () => {
@@ -117,7 +116,7 @@ export const Video: FC<IVideoProps> = ({src}) => {
                              onReady={onReady}
                              onDuration={(s) => setDuration(Math.floor(s))}
                              onProgress={onProgress as any}
-                             url={src + '?action=play'}
+                             url={src}
                 />
 
 

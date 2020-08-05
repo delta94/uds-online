@@ -23,16 +23,8 @@ func (s *courseService) Create(model *m.Course) error {
 	return nil
 }
 
-func (s *courseService) Update(id uint, fields map[string]interface{}) error {
-	query := m.GetDB().
-		Table(s.TableName).
-		Where("id = ?", id).
-		Update(fields)
-
-	err := query.Error
-	if query.RowsAffected == 0 {
-		return fmt.Errorf("no records updated")
-	}
+func (s *courseService) Update(model *m.Course) error {
+	err := m.GetDB().Save(model).Error
 	if err != nil {
 		return err
 	}

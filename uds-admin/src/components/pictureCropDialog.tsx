@@ -140,12 +140,9 @@ const PictureCropDialog: FC<IPictureCropDialog> = ({open, onClose, onSave}) => {
 	};
 	const onCropChange = (crop: Point) => {
 		setCrop(crop);
-		console.log(crop);
 	}
 	
 	const onCropComplete = async (croppedArea: Area, croppedAreaPixels: Area) => {
-		// console.log(croppedArea, croppedAreaPixels)
-		console.log(image);
 		if (!image) {
 			return;
 		}

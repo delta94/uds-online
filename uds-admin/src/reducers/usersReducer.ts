@@ -7,6 +7,7 @@ import {
 
 export interface IUser extends Model<string> {
 	email: string,
+	name: string,
 	is_blocked: boolean,
 	role: number,
 	confirmed: boolean

@@ -22,10 +22,14 @@ func (s *lessonService) Get(id uint) (*m.Lesson, error) {
 }
 
 func (s *lessonService) Create(model *m.Lesson) error {
-	//if err := model.Validate(); err != nil {
-	//	return err
-	//}
 	if err := m.GetDB().Create(model).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *lessonService) Update(model *m.Lesson) error {
+	if err := m.GetDB().Save(model).Error; err != nil {
 		return err
 	}
 	return nil

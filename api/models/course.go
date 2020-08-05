@@ -13,6 +13,7 @@ type Course struct {
 	Annotation  string    `json:"annotation" gorm:"size:1000"`
 	Picture     string    `json:"picture" gorm:"size:1000"`
 	Price       int       `json:"price"`
+	Video       string    `json:"video" gorm:"size:12"`
 	Lessons     []*Lesson `json:"lessons" gorm:"foreignkey:CourseID"`
 	AssistantID uuid.UUID `json:"assistant_id" gorm:"index;type:char(36);"`
 	Published   bool      `json:"published"`
@@ -63,7 +64,7 @@ func (course *Course) Validate() error {
 	if course.Price < 100 {
 		return fmt.Errorf("price is too low")
 	}
-	if course.Price > 9000 {
+	if course.Price > 99999 {
 		return fmt.Errorf("price is too high")
 	}
 	if course.AssistantID.String() == "00000000-0000-0000-0000-000000000000" {
