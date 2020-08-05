@@ -251,12 +251,12 @@ export const create_course = (title: string, annotation: string, price: number, 
 	}
 }
 
-export const update_course = (id: number, title: string, annotation: string, price: number, assistant_id: string, published: boolean, callback: () => void) => {
+export const update_course = (id: number, picture: string, title: string, annotation: string, price: number, assistant_id: string, published: boolean, callback: () => void) => {
 	return (dispatch: Dispatch) => {
 		return api_request<any>({
 			method: "PUT",
 			url: `admin/courses`,
-			data: {ID: id, title, annotation, price, assistant_id, published},
+			data: {ID: id, picture, title, annotation, price, assistant_id, published},
 			version: 1
 		})
 			.then(() => {
@@ -421,11 +421,18 @@ interface IUploadFileConfig {
 	onUploadProgress?: (progressEvent: ProgressEvent) => void
 }
 
-export const upload_file = (formData: FormData, config: IUploadFileConfig, callback: (result: boolean) => void) => {
+export const upload_file = (formData: FormData, config: IUploadFileConfig, callback: (result: boolean, path?: string) => void) => {
+	interface UploadResponse {
+		alias: string;
+		comment: string;
+		originalName: string;
+		path: string;
+	}
 	return (dispatch: Dispatch) => {
 		return axios.post("/v1/uploads", formData, config)
-			.then(() => {
-				callback(true);
+			.then((response) => {
+				console.log("RESP:", response);
+				callback(true, (response as unknown as UploadResponse).path);
 			})
 			.catch(() => callback(false));
 	};

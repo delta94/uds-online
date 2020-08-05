@@ -49,6 +49,7 @@ var UpdateCourse = func(w http.ResponseWriter, r *http.Request) {
 	fields["price"] = course.Price
 	fields["assistant_id"] = course.AssistantID
 	fields["published"] = course.Published
+	fields["picture"] = course.Picture
 	err = srv.CourseService.Update(course.ID, fields)
 	if err != nil {
 		u.RespondJson(w, u.Response{Message: "Could not update course", ErrorCode: u.ErrGeneral}, http.StatusOK)
@@ -112,7 +113,6 @@ var CopyCourse = func(w http.ResponseWriter, r *http.Request) {
 var CopyLesson = func(w http.ResponseWriter, r *http.Request) {
 
 }
-
 
 var CreateLesson = func(w http.ResponseWriter, r *http.Request) {
 	lesson := &m.Lesson{}

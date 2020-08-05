@@ -6,6 +6,7 @@ import {ILesson} from "./lessonsReducer";
 
 export interface ICourse extends Model<number> {
 	title: string,
+	picture: string,
 	annotation: string,
 	published: boolean,
 	price: number,

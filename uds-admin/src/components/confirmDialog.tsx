@@ -37,9 +37,15 @@ export const ConfirmDialog: FC<IConfirmDialogProps> = ({children, text, heading,
 };
 
 export function PaperComponent(props: PaperProps) {
+	const styles = {
+		width: 'auto',
+		minWidth: 370,
+		maxWidth: 'calc(100% - 64px)',
+		
+	};
 	return (
 		<Draggable handle="#draggable-dialog-title" cancel={'[class*="MuiDialogContent-root"]'}>
-			<Paper {...props} />
+			<Paper {...props} style={styles}/>
 		</Draggable>
 	);
 }

@@ -11,6 +11,7 @@ type Course struct {
 	gorm.Model
 	Title       string    `json:"title" gorm:"size:120;not null"`
 	Annotation  string    `json:"annotation" gorm:"size:1000"`
+	Picture     string    `json:"picture" gorm:"size:1000"`
 	Price       int       `json:"price"`
 	Lessons     []*Lesson `json:"lessons" gorm:"foreignkey:CourseID"`
 	AssistantID uuid.UUID `json:"assistant_id" gorm:"index;type:char(36);"`

@@ -93,6 +93,9 @@ var HandleLocalUpload = func(w http.ResponseWriter, r *http.Request) {
 		u.RespondJson(w, u.Response{Message: "Could not upload file", ErrorCode: u.ErrGeneral}, http.StatusOK)
 		return
 	}
+	if fileHeader.Filename == "blob" {
+		fileHeader.Filename = "blob.jpg"
+	}
 	if utf8.RuneCountInString(fileHeader.Filename) > 80 {
 		log.Println("Filename is too long")
 		u.RespondJson(w, u.Response{Message: "Filename is too long", ErrorCode: u.ErrGeneral}, http.StatusOK)

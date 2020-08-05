@@ -18,12 +18,21 @@ import {ROUTES} from "../constants";
 import {Save, Info, FileCopy} from "@material-ui/icons";
 import {Alert} from "@material-ui/lab";
 import {useDispatch} from "react-redux";
-import {clone_course, create_course, get_assistants_plain, get_course, popup_snack, update_course} from "../actions";
+import {
+    clone_course,
+    create_course,
+    get_assistants_plain,
+    get_course,
+    popup_snack,
+    update_course,
+    upload_file
+} from "../actions";
 import history from "../history";
 import {IUser} from "../reducers/usersReducer";
 import {getCourseUrl} from "../helpers/getUrl";
 import {ICourse} from "../reducers/courseReducer";
 import {useTranslation} from "react-i18next";
+import PictureCropDialog from "../components/pictureCropDialog";
 
 const MAX_LENGTH_TITLE = 80;
 const MIN_LENGTH_TITLE = 10;
@@ -32,8 +41,25 @@ const MIN_LENGTH_ANNOTATION = 10;
 const MAX_PRICE_VALUE = 9000;
 const MIN_PRICE_VALUE = 100;
 
+const PICTURE_WIDTH = 200;
+const PICTURE_RATIO = 16 / 9;
+
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
+        row: {
+            display: 'flex',
+        },
+        pictureCell: {
+            width: PICTURE_WIDTH,
+            flexShrink: 0,
+            marginRight: 20
+        },
+        pictureContainer: {
+            border: '1px solid #CECECE',
+            marginBottom: 10,
+            height: PICTURE_WIDTH / PICTURE_RATIO,
+            width: PICTURE_WIDTH
+        },
         spacer: {
             height: 20,
         },
@@ -66,7 +92,9 @@ interface IRouteProps {
 const CourseFormPage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) => {
     const classes = useStyles();
     const {params: {id: course_id}} = match!;
+    const [pictureDialogOpen, setPictureDialogOpen] = useState<boolean>(false);
     const [title, setTitle] = useState<string>("");
+    const [picture, setPicture] = useState<string>("");
     const [annotation, setAnnotation] = useState<string>("");
     const [assistantID, setAssistantID] = React.useState<string>("");
     const [assistants, setAssistants] = React.useState<IUser[]>([]);
@@ -87,6 +115,7 @@ const CourseFormPage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) => {
                     setAssistantID(c.assistant_id);
                     setPublished(c.published);
                     setPrice(c.price);
+                    setPicture(c.picture);
                     setOldState(c);
                 })));
             }
@@ -112,6 +141,7 @@ const CourseFormPage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) => {
             && oldState
             && title.trim() === oldState.title
             && price === oldState.price
+            && picture === oldState.picture
             && annotation.trim() === oldState.annotation
             && assistantID === oldState.assistant_id
             && published === oldState.published
@@ -128,7 +158,7 @@ const CourseFormPage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) => {
         }
         if (course_id) {
             // update course
-            dispatch(update_course(Number(course_id), title, annotation, price, assistantID, published, () => {
+            dispatch(update_course(Number(course_id), picture, title, annotation, price, assistantID, published, () => {
                 dispatch(popup_snack(`Курс "${title}" успешно обновлен`));
                 history.push(getCourseUrl(course_id));
             }));
@@ -149,59 +179,107 @@ const CourseFormPage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) => {
             }));
         }
     };
+    
+    const onChangePicture = async (blobURL: string) => {
+        setPictureDialogOpen(false);
+        const blob = await fetch(blobURL).then(r => r.blob());
+    
+        const formData = new FormData();
+        formData.append('file', blob);
+        formData.append('comment', 'Изображение для раздела (загружено автоматически)');
+        dispatch(upload_file(formData, {}, (result, path) => {
+            console.log("result: ", result);
+            console.log("path: ", path);
+            if (result) {
+                setPicture(path!);
+            } else {
+            }
+        }));
+    };
 
     return (
         <PageWrapper heading={course_id ? "Редактирование курса" : "Добавить курс"}>
             <form onSubmit={onSubmit} autoComplete="off">
-                <FormControl fullWidth>
-                    <TextField
-                        id="input-title"
-                        value={title}
-                        label="Название курса"
-                        helperText={`${title.length}/${MAX_LENGTH_TITLE} символов. Минимальная длинна ${MIN_LENGTH_TITLE} символов.`}
-                        fullWidth
-                        required
-                        inputProps={{
-                            maxLength: MAX_LENGTH_TITLE,
-                            minLength: MIN_LENGTH_TITLE,
-                        }}
-                        onChange={(e) => setTitle(e.target.value)}
-                    />
-                </FormControl>
-                
-                <div className={classes.spacer}/>
-
-                <FormControl fullWidth>
-                    <div className={classes.tooltipRow}>
-                        <div className={classes.assistantSelect}>
-                            <InputLabel id="select-assistant">Назначеный ассистент</InputLabel>
-                            <Select
-                                required
-                                fullWidth
-                                labelId="select-assistant"
-                                value={assistantID}
-                                onChange={({target}) => setAssistantID(String(target.value))}
-                            >
-                                {assistants && assistants.map((a) => {
-                                    return (
-                                        <MenuItem key={a.ID} value={a.ID}>
-                                            {a.email} &bull; [ ID: {a.ID} ]
-                                        </MenuItem>
-                                    )
-                                })}
-                            </Select>
+                <div className={classes.row}>
+                    <div className={classes.pictureCell}>
+                        <div className={classes.pictureContainer}>
+                            {picture ?
+                                <img src={process.env.REACT_APP_HOST_API + '/' + picture} alt=""
+                                     width={PICTURE_WIDTH}
+                                     height={PICTURE_WIDTH / PICTURE_RATIO}
+                                />
+                                :
+                                <img src="" alt=""
+                                     width={PICTURE_WIDTH}
+                                     height={PICTURE_WIDTH / PICTURE_RATIO}
+                                />
+                            }
                         </div>
-
-                        <Tooltip title={
-                            `Указанный аккаунт будет получать на проверку задания из данного курса, а также 
-                             сообщения из него. Новый ассистент может быть добавлен в разделе "Учетные записи".`
-                        }>
-                            <Info/>
-                        </Tooltip>
+                        <Button
+                            fullWidth
+                            variant='contained'
+                            color='primary'
+                            onClick={() => setPictureDialogOpen(true)}>
+                            Select picture
+                        </Button>
                     </div>
-                </FormControl>
+                    
+                    <div className={classes.grow}>
+                        
+                        <FormControl fullWidth>
+                            <TextField
+                                id="input-title"
+                                value={title}
+                                label="Название курса"
+                                helperText={`${title.length}/${MAX_LENGTH_TITLE} символов. Минимальная длинна ${MIN_LENGTH_TITLE} символов.`}
+                                fullWidth
+                                required
+                                inputProps={{
+                                    maxLength: MAX_LENGTH_TITLE,
+                                    minLength: MIN_LENGTH_TITLE,
+                                }}
+                                onChange={(e) => setTitle(e.target.value)}
+                            />
+                        </FormControl>
+    
+                        <div className={classes.spacer}/>
+                        <div className={classes.spacer}/>
+    
+                        <FormControl fullWidth>
+                            <div className={classes.tooltipRow}>
+                                <div className={classes.assistantSelect}>
+                                    <InputLabel id="select-assistant">Назначеный ассистент</InputLabel>
+                                    <Select
+                                        required
+                                        fullWidth
+                                        labelId="select-assistant"
+                                        value={assistantID}
+                                        onChange={({target}) => setAssistantID(String(target.value))}
+                                    >
+                                        {assistants && assistants.map((a) => {
+                                            return (
+                                                <MenuItem key={a.ID} value={a.ID}>
+                                                    {a.email} &bull; [ ID: {a.ID} ]
+                                                </MenuItem>
+                                            )
+                                        })}
+                                    </Select>
+                                </div>
+            
+                                <Tooltip title={
+                                    `Указанный аккаунт будет получать на проверку задания из данного курса, а также
+                             сообщения из него. Новый ассистент может быть добавлен в разделе "Учетные записи".`
+                                }>
+                                    <Info/>
+                                </Tooltip>
+                            </div>
+                        </FormControl>
 
-                <div className={classes.spacer}/>
+                    </div>
+                </div>
+                
+                
+                
                 <div className={classes.spacer}/>
 
                 <FormControl fullWidth>
@@ -294,7 +372,12 @@ const CourseFormPage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) => {
                     </>}
                 </div>
             </form>
-
+            
+            <PictureCropDialog
+                open={pictureDialogOpen}
+                onSave={onChangePicture}
+                onClose={() => setPictureDialogOpen(false)}
+            />
         </PageWrapper>
     );
 };
