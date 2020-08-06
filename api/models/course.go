@@ -2,8 +2,8 @@ package models
 
 import (
 	"fmt"
+	"github.com/google/uuid"
 	"github.com/jinzhu/gorm"
-	uuid "github.com/satori/go.uuid"
 	"unicode/utf8"
 )
 
@@ -67,7 +67,8 @@ func (course *Course) Validate() error {
 	if course.Price > 99999 {
 		return fmt.Errorf("price is too high")
 	}
-	if course.AssistantID.String() == "00000000-0000-0000-0000-000000000000" {
+	assId := course.AssistantID.String()
+	if assId == "00000000-0000-0000-0000-000000000000" {
 		return fmt.Errorf("assistant id is not defined")
 	}
 	return nil

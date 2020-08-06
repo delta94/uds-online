@@ -29,6 +29,10 @@ sudo bash letsencrypt.sh
 ```
 Once Letsencrypt finishes its job, restore the commented parts mentioned above.
 
+### Mailgun Configuration:
+Visit `https://app.mailgun.com/app/account/security/api_keys` to get API keys for sending mail via Mailgun.
+Do not forget to set MX records and other stuff for your domain.
+
 ### To start:
 ```shell script
 sudo docker-compose up -d

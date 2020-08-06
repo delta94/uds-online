@@ -2,15 +2,17 @@ package controllers
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
+	"github.com/mailgun/mailgun-go/v4"
 	"golang.org/x/crypto/bcrypt"
 	"html/template"
+	"io/ioutil"
 	"log"
 	"net/http"
-	"net/smtp"
 	"os"
 	"strconv"
 	"strings"
@@ -39,7 +41,7 @@ var CreateAccount = func(w http.ResponseWriter, r *http.Request) {
 	tplv["email"] = account.Email
 	tplv["name"] = account.Name
 	// Send email
-	go SendEmail([]string{account.Email}, "Создание учетной записи - Подтверждение Email", "info", tplv, "tpl/confirmation_email.html")
+	go SendEmail(account.Email, "Создание учетной записи - Подтверждение Email", "info", tplv, "tpl/confirmation_email.html")
 
 	p := make(map[string]interface{})
 	p["id"] = account.ID
@@ -80,7 +82,7 @@ var CreateAssistant = func(w http.ResponseWriter, r *http.Request) {
 	tplv["password"] = password
 	tplv["name"] = account.Name
 	// Send email
-	go SendEmail([]string{account.Email}, "Создание учетной записи ассистента - Подтверждение Email", "info", tplv, "tpl/confirmation_email_assistant.html")
+	go SendEmail(account.Email, "Создание учетной записи ассистента - Подтверждение Email", "info", tplv, "tpl/confirmation_email_assistant.html")
 
 	p := make(map[string]interface{})
 	p["id"] = account.ID
@@ -323,7 +325,7 @@ var IssuePasswordReset = func(w http.ResponseWriter, r *http.Request) {
 	tplv := make(map[string]string)
 	tplv["link"] = fmt.Sprintf("%s/reset?t=%s", os.Getenv("REACT_APP_HOST_PUBLIC"), account.ResetToken.Value)
 	tplv["email"] = account.Email
-	go SendEmail([]string{account.Email}, "Password reset", "info", tplv, "tpl/reset_email.html")
+	go SendEmail(account.Email, "Password reset", "info", tplv, "tpl/reset_email.html")
 
 	u.RespondJson(w, u.Response{Message: "OK! Please check your your email!"}, http.StatusOK)
 }
@@ -420,7 +422,7 @@ func RedeemReset(token string, password string) error {
 	return tx.Commit().Error
 }
 
-func SendEmail(to []string, subject string, from string, data interface{}, tplPath string) {
+func SendEmail(to string, subject string, from string, data interface{}, tplPath string) {
 	t, err := template.ParseFiles(tplPath)
 	if err != nil {
 		log.Println("Could load template", err.Error())
@@ -431,26 +433,33 @@ func SendEmail(to []string, subject string, from string, data interface{}, tplPa
 		log.Println("Could execute template", err.Error())
 		return
 	}
-	auth := smtp.PlainAuth(
-		"",
-		os.Getenv("SMTP_USER"),
-		os.Getenv("SMTP_PASSWORD"),
-		os.Getenv("SMTP_HOST"),
-	)
-	mime := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
-	subject = "Subject: " + subject + "\n"
-	msg := []byte(subject + mime + "\n" + buffer.String())
-	log.Printf("Trying to send email to %s\n", strings.Join(to, ","))
-	err = smtp.SendMail(
-		fmt.Sprintf("%s:%s", os.Getenv("SMTP_HOST"), os.Getenv("SMTP_PORT")),
-		auth,
-		fmt.Sprintf("%s@%s", from, os.Getenv("SMTP_SENDER_DOMAIN")),
-		to,
-		msg,
-	)
+	html := buffer.String()
+
+	log.Printf("Trying to send email to %s\n", to)
+
+	// Credentials
+	domain := os.Getenv("MG_DOMAIN")
+	apiKey := os.Getenv("MG_API_KEY")
+
+	// Mime parts:
+	subject = "Subject: =?utf-8?B?" + subject + "?=\n"
+	to = fmt.Sprintf(fmt.Sprintf("To: %s", to)) + "\n"
+	from = fmt.Sprintf(fmt.Sprintf("From: %s@%s", from, domain)) + "\n"
+	mime := "MIME-version: 1.0;\nContent-Type: text/html; charset='UTF-8';\n\n"
+	body := subject + from + to + mime + html
+
+	mg := mailgun.NewMailgun(domain, apiKey)
+	message := mg.NewMIMEMessage(ioutil.NopCloser(strings.NewReader(body)), to)
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	// Send the message with a 10 second timeout
+	resp, id, err := mg.Send(ctx, message)
+
 	if err != nil {
 		log.Println("Cannot send email", err)
 	} else {
-		log.Printf("Mail to %s has been sent successfully", strings.Join(to, ","))
+		log.Printf("Mail to %s has been sent successfully; ID: %s; Response: %s\n", to, id, resp)
 	}
 }

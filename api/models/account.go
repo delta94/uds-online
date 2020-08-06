@@ -3,8 +3,8 @@ package models
 import (
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/google/uuid"
 	"github.com/jinzhu/gorm"
-	uuid "github.com/satori/go.uuid"
 	"strings"
 	"time"
 	u "uds-online/api/utils"
@@ -55,7 +55,7 @@ type Token struct {
 }
 
 func (account *Account) BeforeCreate() (err error) {
-	id, err := uuid.NewV4()
+	id, _ := uuid.NewRandom()
 	account.ID = id
 	return
 }
@@ -93,7 +93,6 @@ func (account *Account) Validate() error {
 
 	return nil
 }
-
 
 func (password *Password) Validate() error {
 	if password.Raw == "" {

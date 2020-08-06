@@ -3,7 +3,7 @@ import store from "./store";
 import {popup_snack} from "./actions";
 import {IAPIResponseData} from "./helpers/api";
 
-axios.defaults.baseURL = process.env.REACT_APP_HOST_API;
+axios.defaults.baseURL = process.env.REACT_APP_HOST_API + '/api';
 axios.defaults.headers['x-request-client'] = 'WEB_APP';
 axios.interceptors.request.use(
 	config => {

@@ -3,8 +3,8 @@ package controllers
 import (
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/google/uuid"
 	"github.com/gorilla/mux"
-	uuid "github.com/satori/go.uuid"
 	"io"
 	"io/ioutil"
 	"log"
@@ -130,8 +130,8 @@ var HandleLocalUpload = func(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	uuid, _ := uuid.NewV4()
-	newPath := filepath.Join(".", "uploaded", strings.ToLower(fmt.Sprintf("%s%s", uuid.String(), path.Ext(fileHeader.Filename))))
+	uuId := uuid.New()
+	newPath := filepath.Join(".", "uploaded", strings.ToLower(fmt.Sprintf("%s%s", uuId.String(), path.Ext(fileHeader.Filename))))
 
 	err = MoveFile(tempFile.Name(), newPath)
 	if err != nil {

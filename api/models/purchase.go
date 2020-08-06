@@ -2,7 +2,7 @@ package models
 
 import (
 	"fmt"
-	uuid "github.com/satori/go.uuid"
+	uuid "github.com/google/uuid"
 	"time"
 )
 
@@ -25,7 +25,7 @@ func (p *Purchase) Validate() error {
 }
 
 func (p *Purchase) BeforeCreate() (err error) {
-	id, err := uuid.NewV4()
+	id, _ := uuid.NewRandom()
 	p.ID = id
 	return
 }
