@@ -5,8 +5,11 @@ import {IAPIResponseData} from "./helpers/api";
 
 axios.defaults.baseURL = process.env.REACT_APP_HOST_API + '/api';
 axios.defaults.headers['x-request-client'] = 'WEB_APP';
+/**
+ * Modify all outgoing requests.
+ */
 axios.interceptors.request.use(
-	config => {
+	(config) => {
 		const token = store.getState().auth.token;
 		if (token) {
 			config.headers.Authorization = `Bearer ${token}`;
@@ -15,18 +18,24 @@ axios.interceptors.request.use(
 	},
 	error => Promise.reject(error)
 );
+
+/**
+ * Here we process all the responses.
+ */
 axios.interceptors.response.use(
 	(response: IAPIResponseData): any => {
-		console.log('Response was received', response);
 		if (response.data.error_code !== 0) {
 			store.dispatch(popup_snack(response.data.message));
 			return Promise.reject(response.data.message);
 		}
 		return response.data.payload;
 	},
-	(error: AxiosError)=> {
+	(error: AxiosError) => {
 		// handle the response error
-		const msg = error.response && error.response.data.message ? error.response.data.message: error.message;
+		let msg = error.message;
+		if (error.isAxiosError && error.response) {
+			msg = error.response.data.message;
+		}
 		store.dispatch(popup_snack(msg));
 		return Promise.reject(error);
 	}

@@ -11,8 +11,16 @@ const storage = window.localStorage;
 export interface IAuthRequest {
 	email: string,
 	password: {
+		value: string
+	}
+}
+
+export interface IRegisterRequest {
+	email: string,
+	name: string,
+	password: {
 		value: string,
-		confirmation?: string
+		confirmation: string
 	}
 }
 

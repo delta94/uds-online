@@ -14,8 +14,7 @@ const TOKEN = "_token";
 export interface IAuthRequest {
 	email: string,
 	password: {
-		value: string,
-		confirmation?: string
+		value: string
 	}
 }
 

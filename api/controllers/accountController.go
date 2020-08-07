@@ -13,6 +13,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"strconv"
 	"strings"
@@ -23,9 +24,69 @@ import (
 	u "uds-online/api/utils"
 )
 
+type reCHAPTCHAResponse struct {
+	Success        bool      `json:"success"`
+	ChallengeTS    time.Time `json:"challenge_ts"`
+	Hostname       string    `json:"hostname,omitempty"`
+	ApkPackageName string    `json:"apk_package_name,omitempty"`
+	Action         string    `json:"action,omitempty"`
+	Score          float32   `json:"score,omitempty"`
+	ErrorCodes     []string  `json:"error-codes,omitempty"`
+}
+
+var recaptchaSiteVerifyUrl = "https://www.google.com/recaptcha/api/siteverify"
+var recaptchaHeader = "x-recaptcha-token"
+
+
 var CreateAccount = func(w http.ResponseWriter, r *http.Request) {
+	var useRecaptcha, err = strconv.ParseBool(os.Getenv("USE_RECAPTCHA"))
+	if err != nil {
+		log.Println("Wrong value for USE_RECAPTCHA")
+		useRecaptcha = false
+	}
+	if useRecaptcha {
+		recaptchaToken := r.Header.Get(recaptchaHeader)
+		remoteIp := r.RemoteAddr
+		if recaptchaHeader == "" {
+			u.RespondJson(w, u.Response{Message: "No recaptcha", ErrorCode: u.ErrGeneral}, http.StatusForbidden)
+			return
+		}
+		log.Println(fmt.Sprintf("An attempt to register a user from %s", remoteIp))
+
+		formValues := url.Values{
+			"secret": {os.Getenv("RECAPTCHA_SECRET_KEY")},
+			"response": {recaptchaToken},
+			"remoteip": {remoteIp},
+		}
+		response, err := http.PostForm(recaptchaSiteVerifyUrl, formValues)
+		if err != nil {
+			u.RespondJson(w, u.Response{Message: fmt.Sprintf("error posting to recaptcha endpoint: '%s'", err), ErrorCode: u.ErrGeneral}, http.StatusBadRequest)
+			return
+		}
+		defer response.Body.Close()
+		resultBody, err := ioutil.ReadAll(response.Body)
+		if err != nil {
+			u.RespondJson(w, u.Response{Message: fmt.Sprintf("couldn't read response body: '%s'", err), ErrorCode: u.ErrGeneral}, http.StatusBadRequest)
+			return
+		}
+		var result reCHAPTCHAResponse
+		err = json.Unmarshal(resultBody, &result)
+		if err != nil {
+			u.RespondJson(w, u.Response{Message: fmt.Sprintf("invalid response body json: '%s'", err), ErrorCode: u.ErrGeneral}, http.StatusBadRequest)
+			return
+		}
+		if result.ErrorCodes != nil {
+			u.RespondJson(w, u.Response{Message: fmt.Sprintf("remote error codes: %v", result.ErrorCodes), ErrorCode: u.ErrGeneral}, http.StatusBadRequest)
+			return
+		}
+		if !result.Success {
+			u.RespondJson(w, u.Response{Message: fmt.Sprintf("invalid challenge solution"), ErrorCode: u.ErrGeneral}, http.StatusBadRequest)
+			return
+		}
+	}
+
 	account := &m.Account{}
-	err := json.NewDecoder(r.Body).Decode(account)
+	err = json.NewDecoder(r.Body).Decode(account)
 	if err != nil {
 		u.RespondJson(w, u.Response{Message: "Invalid request", ErrorCode: u.ErrGeneral}, http.StatusOK)
 		return
@@ -442,7 +503,7 @@ func SendEmail(to string, subject string, from string, data interface{}, tplPath
 	apiKey := os.Getenv("MG_API_KEY")
 
 	// Mime parts:
-	subject = "Subject: =?utf-8?B?" + subject + "?=\n"
+	subject = "Subject: " + subject + "\n"
 	to = fmt.Sprintf(fmt.Sprintf("To: %s", to)) + "\n"
 	from = fmt.Sprintf(fmt.Sprintf("From: %s@%s", from, domain)) + "\n"
 	mime := "MIME-version: 1.0;\nContent-Type: text/html; charset='UTF-8';\n\n"

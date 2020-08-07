@@ -1,7 +1,7 @@
 {
 	"name": "uds-public",
 	"author": "Max Isaev",
-	"version": "0.2.3",
+	"version": "0.3.1",
 	"private": true,
 	"dependencies": {
 		"@material-ui/core": "4.11.0",
@@ -21,6 +21,7 @@
 		"@types/node": "12.12.50",
 		"@types/react": "16.9.42",
 		"@types/react-beautiful-dnd": "13.0.0",
+		"@types/react-google-recaptcha": "2.1.0",
 		"@types/react-dom": "16.9.8",
 		"@types/react-redux": "7.1.9",
 		"@types/react-router-dom": "5.1.5",
@@ -28,6 +29,7 @@
 		"@types/utf8": "2.1.6",
 		"atob": "2.1.2",
 		"axios": "0.19.2",
+		"react-google-recaptcha": "2.1.0",
 		"btoa": "1.2.1",
 		"enzyme": "3.11.0",
 		"enzyme-adapter-react-16": "1.15.2",

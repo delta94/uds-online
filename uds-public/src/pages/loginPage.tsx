@@ -181,7 +181,7 @@ export function LoginPage() {
 						<Button type="submit" color="primary" variant="contained">Sign in</Button>
 					</div>
 				</div>
-				<div className={classes.phone}><Phone />&nbsp;+7(0732)12-34-56</div>
+				
 			</form>
 		
 		</div>

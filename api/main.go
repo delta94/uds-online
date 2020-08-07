@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/gorilla/mux"
+	"log"
 	"net/http"
 	"os"
 	"uds-online/api/controllers"
@@ -14,6 +15,7 @@ func main() {
 
 	// Common Middleware
 	if os.Getenv("IS_PRODUCTION") == "" {
+		// in production, CORS is handled by NGINX
 		router.Use(mw.CorsMiddleware)
 	}
 
@@ -21,7 +23,7 @@ func main() {
 	router.PathPrefix("/uploaded/").Handler(http.StripPrefix("/uploaded", controllers.Neuter(fileServer))).Methods("GET", "OPTIONS")
 
 	// Handle Routes
-	// Public Routes
+
 	router.Handle(mw.Routes["v1"]["landing"], http.HandlerFunc(controllers.LandingPage)).Methods("GET")
 	router.Handle(mw.Routes["v1"]["register"], mw.XhrMiddleware(http.HandlerFunc(controllers.CreateAccount))).Methods("POST", "OPTIONS")
 	router.Handle(mw.Routes["v1"]["auth"], mw.XhrMiddleware(controllers.Authenticate([]int{mw.RoleUser}))).Methods("POST", "OPTIONS")
@@ -29,7 +31,6 @@ func main() {
 	router.Handle(mw.Routes["v1"]["resetPassword"], mw.XhrMiddleware(http.HandlerFunc(controllers.IssuePasswordReset))).Methods("POST", "OPTIONS")
 	router.HandleFunc(mw.Routes["v1"]["confirmEmail"], controllers.ConfirmEmail).Methods("GET", "OPTIONS")
 
-	// Secure Routes
 	router.Handle(mw.Routes["v1"]["register"]+"/assistant", mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.CreateAssistant), []int{mw.RoleAdmin}))).Methods("POST", "OPTIONS")
 	router.Handle(mw.Routes["v1"]["accounts"], mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.GetAccounts), []int{mw.RoleAdmin}))).Methods("GET", "OPTIONS")
 	router.Handle(mw.Routes["v1"]["accounts"]+"/users", mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.GetUsersPlain), []int{mw.RoleAdmin}))).Methods("GET", "OPTIONS")
@@ -74,15 +75,11 @@ func main() {
 	router.Handle(mw.Routes["v1"]["uploads"]+"/{alias}", mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.GetFilePath), []int{mw.RoleAdmin, mw.RoleUser, mw.RoleAssistant}))).Methods("GET", "OPTIONS")
 
 	// Port
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "7000"
-	}
+	port := "7000"
 
-	fmt.Println("App's running on port:", port)
+	log.Println(fmt.Sprintf("App's running on port: %s", port))
 
-	err := http.ListenAndServe(":"+port, router)
-	if err != nil {
+	if err := http.ListenAndServe(":" + port, router); err != nil {
 		panic(err)
 	}
 }

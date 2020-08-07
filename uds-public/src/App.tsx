@@ -2,7 +2,7 @@ import React, {lazy, Suspense, useEffect, useState} from 'react';
 import "./axios";
 import {theme} from "./theme";
 import {MuiThemeProvider} from "@material-ui/core";
-import {useDispatch, useSelector} from "react-redux";
+import {useSelector} from "react-redux";
 import {IReducerState} from "./reducers";
 import {Router, Switch, Route} from "react-router-dom";
 import SnackbarProvider from "./components/snackbarProvider";
@@ -13,6 +13,7 @@ import {Layout} from "./components/layout";
 import history from "./history";
 
 const LoginPage = lazy(() => import("./pages/loginPage"));
+const RegisterPage = lazy(() => import("./pages/registerPage"));
 const ResetPage = lazy(() => import("./pages/resetPage"));
 const ForgotPage = lazy(() => import("./pages/forgotPage"));
 const HomePage = lazy(() => import("./pages/homePage"));
@@ -37,6 +38,7 @@ function App() {
 				<Suspense fallback={<Spinner/>}>
 					<Switch>
 						<Route exact path={ROUTES.LOGIN} component={LoginPage}/>
+						<Route exact path={ROUTES.SIGNUP} component={RegisterPage}/>
 						<Route exact path={ROUTES.RESET} component={ResetPage}/>
 						<Route exact path={ROUTES.FORGOT} component={ForgotPage}/>
 						<PrivateRoute exact path={ROUTES.ACCOUNT} component={() => <Layout><HomePage /></Layout>}/>
@@ -47,7 +49,6 @@ function App() {
 						<Route exact component={() => <div>404</div>}/>
 					</Switch>
 				</Suspense>
-				
 			</Router>
 			<SnackbarProvider/>
 		</MuiThemeProvider>

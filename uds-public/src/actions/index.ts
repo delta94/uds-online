@@ -1,7 +1,7 @@
 import {AnyAction, Dispatch} from "redux";
 import {decode as jwtDecode} from "jsonwebtoken";
 import {CLOSE_MESSAGE, EXIT_MESSAGE, LOG_IN, LOG_OUT, SHOW_POPUP_MESSAGE} from "./types";
-import {IAuthRequest, ITokenPayload} from "../reducers/authReducer";
+import {IAuthRequest, IRegisterRequest, ITokenPayload} from "../reducers/authReducer";
 import {api_request} from "../helpers/api";
 import history from "../history";
 import {ROUTES} from "../constants";
@@ -64,6 +64,27 @@ export const reset_password = (password: string, confirmation: string, token: st
 			})
 	}
 }
+
+export const register_user = (request: IRegisterRequest, recaptchaToken: string) => {
+	interface IRegisterResponse {
+		email: string,
+		id: string,
+	}
+	return (dispatch: Dispatch) => {
+		return api_request<IRegisterResponse>({
+			method: "POST",
+			url: `register`,
+			data: request,
+			headers: {
+				'x-recaptcha-token': recaptchaToken
+			},
+			version: 1
+		})
+			.then(() => {
+			
+			});
+	};
+};
 
 /**
  * Sends a POST request to authenticate the user. Used to obtain JSON Web Token.
