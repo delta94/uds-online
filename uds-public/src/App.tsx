@@ -8,7 +8,7 @@ import {Router, Switch, Route} from "react-router-dom";
 import SnackbarProvider from "./components/snackbarProvider";
 import PrivateRoute from "./components/privateRoute";
 import {ROUTES} from "./constants";
-import {Spinner} from "./components/spinner";
+import {PageSpinner} from "./components/spinner";
 import {Layout} from "./components/layout";
 import history from "./history";
 
@@ -20,7 +20,9 @@ const HomePage = lazy(() => import("./pages/homePage"));
 const MessagesPage = lazy(() => import("./pages/messagesPage"));
 const MessageDetailedPage = lazy(() => import("./pages/messagePage"));
 const ComposeMessagePage = lazy(() => import("./pages/composeMessagePage"));
+const LessonPage = lazy(() => import("./pages/lessonPage"));
 const CoursePage = lazy(() => import("./pages/coursePage"));
+const CoursesPage = lazy(() => import("./pages/coursesPage"));
 
 function App() {
 	// const dispatch = useDispatch();
@@ -35,17 +37,24 @@ function App() {
 	return (
 		<MuiThemeProvider theme={theme}>
 			<Router history={history}>
-				<Suspense fallback={<Spinner/>}>
+				<Suspense fallback={<PageSpinner/>}>
 					<Switch>
 						<Route exact path={ROUTES.LOGIN} component={LoginPage}/>
 						<Route exact path={ROUTES.SIGNUP} component={RegisterPage}/>
 						<Route exact path={ROUTES.RESET} component={ResetPage}/>
 						<Route exact path={ROUTES.FORGOT} component={ForgotPage}/>
 						<PrivateRoute exact path={ROUTES.ACCOUNT} component={() => <Layout><HomePage /></Layout>}/>
+						
+						<PrivateRoute exact path={ROUTES.LESSON} component={() => <Layout><LessonPage /></Layout>}/>
+						
+						<PrivateRoute exact path={ROUTES.COURSE} component={() => <Layout><CoursePage /></Layout>}/>
+						<PrivateRoute exact path={ROUTES.COURSES} component={() => <Layout><CoursesPage /></Layout>}/>
+						
 						<PrivateRoute exact path={ROUTES.MESSAGES} component={() => <Layout><MessagesPage /></Layout>}/>
 						<PrivateRoute exact path={ROUTES.MESSAGE} component={() => <Layout><MessageDetailedPage /></Layout>}/>
+						
 						<PrivateRoute exact path={ROUTES.COMPOSE_MESSAGE} component={() => <Layout><ComposeMessagePage /></Layout>}/>
-						<PrivateRoute exact path={ROUTES.COURSE} component={() => <Layout><CoursePage /></Layout>}/>
+						
 						<Route exact component={() => <div>404</div>}/>
 					</Switch>
 				</Suspense>

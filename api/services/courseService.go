@@ -2,6 +2,7 @@ package services
 
 import (
 	"fmt"
+	"log"
 	"time"
 	m "uds-online/api/models"
 )
@@ -29,6 +30,58 @@ func (s *courseService) Update(model *m.Course) error {
 		return err
 	}
 	return nil
+}
+
+// Returns a list of lessons
+func (s *courseService) Get(id uint, accountId string) (*m.Course, error) {
+	o := &m.Course{}
+	query := m.GetDB().
+		Where("published = ?", true).
+		Preload("Lessons").
+		Take(o, "id = ?", id).
+		Joins("JOIN purchases p ON p.course_id = ? AND p.account_id = ?", o.ID, accountId)
+	if err := query.Error; err != nil {
+		return nil, err
+	}
+	rows, err := query.Rows()
+	if err != nil {
+		return nil, err
+	}
+	o.Purchased = rows.Next()
+	return o, nil
+}
+
+// Returns a lesson of with tasks
+func (s *courseService) GetLesson(id uint, accountId string) (*m.Lesson, error) {
+	o := &m.Lesson{}
+	err := m.GetDB().
+		Where("published = ?", true).
+		Preload("Content").
+		Preload("Content.Tasks").
+		Take(o, "id = ?", id).
+		Error
+	if err != nil {
+		return nil, err
+	}
+	query := m.GetDB().Raw(`
+		SELECT * FROM courses as c
+		INNER JOIN lessons l on c.id = l.course_id AND l.id = ?
+		INNER JOIN purchases p on c.id = p.course_id and p.account_id = ?
+	`, o.ID, accountId)
+
+	if query.Error != nil {
+		log.Println("Lesson not found / not purchased")
+	}
+	rows, err := query.Rows()
+	if err != nil {
+		log.Println(err.Error())
+		return o, err
+	}
+	purchased := rows.Next()
+	if !purchased && o.Paid {
+		return nil, fmt.Errorf("not purchased")
+	}
+	return o, nil
 }
 
 func (s *courseService) Find(offset int, limit int) ([]*m.Course, uint, error) {

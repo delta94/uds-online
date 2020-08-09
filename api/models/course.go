@@ -17,6 +17,7 @@ type Course struct {
 	Lessons     []*Lesson `json:"lessons" gorm:"foreignkey:CourseID"`
 	AssistantID uuid.UUID `json:"assistant_id" gorm:"index;type:char(36);"`
 	Published   bool      `json:"published"`
+	Purchased   bool      `json:"purchased" sql:"-"`
 }
 
 type Lesson struct {

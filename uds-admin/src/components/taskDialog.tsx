@@ -79,8 +79,6 @@ export const TaskDialog: FC<ITaskDialogProps> = ({open, onClose, onSave, task}) 
 		}
 	}, []);
 	
-	//useEffect(() => {console.log("JSON", json);}, [json]);
-	
 	const onTypeChange = (value: number) => {
 		setType(value);
 	};

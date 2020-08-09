@@ -12,7 +12,7 @@ margin-bottom: 4rem;
 
 const useStyles = makeStyles((theme: Theme) =>
 	createStyles({
-		wrap: {
+		wrapPage: {
 			position: 'fixed',
 			width: '100%',
 			height: '100%',
@@ -26,16 +26,22 @@ const useStyles = makeStyles((theme: Theme) =>
 		},
 		text: {
 			color: "rgb(128,128,128)",
-		}
+		},
+		wrapComponent: {
+			padding: '2rem 0',
+			display: 'flex',
+			justifyContent: 'center',
+			alignItems: 'center',
+		},
 	})
 );
 
-export const Spinner: FC = () => {
+export const PageSpinner: FC = () => {
 	const t = useRef<unknown>();
 	const classes = useStyles();
 	const [isVisible, setVisible] = useState<boolean>(false);
 	useEffect(() => {
-		t.current = setTimeout(() => setVisible(true), 300);
+		t.current = setTimeout(() => setVisible(true), 100);
 		return () => {
 			if (t && t.current) {
 				clearTimeout(t.current as number);
@@ -43,8 +49,8 @@ export const Spinner: FC = () => {
 		};
 	}, []);
 	return (
-		<div className={classes.wrap}>
-			<Fade in={isVisible} timeout={500}>
+		<div className={classes.wrapPage}>
+			<Fade in={isVisible} timeout={200}>
 				<div>
 					<Animation
 						css={override}
@@ -56,6 +62,34 @@ export const Spinner: FC = () => {
 							Loading. Please wait...
 						</Typography>
 					</div>
+				</div>
+			</Fade>
+		</div>
+	)
+};
+
+
+export const ComponentSpinner: FC = () => {
+	const t = useRef<unknown>();
+	const classes = useStyles();
+	const [isVisible, setVisible] = useState<boolean>(false);
+	useEffect(() => {
+		t.current = setTimeout(() => setVisible(true), 100);
+		return () => {
+			if (t && t.current) {
+				clearTimeout(t.current as number);
+			}
+		};
+	}, []);
+	return (
+		<div className={classes.wrapComponent}>
+			<Fade in={isVisible} timeout={200}>
+				<div>
+					<Animation
+						css={override}
+						color={"#8c8e96"}
+						loading={true}
+					/>
 				</div>
 			</Fade>
 		</div>

@@ -7,3 +7,9 @@ export function getMessageUrl(id: number) {
 export function getCourseUrl(id: number) {
 	return `${ROUTES.COURSES}/${id}`;
 }
+
+export function getLessonUrl(course_id: string, lesson_id: string): string {
+	return ROUTES.LESSON
+		.replace(/:course_id/, course_id)
+		.replace(/:lesson_id/, lesson_id);
+}

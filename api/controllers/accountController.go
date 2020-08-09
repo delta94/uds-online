@@ -244,7 +244,7 @@ var UpdateAccount = func(w http.ResponseWriter, r *http.Request) {
 		u.RespondJson(w, u.Response{Message: "Invalid request"}, http.StatusOK)
 		return
 	}
-	ctx := r.Context().Value("0").(u.ContextPayload)
+	ctx := r.Context().Value(0).(u.ContextPayload)
 	issuerId := ctx.Get("user")
 	if issuerId == "" {
 		log.Println("Error! Secure route has no user stored in context")

@@ -53,8 +53,15 @@ func main() {
 	// get course (Admin)
 	router.Handle(mw.Routes["v1"]["adminCourses"]+"/{id}", mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.GetCourseAdmin), []int{mw.RoleAdmin}))).Methods("GET", "OPTIONS")
 
+	// get course (public)
 	router.Handle(mw.Routes["v1"]["courses"]+"/{id}", mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.GetCourse), []int{mw.RoleUser}))).Methods("GET", "OPTIONS")
+	// get courses (public)
 	router.Handle(mw.Routes["v1"]["courses"], mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.GetCourses), []int{mw.RoleUser}))).Methods("GET", "OPTIONS")
+
+	// get lesson (public)
+	router.Handle(mw.Routes["v1"]["lessons"]+"/{id}", mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.GetLesson), []int{mw.RoleUser}))).Methods("GET", "OPTIONS")
+
+
 
 	// create lesson (Admin)
 	router.Handle(mw.Routes["v1"]["adminLessons"], mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.CreateLesson), []int{mw.RoleAdmin}))).Methods("POST", "OPTIONS")

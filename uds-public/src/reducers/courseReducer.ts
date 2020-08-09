@@ -1,8 +1,7 @@
 import {AnyAction} from "redux";
 import {SET_COURSES} from "../actions/types";
-import {IAction, Model} from "../helpers/models";
+import {IAction, IPaginatablePayload, IPagination, Model} from "../helpers/models";
 import {ILesson} from "./lessonsReducer";
-
 
 export interface ICourse extends Model<number> {
 	title: string,
@@ -11,34 +10,30 @@ export interface ICourse extends Model<number> {
 	published: boolean,
 	price: number,
 	assistant_id: string,
-	purchased: boolean,
-	lessons: ILesson[]
+	lessons: ILesson[],
+	purchased: boolean
 }
 
-export interface ICourseState {
-	items: ICourse[],
+export interface ICourseState extends IPaginatablePayload<ICourse> {
 }
 
 export const defaultState: ICourseState = {
-	items: []
+	data: [],
+	size: 10,
+	total: 0,
+	page: 0
 };
-
-export type GetCoursesResponse = ICourse[];
-
-export interface CreateCourseResponse {
-	ID: number,
-	title: string,
-	published: boolean,
-	CreatedAt: string
-}
 
 export const reducer = (state: ICourseState = defaultState, action: AnyAction): ICourseState => {
 	switch (action.type) {
 		case SET_COURSES: {
-			const a = action as IAction<ICourse[]>;
+			const a = action as IAction<IPaginatablePayload<ICourse>>;
 			state = {
 				...state,
-				items: a.payload
+				size: a.payload.size,
+				page: a.payload.page,
+				total: a.payload.total,
+				data: a.payload.data,
 			};
 			break;
 		}

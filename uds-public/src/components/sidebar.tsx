@@ -1,67 +1,91 @@
-import React, {FC} from "react";
+import React, {FC, useState} from "react";
 import clsx from 'clsx';
-import {Divider, Drawer, IconButton, List, ListItem, ListItemIcon, ListItemText, useTheme} from "@material-ui/core";
-import {Create, MenuBook, Message, Dashboard} from "@material-ui/icons";
+import {List as ListComp , ListItem, ListItemIcon, ListItemText} from "@material-ui/core";
+import {MenuBook, Person, Message, Dashboard, PermMedia, MonetizationOn, SvgIconComponent} from "@material-ui/icons";
 import {makeStyles} from "@material-ui/core/styles";
 import {Link} from "react-router-dom";
-import {ROUTES} from "../constants";
+import {ROUTES, ROLES} from "../constants";
+import {useSelector} from "react-redux";
+import {IReducerState} from "../reducers";
 
+const {ROLE_USER} = ROLES;
 
-const sidebarWidth = 240;
-
-const useStyles = makeStyles((theme) => ({
+const useStyles = (sidebar_width: number) => makeStyles((theme) => ({
 	root: {
 		position: 'relative',
-		width: sidebarWidth,
+		width: sidebar_width,
 		background: '#FFFFFF',
 		flexShrink: 0,
+		zIndex: 10,
 		transition: 'ease 300ms',
 		[theme.breakpoints.down('xs')]: {
-			marginLeft: `-${sidebarWidth}px`
+			marginLeft: `-${sidebar_width}px`
 		}
 	},
 	isOpen: {
 		[theme.breakpoints.down('xs')]: {
-			transform: `translateX(${sidebarWidth}px)`
+			transform: `translateX(${sidebar_width}px)`
 		}
 		
 	}
-
 }));
 
 export interface ISidebarProps {
-	isOpen: boolean
+	isOpen: boolean,
+	width: number
 }
-export const Sidebar: FC<ISidebarProps> = ({isOpen}) => {
-	const classes = useStyles();
-	const theme = useTheme();
-	const [open, setOpen] = React.useState(true);
-	
-	const handleDrawerOpen = () => {
-		setOpen(true);
-	};
-	
-	const handleDrawerClose = () => {
-		setOpen(false);
-	};
+
+interface IOptionalListItemProps {
+	route: string,
+	svgIcon: SvgIconComponent,
+	role: number,
+	roles: number[],
+	text: string,
+	subtext?: string
+}
+const OptionalListItem: FC<IOptionalListItemProps> = (props) => {
+	const {route, svgIcon: SvgIcon, text, subtext, role, roles} = props;
+	if (!roles.includes(role)) {
+		return null;
+	}
+	return (
+		<ListItem button component={Link} to={route}>
+			<ListItemIcon><SvgIcon/></ListItemIcon>
+			<ListItemText primary={text} />
+			{subtext && <ListItemText secondary={subtext} />}
+		</ListItem>
+	)
+}
+export const Sidebar: FC<ISidebarProps> = ({isOpen, width}) => {
+	const classes = useStyles(width)();
+	const authState = useSelector((state: IReducerState) => state.auth);
+	const [role] = useState(authState.role);
 	
 	return (
 		<aside className={clsx(classes.root, {[classes.isOpen]: isOpen})}>
-			<List component="nav">
-				<ListItem button component={Link} to={ROUTES.ACCOUNT}>
-					<ListItemIcon><Dashboard/></ListItemIcon>
-					<ListItemText primary="Dashboard" />
-				</ListItem>
-				<ListItem button component={Link} to={ROUTES.MESSAGES}>
-					<ListItemIcon><Message/></ListItemIcon>
-					<ListItemText primary="My messages" />
-				</ListItem>
-				<ListItem button component={Link} to={ROUTES.COMPOSE_MESSAGE}>
-					<ListItemIcon><Create/></ListItemIcon>
-					<ListItemText primary="Compose message" />
-				</ListItem>
-			</List>
-			
+			<ListComp component="nav">
+				<OptionalListItem role={role!}
+								  roles={[ROLE_USER]}
+								  svgIcon={Dashboard}
+								  route={ROUTES.ACCOUNT}
+								  text="Dashboard"
+				/>
+				
+				<OptionalListItem role={role!}
+								  roles={[ROLE_USER]}
+								  svgIcon={MenuBook}
+								  route={ROUTES.COURSES}
+								  text="Курсы"
+				/>
+				
+				
+				<OptionalListItem role={role!}
+								  roles={[ROLE_USER]}
+								  svgIcon={Message}
+								  route={ROUTES.MESSAGES}
+								  text="Сообщения"
+				/>
+			</ListComp>
 		</aside>
 	)
 }
