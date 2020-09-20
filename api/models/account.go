@@ -29,10 +29,11 @@ type Account struct {
 	Role              int       `json:"role"`
 	CreatedAt         time.Time
 	UpdatedAt         time.Time
-	DeletedAt         *time.Time  `sql:"index"`
-	IsBlocked         bool        `json:"is_blocked"`
-	AssignedCourses   []*Course   `json:"assigned_courses" gorm:"foreignkey:AssistantID"`
-	Purchases         []*Purchase `json:"purchases" gorm:"foreignkey:PurchaseID"`
+	DeletedAt         *time.Time      `sql:"index"`
+	IsBlocked         bool            `json:"is_blocked"`
+	AssignedCourses   []*Course       `json:"assigned_courses" gorm:"foreignkey:AssistantID"`
+	Purchases         []*Purchase     `json:"purchases" gorm:"foreignkey:PurchaseID"`
+	LessonAnswers     []*LessonAnswer `gorm:"foreignkey:AccountID" json:"-"`
 }
 
 type Password struct {

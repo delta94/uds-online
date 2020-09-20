@@ -45,17 +45,25 @@ export interface ITaskOption {
 	option: string;
 }
 
+export interface IAnswer <T> {
+	control: T
+}
+
 export interface ITaskSingleOption {
 	text: string,
 	options: ITaskOption[],
 	control: number
 }
 
+export type IAnswerSingleOption = IAnswer<number>;
+
 export interface ITaskMultipleOptions {
 	text: string,
 	options: ITaskOption[],
 	control: number[]
 }
+
+export type IAnswerMultipleOptions = IAnswer<number[]>;
 
 export interface ITaskFillGaps {
 
@@ -72,9 +80,9 @@ export interface ITaskCompareOptions {
 export type TaskJsonType = ITaskSingleOption | ITaskMultipleOptions | ITaskFillGaps;
 
 export interface ITaskWidget {
-	data?: string;
+	data: string;
 	onJsonUpdate: (json_str: string) => void
 }
 export type ITask = Modify<ILessonTask, {
-	json: TaskJsonType;
+	type: TaskJsonType;
 }>;

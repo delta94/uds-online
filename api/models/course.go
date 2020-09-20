@@ -39,12 +39,21 @@ type LessonContent struct {
 
 type LessonTask struct {
 	gorm.Model
-	Type            int    `json:"type"`
-	Description     string `json:"description"`
-	Json            string `json:"json" gorm:"size:6000;"`
-	Sort            int    `json:"sort"`
-	Published       bool   `json:"published"`
-	LessonContentID uint   `json:"-"`
+	Type            int             `json:"type"`
+	Description     string          `json:"description"`
+	Json            string          `json:"json" gorm:"size:6000;"`
+	Sort            int             `json:"sort"`
+	Published       bool            `json:"published"`
+	Answers         []*LessonAnswer `json:"-" gorm:"foreignkey:LessonAnswerID"`
+	LessonContentID uint            `json:"-"`
+	Lesson          *Lesson         `json:"-"`
+}
+
+type LessonAnswer struct {
+	gorm.Model
+	Json         string    `json:"json" gorm:"size:4096;"`
+	LessonTaskID uint      `json:"-"`
+	AccountID    uuid.UUID `gorm:"primary_key;type:char(36);"`
 }
 
 func (course *Course) Validate() error {

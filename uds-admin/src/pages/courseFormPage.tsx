@@ -146,6 +146,7 @@ const CourseFormPage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) => {
             annotation,
             assistant_id: assistantID,
             published,
+            purchased: false, // ????
             title,
             picture,
             price,

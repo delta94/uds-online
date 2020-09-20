@@ -42,6 +42,7 @@ func init() {
 		&Course{},
 		&Purchase{},
 		&Upload{},
+		&LessonAnswer{},
 	)
 	// Foreign Keys
 	db.Model(&Password{}).AddForeignKey("account_id", "accounts(id)", "CASCADE", "NO ACTION")
@@ -52,6 +53,8 @@ func init() {
 	db.Model(&Course{}).AddForeignKey("assistant_id", "accounts(id)", "SET NULL", "NO ACTION")
 	db.Model(&Purchase{}).AddForeignKey("account_id", "accounts(id)", "SET NULL", "NO ACTION")
 	db.Model(&Purchase{}).AddForeignKey("course_id", "courses(id)", "SET NULL", "NO ACTION")
+	db.Model(&LessonAnswer{}).AddForeignKey("lesson_task_id", "lesson_tasks(id)", "CASCADE", "NO ACTION")
+	db.Model(&LessonAnswer{}).AddForeignKey("account_id", "accounts(id)", "CASCADE", "NO ACTION")
 
 	//adm := &Account{}
 	//err = GetDB().Take(adm, "id = ?", uint(1)).Error

@@ -24,6 +24,11 @@ export interface ILesson extends Model<number> {
 	content?: ILessonContent
 }
 
+export interface ITaskAnswerSaveRequest {
+	json: string,
+	task: number
+}
+
 export interface ILessonsState extends IPagination {
 	items: ILesson[],
 	purchased: boolean

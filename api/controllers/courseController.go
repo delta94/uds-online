@@ -108,6 +108,43 @@ var GetLesson = func(w http.ResponseWriter, r *http.Request) {
 	u.RespondJson(w, u.Response{Payload: course}, http.StatusOK)
 }
 
+var SaveTaskAnswer = func(w http.ResponseWriter, r *http.Request) {
+	type Answer struct {
+		Json string `json:"json"`
+		Task uint `json:"task"`
+	}
+	answer := &Answer{}
+	err := json.NewDecoder(r.Body).Decode(answer)
+	if err != nil {
+		u.RespondJson(w, u.Response{Message: "Invalid request", ErrorCode: u.ErrGeneral}, http.StatusBadRequest)
+		return
+	}
+	params := mux.Vars(r)
+	courseId, err1 := strconv.Atoi(params["course_id"])
+	lessonId, err2 := strconv.Atoi(params["lesson_id"])
+	if err1 != nil || err2 != nil {
+		log.Print(err.Error())
+		u.RespondJson(w, u.Response{Message: "Invalid request"}, http.StatusOK)
+		return
+	}
+
+	ctx := r.Context().Value(0).(u.ContextPayload)
+	issuerId := ctx.Get("user")
+	if issuerId == "" {
+		log.Println("Error! Secure route has no user stored in context")
+		u.RespondJson(w, u.Response{Message: "Invalid request",  ErrorCode: u.ErrGeneral}, http.StatusBadRequest)
+		return
+	}
+	err = srv.LessonService.SaveTaskAnswer(issuerId, courseId, lessonId, answer.Task, answer.Json)
+	if err != nil {
+		log.Println("Error!")
+		u.RespondJson(w, u.Response{Message: err.Error(), ErrorCode: u.ErrGeneral}, http.StatusBadRequest)
+		return
+	}
+
+	u.RespondJson(w, u.Response{}, http.StatusOK)
+}
+
 var GetCourseAdmin = func(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	id, err := strconv.Atoi(params["id"])

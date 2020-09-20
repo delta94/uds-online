@@ -6,7 +6,7 @@ import history from "../history";
 import {ROUTES} from "../constants";
 import {ICourse} from "../reducers/courseReducer";
 import {IAction, IPaginatablePayload} from "../helpers/models";
-import {ILesson} from "../reducers/lessonsReducer";
+import {ILesson, ITaskAnswerSaveRequest} from "../reducers/lessonsReducer";
 import {ILoginPayload} from "../reducers/authReducer";
 import {
 	CLOSE_MESSAGE,
@@ -207,10 +207,28 @@ export const get_lesson = (id: string, callback: (lesson: ILesson | null) => voi
 			.catch(() => {
 				callback(null);
 			});
-		
 	};
 };
 
+export const save_answer = (task: number, course_id: string, lesson_id: string, json: string) => {
+	const data: ITaskAnswerSaveRequest = {
+		json, task
+	};
+	return () => {
+		return api_request({
+			method: "POST",
+			url: `courses/${course_id}/lessons/${lesson_id}/save-answer`,
+			data,
+			version: 1
+		})
+			.then(() => {
+			
+			})
+			.catch(() => {
+			
+			})
+	};
+};
 
 /* ======         ======= */
 

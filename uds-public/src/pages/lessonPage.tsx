@@ -1,4 +1,4 @@
-import React, {FC, useEffect, useState} from "react";
+import React, {FC, useEffect, useState, Suspense} from "react";
 import {PageWrapper} from "../components/pageWrapper";
 import {withRouter, RouteComponentProps} from "react-router-dom";
 import {useTranslation} from "react-i18next";
@@ -9,6 +9,8 @@ import {ILessonTask} from "../reducers/lessonsReducer";
 import {ParsedContent} from "../components/parsedContent";
 import history from "../history";
 import {ROUTES} from "../constants";
+import {ComponentSpinner} from "../components/spinner";
+import Task from "../components/task";
 
 const useStyles = makeStyles((theme: Theme) =>
 	createStyles({}),
@@ -20,19 +22,17 @@ interface IRouteProps {
 }
 
 const LessonPage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) => {
-	const {params: {lesson_id}} = match!;
+	const {params: {lesson_id, course_id}} = match!;
 	const classes = useStyles();
 	const [t] = useTranslation();
 	const dispatch = useDispatch();
 	const [body, setBody] = useState<string>("");
 	const [tasks, setTasks] = useState<ILessonTask[]>([]);
 	
-	
-	
 	useEffect(() => {
 		// Preload lesson and check if the lesson is available for the user
 		dispatch(get_lesson(lesson_id, (lesson) => {
-			if (!lesson || !lesson.content || !lesson.content.body) {
+			if (!lesson || !lesson.content || !('body' in lesson.content)) {
 				// redirect page
 				history.replace(ROUTES.COURSES);
 				return
@@ -50,9 +50,21 @@ const LessonPage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) => {
 	return (
 		<PageWrapper heading={t('')}>
 			{body && <ParsedContent content={body}/>}
-			{tasks.map(() => {
-				return null;
-			})}
+			
+			<hr/>
+			
+			<Suspense fallback={ComponentSpinner}>
+				{tasks.map((task) => {
+					return (
+						<Task
+							key={task.ID}
+							course_id={course_id}
+							lesson_id={lesson_id}
+							{...task}
+						/>
+					)
+				})}
+			</Suspense>
 		</PageWrapper>
 	);
 };
