@@ -18,7 +18,6 @@ func init() {
 	password := os.Getenv("DB_PASS")
 	dbName := os.Getenv("DB_NAME")
 	dbHost := os.Getenv("DB_HOST")
-	//dbPort := os.Getenv("DB_PORT")
 
 	log.Printf("Using Database: %s\n", dbName)
 	// Build connection string

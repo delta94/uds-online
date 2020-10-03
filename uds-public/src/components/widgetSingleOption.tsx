@@ -21,9 +21,6 @@ const useStyles = makeStyles((theme: Theme) =>
 		grow: {
 			flexGrow: 1
 		},
-		delete: {
-			color: 'red'
-		},
 		correctAnswer: {
 			color: '#008000',
 			'& *': {

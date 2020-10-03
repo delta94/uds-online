@@ -2,12 +2,8 @@ import React, {FC, useEffect, useState} from "react";
 import {IAnswerMultipleOptions, ITaskMultipleOptions, ITaskOption, ITaskWidget} from "../helpers/models";
 import {decodeBase64ToObject, encodeObjectToBase64} from "../helpers";
 import {createStyles, makeStyles, Theme} from "@material-ui/core/styles";
-import {Checkbox, Divider, FormControl, FormControlLabel, TextField, Typography} from "@material-ui/core";
+import {Checkbox, Divider, FormControlLabel, Typography} from "@material-ui/core";
 import clsx from "clsx";
-
-const MAX_LENGTH_TEXT = 500;
-const MAX_LENGTH_OPTION = 80;
-const MAX_OPTIONS = 8;
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -24,9 +20,6 @@ const useStyles = makeStyles((theme: Theme) =>
         },
         grow: {
             flexGrow: 1
-        },
-        delete: {
-            color: 'red'
         },
         correctAnswer: {
             color: '#008000',
@@ -72,7 +65,6 @@ export const WidgetMultipleOptions: FC<ITaskWidget<number[]>> = ({data, givenAns
             control: control!,
         };
         onUpdate(encodeObjectToBase64(t), control);
-        console.log('INSIDE MULTI-OPTION WIDGET: ', givenAnswer);
     }, [control]);
 
 
@@ -87,7 +79,6 @@ export const WidgetMultipleOptions: FC<ITaskWidget<number[]>> = ({data, givenAns
         if (!control.length) {
             valid = false;
         }
-        console.log(valid);
         return valid;
     };
 
@@ -103,13 +94,10 @@ export const WidgetMultipleOptions: FC<ITaskWidget<number[]>> = ({data, givenAns
             _control.splice(_control.indexOf(value), 1);
         }
         setControl([..._control]);
-        console.log({givenAnswer});
-        console.log('INSIDE MULTI-OPTION WIDGET: ', givenAnswer);
     };
 
     return (
         <>
-
             <Typography variant='body1'>
                 {text}
             </Typography>
@@ -136,20 +124,16 @@ export const WidgetMultipleOptions: FC<ITaskWidget<number[]>> = ({data, givenAns
                                 />
                             }
                             className={clsx({
-                                [classes.correctAnswer]: (givenAnswer && givenAnswer.includes(id)) && correctAnswers.includes(id),
+                                [classes.correctAnswer]: (givenAnswer && givenAnswer.includes(id)) && correctAnswers.includes(id) || correctAnswers.includes(id),
                                 [classes.wrongAnswer]: (givenAnswer && givenAnswer.includes(id)) && !correctAnswers.includes(id),
                             })}
                             label={option}
                             labelPlacement="end"
 
                         />
-
                     </div>
                 );
             })}
- 
-
-
         </>
     );
 };
