@@ -1,8 +1,8 @@
 import React, {FC, useEffect, useState} from "react";
-import {ITaskMultipleOptions, ITaskOption, ITaskWidget} from "../helpers/models";
-import {decodeBase64ToObject} from "../helpers";
+import {IAnswerMultipleOptions, ITaskMultipleOptions, ITaskOption, ITaskWidget} from "../helpers/models";
+import {decodeBase64ToObject, encodeObjectToBase64} from "../helpers";
 import {createStyles, makeStyles, Theme} from "@material-ui/core/styles";
-import {   Checkbox, Divider, FormControl,    TextField} from "@material-ui/core";
+import {Checkbox, Divider, FormControl, FormControlLabel, TextField, Typography} from "@material-ui/core";
 import clsx from "clsx";
 
 const MAX_LENGTH_TEXT = 500;
@@ -27,131 +27,123 @@ const useStyles = makeStyles((theme: Theme) =>
         },
         delete: {
             color: 'red'
-        }
+        },
+        correctAnswer: {
+            color: '#008000',
+            '& *': {
+                fontWeight: '700 !important' as any,
+            },
+        },
+        wrongAnswer: {
+            color: '#c10000',
+            '& *': {
+                fontWeight: '700 !important' as any,
+            },
+        },
     }),
 );
 
-export const WidgetMultipleOptions: FC<ITaskWidget> = ({data, onJsonUpdate}) => {
+export const WidgetMultipleOptions: FC<ITaskWidget<number[]>> = ({data, givenAnswer, onUpdate}) => {
     const classes = useStyles();
-    const [options, setOptions] = useState<ITaskOption[]>([
-        {id: 1, option: ""},
-        {id: 2, option: ""},
-        {id: 3, option: ""},
-        {id: 4, option: ""},
-    ]);
+    const [options, setOptions] = useState<ITaskOption[]>([]);
     const [control, setControl] = useState<number[]>([]);
     const [text, setText] = useState<string>("");
+    const [correctAnswers, setCorrectAnswers] = useState<number[]>([]);
 
     useEffect(() => {
         if (data) {
             const parsed = decodeBase64ToObject<ITaskMultipleOptions>(data);
+
             setOptions(parsed.options);
-            setControl(parsed.control);
             setText(parsed.text);
+            setCorrectAnswers([...parsed.control]);
+            if (givenAnswer && givenAnswer.length > 0) {
+                setControl([...givenAnswer]);
+            }
         }
     }, []);
 
     useEffect(() => {
         if (!validate()) {
-           // onJsonUpdate("");
+            onUpdate("", null);
             return;
         }
-        const t: ITaskMultipleOptions = {
-            text,
+        const t: IAnswerMultipleOptions = {
             control: control!,
-            options
         };
-        //onJsonUpdate(encodeObjectToBase64(t));
-    }, [control, text, options]);
+        onUpdate(encodeObjectToBase64(t), control);
+        console.log('INSIDE MULTI-OPTION WIDGET: ', givenAnswer);
+    }, [control]);
+
+
 
     const validate = (): boolean => {
         let valid = true;
-        if (options.length < 4 || options.length > MAX_OPTIONS) {
-            valid = false;
-        }
-        if (control.length < 1) {
-            valid = false;
-        }
-        if (!text.trim().length || text.length > MAX_LENGTH_TEXT) {
-            valid = false;
-        }
-        options.forEach((o) => {
-            if (!o.option.trim()) {
+        control.forEach(c => {
+            if (!Number.isInteger(c)) {
                 valid = false;
             }
         });
+        if (!control.length) {
+            valid = false;
+        }
+        console.log(valid);
         return valid;
     };
-    
-    const onOptionChange = (value: string, id: number) => {
-        const _options = [...options];
-        const o = _options.find(option => option.id === id);
-        if (!o) {
-            return;
-        }
-        o.option = value;
-        setOptions([..._options]);
-    };
 
-    const onControlChange = (checked: boolean, value: number) => {
-        if (!checked) {
-            const _control = [...control];
-            _control.splice(_control.indexOf(value), 1);
-            setControl([..._control]);
+    const onCheckboxChange = (checked: boolean, value: number) => {
+        if (givenAnswer) {
             return;
         }
-        setControl([...control, value]);
+        const _control = [...control];
+        if (checked) {
+            _control.push(value);
+        }
+        else  {
+            _control.splice(_control.indexOf(value), 1);
+        }
+        setControl([..._control]);
+        console.log({givenAnswer});
+        console.log('INSIDE MULTI-OPTION WIDGET: ', givenAnswer);
     };
 
     return (
         <>
-            <FormControl fullWidth>
-                <TextField
-                    id="input-text"
-                    label="Текст"
-                    fullWidth
-                    required
-                    autoComplete="off"
-                    inputProps={{
-                        maxLength: MAX_LENGTH_TEXT,
-                    }}
-                    value={text}
-                    onChange={(e) => setText(e.target.value)}
-                    variant="outlined"
-                />
-            </FormControl>
 
-            <div className={classes.spacer} />
+            <Typography variant='body1'>
+                {text}
+            </Typography>
+
+            <div className={classes.spacer}/>
 
             <Divider/>
 
-            <div className={classes.spacer} />
+            <div className={classes.spacer}/>
 
             {options.map(({id, option}, i) => {
                 return (
                     <div key={id} className={classes.optionWrap}>
-                        <TextField
-                            className={clsx(classes.grow, classes.optionInput)}
-                            id={"input-option-" + (id + 1)}
-                            label={"Вариант" + (i + 1)}
-                            fullWidth
-                            required
-                            autoComplete="off"
-                            inputProps={{
-                                maxLength: MAX_LENGTH_OPTION
-                            }}
-                            value={option}
-                            onChange={(e) => onOptionChange(e.target.value, id)}
-                            variant="outlined"
-                        />
- 
 
-                        <Checkbox
-                            title={"Правильный вариант"}
-                            checked={Array.isArray(control) && control.includes(id)}
-                            onChange={({currentTarget: {checked}}) => onControlChange(checked, id)}
-                            inputProps={{ 'aria-label': 'primary checkbox' }}
+
+                        <FormControlLabel
+                            value={option}
+                            control={
+                                <Checkbox
+                                    checked={givenAnswer && givenAnswer.includes(id) || control.includes(id)}
+                                    color="primary"
+                                    onChange={({currentTarget: {checked}}) => onCheckboxChange(checked, id)}
+                                    inputProps={{'aria-label': 'primary checkbox'}}
+                                />
+                            }
+                            className={clsx({
+                                [classes.correctAnswer]: (givenAnswer && givenAnswer.includes(id)) && correctAnswers.includes(id),
+                                [classes.wrongAnswer]: (givenAnswer && givenAnswer.includes(id)) && !correctAnswers.includes(id),
+                            })}
+                            label={option}
+                            labelPlacement="end"
+
                         />
+
                     </div>
                 );
             })}

@@ -1,11 +1,14 @@
 import React, {FC, useEffect, useState} from "react";
-import {ITask, ITaskType} from "../helpers/models";
+import {IAnswer, IAnswerMultipleOptions, IAnswerSingleOption, ITask, ITaskType} from "../helpers/models";
 import {Button, Card, CardActions, CardContent, Typography} from "@material-ui/core";
 import {useTranslation} from "react-i18next";
 import WidgetSingleOption from "./widgetSingleOption";
 import {createStyles, makeStyles, Theme} from "@material-ui/core/styles";
 import {useDispatch} from "react-redux";
 import {save_answer} from "../actions";
+import {decodeBase64ToObject} from "../helpers";
+import {IAnswerResponse} from "../reducers/lessonsReducer";
+import WidgetMultipleOptions from "./widgetMultipleOptions";
 
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -22,36 +25,70 @@ interface ITaskProps extends ITask {
 	lesson_id: string,
 }
 
-const Task: FC<ITaskProps> = ({ID, course_id, lesson_id, description, json, type}) => {
+const Task: FC<ITaskProps> = ({ID, _givenAnswer, course_id, lesson_id, description, json, type}) => {
 	const [t] = useTranslation();
 	const classes = useStyles();
 	const [jsonAnswer, setJsonAnswer] = useState<string>("");
 	const dispatch = useDispatch();
-	
+	const [givenAnswer, setGivenAnswer] = useState<any>();
+	const [potentialAnswer, setPotentialAnswer] = useState<any>();
+
 	let widget = null;
-	
+
 	switch (type) {
 		case ITaskType.PICK_SINGLE_ANSWER:
-			widget = <WidgetSingleOption data={json} onJsonUpdate={(str) => setJsonAnswer(str)}/>;
-			break
-		case ITaskType.PICK_MULTIPLE_ANSWERS:
+			if (_givenAnswer && !givenAnswer) {
+				setGivenAnswer(decodeBase64ToObject<IAnswerSingleOption>(_givenAnswer.json).control);
+			}
+
+			widget = <WidgetSingleOption
+				data={json}
+				givenAnswer={givenAnswer}
+				onUpdate={
+					(json_str, pa) => {
+						setJsonAnswer(json_str);
+						setPotentialAnswer(pa)
+					}
+				}
+			/>;
 			break;
+
+		case ITaskType.PICK_MULTIPLE_ANSWERS:
+			if (_givenAnswer && !givenAnswer) {
+				setGivenAnswer(decodeBase64ToObject<IAnswerMultipleOptions>(_givenAnswer.json).control);
+			}
+
+			widget = <WidgetMultipleOptions
+				data={json}
+				givenAnswer={givenAnswer}
+				onUpdate={
+					(json_str, pa) => {
+						setJsonAnswer(json_str);
+						setPotentialAnswer(pa)
+					}
+				}/>
+			break;
+
 		case ITaskType.COMPARE_OPTIONS:
 			break;
+
 		case ITaskType.FILL_GAPS:
 			break;
 	}
+
 	
 	const confirmAnswer = () => {
-		if (jsonAnswer && ID) {
+		if (jsonAnswer && ID && !givenAnswer) {
+			setGivenAnswer(potentialAnswer);
 			dispatch(save_answer(ID, course_id, lesson_id, jsonAnswer));
 		}
 	};
-	
+
+	console.log('RENDERING BUTTON', givenAnswer);
 	return (
 		<Card className={classes.root}>
 			<CardContent>
-				<Typography variant="h5">
+				<Typography variant="h6">
 					{description}
 				</Typography>
 				
@@ -63,6 +100,7 @@ const Task: FC<ITaskProps> = ({ID, course_id, lesson_id, description, json, type
 					variant="contained"
 					color="primary"
 					type='button'
+					disabled={!!givenAnswer}
 					onClick={confirmAnswer}
 				>
 					{t('BUTTONS.CONFIRM')}

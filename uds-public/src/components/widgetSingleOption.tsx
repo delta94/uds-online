@@ -23,35 +23,50 @@ const useStyles = makeStyles((theme: Theme) =>
 		},
 		delete: {
 			color: 'red'
-		}
+		},
+		correctAnswer: {
+			color: '#008000',
+			'& *': {
+				fontWeight: '700 !important' as any,
+			},
+		},
+		wrongAnswer: {
+			color: '#c10000',
+			'& *': {
+				fontWeight: '700 !important' as any,
+			},
+		},
 	}),
 );
 
 
-export const WidgetSingleOption: FC<ITaskWidget> = ({data, onJsonUpdate}) => {
+export const WidgetSingleOption: FC<ITaskWidget<number>> = ({data, givenAnswer, onUpdate}) => {
 	const classes = useStyles();
 	const [options, setOptions] = useState<ITaskOption[]>([]);
 	const [control, setControl] = useState<number>();
 	const [text, setText] = useState<string>("");
-	
+	const [correctAnswer, setCorrectAnswer] = useState<number>();
+
+
 	useEffect(() => {
 		if (data) {
 			const parsed = decodeBase64ToObject<ITaskSingleOption>(data);
 			setOptions(parsed.options);
 			setText(parsed.text);
+			setCorrectAnswer(parsed.control);
 		}
 	}, []);
 	
 	useEffect(() => {
 		if (!validate()) {
-			onJsonUpdate("");
+			onUpdate("", null);
 			return;
 		}
 		const t: IAnswerSingleOption = {
 			control: control!
 		};
-		
-		onJsonUpdate(encodeObjectToBase64(t));
+
+		onUpdate(encodeObjectToBase64(t), control!);
 	}, [control]);
 	
 	const validate = (): boolean => {
@@ -61,7 +76,14 @@ export const WidgetSingleOption: FC<ITaskWidget> = ({data, onJsonUpdate}) => {
 		}
 		return valid;
 	};
-	
+
+	const onCheckboxChange = (id: number) => {
+		if (givenAnswer) {
+			return;
+		}
+		setControl(id);
+	};
+
 	return (
 		<>
 			<Typography variant='body1'>
@@ -81,12 +103,16 @@ export const WidgetSingleOption: FC<ITaskWidget> = ({data, onJsonUpdate}) => {
 							value={option}
 							control={
 								<Checkbox
-									checked={id === control}
+									checked={id === control || id === givenAnswer}
 									color="primary"
-									onChange={() => setControl(id)}
+									onChange={() => onCheckboxChange(id)}
 									inputProps={{'aria-label': 'primary checkbox'}}
 								/>
 							}
+							className={clsx({
+								[classes.correctAnswer]: givenAnswer &&  correctAnswer === id,
+								[classes.wrongAnswer]: givenAnswer && givenAnswer !== correctAnswer && givenAnswer === id,
+							})}
 							label={option}
 							labelPlacement="end"
 						

@@ -1,4 +1,4 @@
-import {ILessonTask} from "../reducers/lessonsReducer";
+import {IAnswerResponse, ILessonTask} from "../reducers/lessonsReducer";
 
 export type Modify<T, R> = Omit<T, keyof R> & R;
 
@@ -79,10 +79,12 @@ export interface ITaskCompareOptions {
 
 export type TaskJsonType = ITaskSingleOption | ITaskMultipleOptions | ITaskFillGaps;
 
-export interface ITaskWidget {
-	data: string;
-	onJsonUpdate: (json_str: string) => void
+export interface ITaskWidget<TGivenAnswer> {
+	data: string,
+	givenAnswer: TGivenAnswer,
+	onUpdate: (json_str: string, potentialAnswer: any) => void
 }
 export type ITask = Modify<ILessonTask, {
-	type: TaskJsonType;
+	type: TaskJsonType,
+	_givenAnswer?: IAnswerResponse,
 }>;

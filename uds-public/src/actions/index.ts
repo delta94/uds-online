@@ -210,15 +210,16 @@ export const get_lesson = (id: string, callback: (lesson: ILesson | null) => voi
 	};
 };
 
-export const get_answers = (course_id: string, lesson_id: string) => {
+export const get_answers = (course_id: string, lesson_id: string, callback: (answers: IAnswerResponse[]) => void) => {
 	return () => {
-		return api_request<IAnswerResponse>({
+		return api_request<IAnswerResponse[]>({
 			method: "GET",
 			url: `courses/${course_id}/lessons/${lesson_id}/answers`,
 			version: 1
 		})
 			.then((answers) => {
-				console.log("Answers: ", {answers});
+
+				callback(answers);
 			})
 			.catch(err => {
 			

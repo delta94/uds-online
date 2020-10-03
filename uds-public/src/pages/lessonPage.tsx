@@ -5,7 +5,7 @@ import {useTranslation} from "react-i18next";
 import {createStyles, makeStyles, Theme} from "@material-ui/core/styles";
 import {useDispatch} from "react-redux";
 import {get_answers, get_lesson} from "../actions";
-import {ILessonTask} from "../reducers/lessonsReducer";
+import {IAnswerResponse, ILessonTask} from "../reducers/lessonsReducer";
 import {ParsedContent} from "../components/parsedContent";
 import history from "../history";
 import {ROUTES} from "../constants";
@@ -26,8 +26,10 @@ const LessonPage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) => {
 	const classes = useStyles();
 	const [t] = useTranslation();
 	const dispatch = useDispatch();
+	const [title, setTitle] = useState<string>("");
 	const [body, setBody] = useState<string>("");
 	const [tasks, setTasks] = useState<ILessonTask[]>([]);
+	const [answers, setAnswers] = useState<IAnswerResponse[]>([]);
 	
 	useEffect(() => {
 		// Preload lesson and check if the lesson is available for the user
@@ -37,11 +39,14 @@ const LessonPage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) => {
 				history.replace(ROUTES.COURSES);
 				return
 			}
+			setTitle(lesson.title);
 			const {body, tasks} = lesson.content;
 			setBody(body);
 			setTasks(tasks);
 			
-			dispatch(get_answers(course_id, lesson_id));
+			dispatch(get_answers(course_id, lesson_id, (_answers) => {
+				setAnswers(_answers);
+			}));
 		}));
 	}, []);
 	
@@ -50,15 +55,17 @@ const LessonPage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) => {
 	};
 	
 	return (
-		<PageWrapper heading={t('')}>
+		<PageWrapper heading={title}>
 			{body && <ParsedContent content={body}/>}
 			
 			<hr/>
 			
 			<Suspense fallback={ComponentSpinner}>
 				{tasks.map((task) => {
+					const givenAnswer = answers.find(answer => answer.lesson_task_id === task.ID)
 					return (
 						<Task
+							_givenAnswer={givenAnswer}
 							key={task.ID}
 							course_id={course_id}
 							lesson_id={lesson_id}
