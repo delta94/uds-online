@@ -6,7 +6,7 @@ import history from "../history";
 import {ROUTES} from "../constants";
 import {ICourse} from "../reducers/courseReducer";
 import {IAction, IPaginatablePayload} from "../helpers/models";
-import {ILesson, ITaskAnswerSaveRequest} from "../reducers/lessonsReducer";
+import {IAnswerResponse, ILesson, ITaskAnswerSaveRequest} from "../reducers/lessonsReducer";
 import {ILoginPayload} from "../reducers/authReducer";
 import {
 	CLOSE_MESSAGE,
@@ -210,6 +210,22 @@ export const get_lesson = (id: string, callback: (lesson: ILesson | null) => voi
 	};
 };
 
+export const get_answers = (course_id: string, lesson_id: string) => {
+	return () => {
+		return api_request<IAnswerResponse>({
+			method: "GET",
+			url: `courses/${course_id}/lessons/${lesson_id}/answers`,
+			version: 1
+		})
+			.then((answers) => {
+				console.log("Answers: ", {answers});
+			})
+			.catch(err => {
+			
+			});
+	};
+};
+
 export const save_answer = (task: number, course_id: string, lesson_id: string, json: string) => {
 	const data: ITaskAnswerSaveRequest = {
 		json, task
@@ -217,7 +233,7 @@ export const save_answer = (task: number, course_id: string, lesson_id: string, 
 	return () => {
 		return api_request({
 			method: "POST",
-			url: `courses/${course_id}/lessons/${lesson_id}/save-answer`,
+			url: `courses/${course_id}/lessons/${lesson_id}/answers/save`,
 			data,
 			version: 1
 		})

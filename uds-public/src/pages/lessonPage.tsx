@@ -4,7 +4,7 @@ import {withRouter, RouteComponentProps} from "react-router-dom";
 import {useTranslation} from "react-i18next";
 import {createStyles, makeStyles, Theme} from "@material-ui/core/styles";
 import {useDispatch} from "react-redux";
-import {get_lesson} from "../actions";
+import {get_answers, get_lesson} from "../actions";
 import {ILessonTask} from "../reducers/lessonsReducer";
 import {ParsedContent} from "../components/parsedContent";
 import history from "../history";
@@ -40,6 +40,8 @@ const LessonPage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) => {
 			const {body, tasks} = lesson.content;
 			setBody(body);
 			setTasks(tasks);
+			
+			dispatch(get_answers(course_id, lesson_id));
 		}));
 	}, []);
 	
