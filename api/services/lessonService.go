@@ -10,7 +10,7 @@ type lessonService struct {
 	TableName string
 }
 
-func (s *lessonService) Get(id uint) (*m.Lesson, error) {
+func (s *lessonService) Get(id uint) (error, *m.Lesson) {
 	o := &m.Lesson{}
 	err := m.GetDB().
 		Preload("Content").
@@ -18,9 +18,9 @@ func (s *lessonService) Get(id uint) (*m.Lesson, error) {
 		Take(o, "id = ?", id).
 		Error
 	if err != nil {
-		return nil, err
+		return err, nil
 	}
-	return o, nil
+	return nil, o
 }
 
 func (s *lessonService) Create(model *m.Lesson) error {
@@ -35,6 +35,33 @@ func (s *lessonService) Update(model *m.Lesson) error {
 		return err
 	}
 	return nil
+}
+
+func (s *lessonService) GetTaskAnswers(accountId string, lessonId uint) (error, []*m.LessonAnswer) {
+	lesson := &m.Lesson{}
+	answers := make([]*m.LessonAnswer, 0)
+	err := m.GetDB().
+		Preload("Content").
+		Preload("Content.Tasks").
+		Take(lesson, "id = ?", lessonId).
+		Error
+	if err != nil {
+		return err, nil
+	}
+
+	tIds := make([]uint, 0)
+
+	for _, t := range lesson.Content.Tasks {
+		tIds = append(tIds, t.ID)
+	}
+	if len(tIds) == 0 {
+		return nil, answers
+	}
+	query := m.GetDB().Where("account_id = ? AND lesson_task_id IN (?)", accountId, tIds).Find(&answers)
+	if query.Error != nil && !query.RecordNotFound() {
+		return fmt.Errorf("could not find answers"), nil
+	}
+	return nil, answers
 }
 
 func (s *lessonService) SaveTaskAnswer(accountId string, courseId int, lessonId int, taskId uint, json string) error {
@@ -61,9 +88,9 @@ func (s *lessonService) SaveTaskAnswer(accountId string, courseId int, lessonId 
 		return fmt.Errorf("cannot parse UUID")
 	}
 	la := m.LessonAnswer{
-		Json: json,
+		Json:         json,
 		LessonTaskID: taskId,
-		AccountID: uid,
+		AccountID:    uid,
 	}
 	query = m.GetDB().Model(&la).Where("lesson_task_id = ? AND account_id = ?", taskId, accountId).Updates(la)
 	if query.Error != nil {
@@ -76,6 +103,5 @@ func (s *lessonService) SaveTaskAnswer(accountId string, courseId int, lessonId 
 
 	return nil
 }
-
 
 var LessonService = lessonService{TableName: "lessons"}

@@ -52,8 +52,8 @@ type LessonTask struct {
 type LessonAnswer struct {
 	gorm.Model
 	Json         string    `json:"json" gorm:"size:4096;"`
-	LessonTaskID uint      `json:"-"`
-	AccountID    uuid.UUID `gorm:"primary_key;type:char(36);"`
+	LessonTaskID uint      `json:"lesson_task_id"`
+	AccountID    uuid.UUID `json:"-" gorm:"primary_key;type:char(36);"`
 }
 
 func (course *Course) Validate() error {

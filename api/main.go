@@ -57,14 +57,13 @@ func main() {
 	router.Handle(mw.Routes["v1"]["courses"]+"/{id}", mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.GetCourse), []int{mw.RoleUser}))).Methods("GET", "OPTIONS")
 	// get courses (public)
 	router.Handle(mw.Routes["v1"]["courses"], mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.GetCourses), []int{mw.RoleUser}))).Methods("GET", "OPTIONS")
+	// get task answers
+	router.Handle(mw.Routes["v1"]["courses"]+"/{course_id}/lessons/{lesson_id}/answers", mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.GetTaskAnswers), []int{mw.RoleUser}))).Methods("GET", "OPTIONS")
 	// save task answer
-	router.Handle(mw.Routes["v1"]["courses"]+"/{course_id}/lessons/{lesson_id}/save-answer", mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.SaveTaskAnswer), []int{mw.RoleUser}))).Methods("POST", "OPTIONS")
+	router.Handle(mw.Routes["v1"]["courses"]+"/{course_id}/lessons/{lesson_id}/answers/save", mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.SaveTaskAnswer), []int{mw.RoleUser}))).Methods("POST", "OPTIONS")
 
 	// get lesson (public)
 	router.Handle(mw.Routes["v1"]["lessons"]+"/{id}", mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.GetLesson), []int{mw.RoleUser}))).Methods("GET", "OPTIONS")
-
-
-
 
 	// create lesson (Admin)
 	router.Handle(mw.Routes["v1"]["adminLessons"], mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.CreateLesson), []int{mw.RoleAdmin}))).Methods("POST", "OPTIONS")
@@ -89,7 +88,7 @@ func main() {
 
 	log.Println(fmt.Sprintf("App's running on port: %s", port))
 
-	if err := http.ListenAndServe(":" + port, router); err != nil {
+	if err := http.ListenAndServe(":"+port, router); err != nil {
 		panic(err)
 	}
 }

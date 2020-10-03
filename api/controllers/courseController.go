@@ -108,10 +108,34 @@ var GetLesson = func(w http.ResponseWriter, r *http.Request) {
 	u.RespondJson(w, u.Response{Payload: course}, http.StatusOK)
 }
 
+var GetTaskAnswers = func(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	lessonId, err := strconv.Atoi(params["lesson_id"])
+	if err != nil {
+		log.Print(err.Error())
+		u.RespondJson(w, u.Response{Message: "Invalid request"}, http.StatusOK)
+		return
+	}
+	ctx := r.Context().Value(0).(u.ContextPayload)
+	issuerId := ctx.Get("user")
+	if issuerId == "" {
+		log.Println("Error! Secure route has no user stored in context")
+		u.RespondJson(w, u.Response{Message: "Invalid request", ErrorCode: u.ErrGeneral}, http.StatusBadRequest)
+		return
+	}
+	err, answers := srv.LessonService.GetTaskAnswers(issuerId, uint(lessonId))
+	if err != nil {
+		log.Println("Error! Cannot fetch answers")
+		u.RespondJson(w, u.Response{Message: "Invalid request", ErrorCode: u.ErrGeneral}, http.StatusBadRequest)
+		return
+	}
+	u.RespondJson(w, u.Response{Payload: answers}, http.StatusOK)
+}
+
 var SaveTaskAnswer = func(w http.ResponseWriter, r *http.Request) {
 	type Answer struct {
 		Json string `json:"json"`
-		Task uint `json:"task"`
+		Task uint   `json:"task"`
 	}
 	answer := &Answer{}
 	err := json.NewDecoder(r.Body).Decode(answer)
@@ -132,7 +156,7 @@ var SaveTaskAnswer = func(w http.ResponseWriter, r *http.Request) {
 	issuerId := ctx.Get("user")
 	if issuerId == "" {
 		log.Println("Error! Secure route has no user stored in context")
-		u.RespondJson(w, u.Response{Message: "Invalid request",  ErrorCode: u.ErrGeneral}, http.StatusBadRequest)
+		u.RespondJson(w, u.Response{Message: "Invalid request", ErrorCode: u.ErrGeneral}, http.StatusBadRequest)
 		return
 	}
 	err = srv.LessonService.SaveTaskAnswer(issuerId, courseId, lessonId, answer.Task, answer.Json)
@@ -261,7 +285,7 @@ var GetLessonAdmin = func(w http.ResponseWriter, r *http.Request) {
 		u.RespondJson(w, u.Response{Message: "Invalid request"}, http.StatusOK)
 		return
 	}
-	lesson, err := srv.LessonService.Get(uint(id))
+	err, lesson := srv.LessonService.Get(uint(id))
 	if err != nil {
 		log.Print(err.Error())
 		u.RespondJson(w, u.Response{Message: err.Error()}, http.StatusOK)
