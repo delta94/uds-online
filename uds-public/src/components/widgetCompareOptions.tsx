@@ -10,7 +10,7 @@ import {Delete} from '@material-ui/icons';
 import clsx from "clsx";
 import {Paper, Typography} from "@material-ui/core";
 import {HTML5Backend} from "react-dnd-html5-backend";
-import {cloneDeep} from "lodash";
+import {cloneDeep, shuffle} from "lodash";
 import {createStyles, makeStyles, Theme} from "@material-ui/core/styles";
 import {decodeBase64ToObject, encodeObjectToBase64} from "../helpers";
 import {
@@ -26,7 +26,7 @@ import {
 } from 'react-dnd';
 
 
-const TYPE = 'BOX';
+const TYPE_PREFIX = 'BOX';
 
 const useStyles = makeStyles((theme: Theme) =>
 	createStyles({
@@ -51,6 +51,9 @@ const useStyles = makeStyles((theme: Theme) =>
 		correct: {
 			color: 'green',
 		},
+		pointer: {
+			cursor: 'pointer',
+		},
 		answer: {
 			fontWeight: 'bold',
 			display: 'inline-block',
@@ -73,7 +76,25 @@ interface DropResult {
 	boxText?: string,
 }
 
+export interface BoxProps {
+	id: number,
+	option: string,
+	// Collected Props
+	isDragging: boolean
+	connectDragSource: ConnectDragSource
+}
+
+export interface DZoneProps {
+	id: number,
+	option: string,
+	canDrop: boolean,
+	isOver: boolean,
+	connectDropTarget: ConnectDropTarget,
+	onDone: (data: DropResult) => void,
+}
+
 export const WidgetCompareOptions: FC<ITaskWidget<any>> = ({data, givenAnswer, onUpdate}) => {
+	const [prefix] = useState(TYPE_PREFIX + Math.floor(Math.random() * 10000));
 	const classes = useStyles();
 	const [optionsA, setOptionsA] = useState<NullableTaskOption[]>([]);
 	const [optionsB, setOptionsB] = useState<NullableTaskOption[]>([]);
@@ -88,7 +109,7 @@ export const WidgetCompareOptions: FC<ITaskWidget<any>> = ({data, givenAnswer, o
 				setText(parsed.text);
 			}
 			setOptionsA(parsed.optionsA);
-			setOptionsB(parsed.optionsB);
+			setOptionsB(shuffle(parsed.optionsB));
 			setCorrectAnswers(parsed.control);
 		}
 	}, []);
@@ -201,6 +222,55 @@ export const WidgetCompareOptions: FC<ITaskWidget<any>> = ({data, givenAnswer, o
 	
 	const paragraph = text ? <Typography variant='body1'>{text}</Typography> : null;
 	
+	
+	const DTarget = DropTarget(
+		prefix,
+		{
+			drop: (props: DZoneProps) => ({
+				option: props.option,
+				id: props.id,
+				onDone: ({boxId, boxText}: DropResult) => {
+					return props.onDone({
+						dzText: props.option,
+						dzId: props.id,
+						boxId: boxId,
+						boxText: boxText
+					})
+				},
+			}),
+		},
+		(connect: DropTargetConnector, monitor: DropTargetMonitor) => ({
+			connectDropTarget: connect.dropTarget(),
+			isOver: monitor.isOver(),
+			canDrop: monitor.canDrop(),
+		}),
+	)(DZone);
+	
+	const DSource = DragSource(
+		prefix,
+		{
+			beginDrag: (props: BoxProps) => ({
+				option: props.option,
+				id: props.id,
+			}),
+			endDrag(props: BoxProps, monitor: DragSourceMonitor) {
+				const item = monitor.getItem()
+				const dropResult = monitor.getDropResult()
+				
+				if (dropResult) {
+					dropResult.onDone({
+						boxId: item.id,
+						boxText: item.option
+					});
+				}
+			},
+		},
+		(connect: DragSourceConnector, monitor: DragSourceMonitor) => ({
+			connectDragSource: connect.dragSource(),
+			isDragging: monitor.isDragging(),
+		}),
+	)(Box);
+	
 	return (
 		<>
 			{paragraph}
@@ -226,7 +296,8 @@ export const WidgetCompareOptions: FC<ITaskWidget<any>> = ({data, givenAnswer, o
 									}
 									{
 										!givenAnswer && <>{sOpt.option}
-											<span className={classes.grow}/> {getSelectionText(sOpt.id)} <Delete onClick={() => cancelSelection(sOpt.id)}/>
+										
+											<span className={classes.grow}/> {getSelectionText(sOpt.id)} <Delete fontSize="small" className={clsx(classes.redText, classes.pointer)} onClick={() => cancelSelection(sOpt.id)} />
 										</>
 									}
 								</>
@@ -258,13 +329,6 @@ export const WidgetCompareOptions: FC<ITaskWidget<any>> = ({data, givenAnswer, o
 	);
 };
 
-export interface BoxProps {
-	id: number,
-	option: string,
-	// Collected Props
-	isDragging: boolean
-	connectDragSource: ConnectDragSource
-}
 
 const Box: FC<BoxProps> = ({id, option, isDragging, connectDragSource}) => {
 	const classes = useStyles();
@@ -275,82 +339,24 @@ const Box: FC<BoxProps> = ({id, option, isDragging, connectDragSource}) => {
 	)
 };
 
-
-const DSource = DragSource(
-	TYPE,
-	{
-		beginDrag: (props: BoxProps) => ({
-			option: props.option,
-			id: props.id,
-		}),
-		endDrag(props: BoxProps, monitor: DragSourceMonitor) {
-			const item = monitor.getItem()
-			const dropResult = monitor.getDropResult()
-			
-			if (dropResult) {
-				dropResult.onDone({
-					boxId: item.id,
-					boxText: item.option
-				});
-			}
-		},
-	},
-	(connect: DragSourceConnector, monitor: DragSourceMonitor) => ({
-		connectDragSource: connect.dragSource(),
-		isDragging: monitor.isDragging(),
-	}),
-)(Box);
-
-
-export interface DZoneProps {
-	id: number,
-	option: string,
-	canDrop: boolean,
-	isOver: boolean,
-	connectDropTarget: ConnectDropTarget,
-	onDone: (data: DropResult) => void,
-}
-
 const DZone: React.FC<DZoneProps> = ({canDrop, isOver, connectDropTarget}) => {
 	const classes = useStyles();
 	const isActive = canDrop && isOver;
-	// let backgroundColor = '#222';
+	let backgroundColor = '#FFFFFF';
 	if (isActive) {
-		//  backgroundColor = 'darkgreen';
+		 backgroundColor = '#a0a0a0';
 	} else if (canDrop) {
-		//  backgroundColor = 'darkkhaki';
+		 backgroundColor = '#dedede';
 	}
 	
 	return (
 		<div ref={connectDropTarget} className={classes.slot}
-			// style={{ backgroundColor }}
+			style={{ backgroundColor }}
 		>
 			{isActive ? ' ' : ' '}
 		</div>
 	)
 }
 
-const DTarget = DropTarget(
-	TYPE,
-	{
-		drop: (props: DZoneProps) => ({
-			option: props.option,
-			id: props.id,
-			onDone: ({boxId, boxText}: DropResult) => {
-				return props.onDone({
-					dzText: props.option,
-					dzId: props.id,
-					boxId: boxId,
-					boxText: boxText
-				})
-			},
-		}),
-	},
-	(connect: DropTargetConnector, monitor: DropTargetMonitor) => ({
-		connectDropTarget: connect.dropTarget(),
-		isOver: monitor.isOver(),
-		canDrop: monitor.canDrop(),
-	}),
-)(DZone);
 
 export default WidgetCompareOptions;
