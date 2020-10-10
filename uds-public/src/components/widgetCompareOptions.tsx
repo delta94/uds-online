@@ -10,6 +10,7 @@ import {Delete} from '@material-ui/icons';
 import clsx from "clsx";
 import {Paper, Typography} from "@material-ui/core";
 import {HTML5Backend} from "react-dnd-html5-backend";
+import {TouchBackend} from "react-dnd-touch-backend";
 import {cloneDeep, shuffle} from "lodash";
 import {createStyles, makeStyles, Theme} from "@material-ui/core/styles";
 import {decodeBase64ToObject, encodeObjectToBase64} from "../helpers";
@@ -271,11 +272,14 @@ export const WidgetCompareOptions: FC<ITaskWidget<any>> = ({data, givenAnswer, o
 		}),
 	)(Box);
 	
+	const html = document.querySelector("html");
+	const isTouch = html ? html.classList.contains('touch') : false;
+	
 	return (
 		<>
 			{paragraph}
 			<br/>
-			<DndProvider backend={HTML5Backend}>
+			<DndProvider backend={isTouch ? TouchBackend : HTML5Backend}>
 				{optionsA.map(sOpt => {
 					if (!sOpt) {
 						return null;
