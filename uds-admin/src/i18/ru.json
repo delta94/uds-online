@@ -32,6 +32,9 @@
 		"DELETE_DIALOG_TITLE": "Удаление ресурса",
 		"DELETE_DIALOG_TEXT": "Информация о данном файле и сам файл будут удалены. Продолжить?"
 	},
+	"PAGE_LESSONS": {
+		"SELECT_TASK_TYPE_TEXT": "Выберите тип задания"
+	},
 	"BUTTONS": {
 		"CLOSE": "Закрыть",
 		"CANCEL": "Отмена",
@@ -41,6 +44,8 @@
 		"APPLY": "Применить",
 		"CLONE": "Клонировать",
 		"RESET": "Сброс",
+		"DELETE": "Удалить",
+		"EDIT": "Редактировать",
 		"UPLOAD": "Загрузить"
 	},
 	"MESSAGES": {

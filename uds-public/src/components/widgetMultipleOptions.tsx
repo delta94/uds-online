@@ -67,8 +67,6 @@ export const WidgetMultipleOptions: FC<ITaskWidget<number[]>> = ({data, givenAns
         onUpdate(encodeObjectToBase64(t), control);
     }, [control]);
 
-
-
     const validate = (): boolean => {
         let valid = true;
         control.forEach(c => {

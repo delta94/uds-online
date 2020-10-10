@@ -45,7 +45,7 @@ func LoadEnv() {
 	log.Println("Loading env values...")
 	os.Setenv("IS_PRODUCTION", "true")
 
-	if os.Getenv("REACT_APP_USE_RECAPTCHA") == "True" {
+	if os.Getenv("REACT_APP_USE_RECAPTCHA") == "true" {
 		log.Printf("Google's ReCaptcha is ACTIVATED")
 	} else {
 		log.Printf("Google's ReCaptcha is OFF")

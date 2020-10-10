@@ -1,5 +1,12 @@
 import React, {FC, useEffect, useState} from "react";
-import {IAnswer, IAnswerMultipleOptions, IAnswerSingleOption, ITask, ITaskType} from "../helpers/models";
+import {
+	IAnswer,
+	IAnswerCompareOptions,
+	IAnswerMultipleOptions,
+	IAnswerSingleOption,
+	ITask,
+	ITaskType
+} from "../helpers/models";
 import {Button, Card, CardActions, CardContent, Typography} from "@material-ui/core";
 import {useTranslation} from "react-i18next";
 import WidgetSingleOption from "./widgetSingleOption";
@@ -9,6 +16,7 @@ import {save_answer} from "../actions";
 import {decodeBase64ToObject} from "../helpers";
 import {IAnswerResponse} from "../reducers/lessonsReducer";
 import WidgetMultipleOptions from "./widgetMultipleOptions";
+import WidgetCompareOptions from "./widgetCompareOptions";
 
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -47,7 +55,7 @@ const Task: FC<ITaskProps> = ({ID, _givenAnswer, course_id, lesson_id, descripti
 				onUpdate={
 					(json_str, pa) => {
 						setJsonAnswer(json_str);
-						setPotentialAnswer(pa)
+						setPotentialAnswer(pa);
 					}
 				}
 			/>;
@@ -64,12 +72,25 @@ const Task: FC<ITaskProps> = ({ID, _givenAnswer, course_id, lesson_id, descripti
 				onUpdate={
 					(json_str, pa) => {
 						setJsonAnswer(json_str);
-						setPotentialAnswer(pa)
+						setPotentialAnswer(pa);
 					}
 				}/>
 			break;
 
 		case ITaskType.COMPARE_OPTIONS:
+			if (_givenAnswer && !givenAnswer) {
+				setGivenAnswer(decodeBase64ToObject<IAnswerCompareOptions>(_givenAnswer.json).control);
+			}
+			
+			widget = <WidgetCompareOptions
+				data={json}
+				givenAnswer={givenAnswer}
+				onUpdate={
+					(json_str, pa) => {
+						setJsonAnswer(json_str);
+						setPotentialAnswer(pa);
+					}
+				}/>
 			break;
 
 		case ITaskType.FILL_GAPS:
@@ -83,8 +104,7 @@ const Task: FC<ITaskProps> = ({ID, _givenAnswer, course_id, lesson_id, descripti
 			dispatch(save_answer(ID, course_id, lesson_id, jsonAnswer));
 		}
 	};
-
-	console.log('RENDERING BUTTON', givenAnswer);
+	
 	return (
 		<Card className={classes.root}>
 			<CardContent>

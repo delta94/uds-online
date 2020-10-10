@@ -1,4 +1,4 @@
-import React, {FC, useEffect, useState, Suspense, lazy} from "react";
+import React, {FC, lazy, Suspense, useEffect, useState} from "react";
 import {
 	Button,
 	Checkbox,
@@ -14,14 +14,15 @@ import {
 	Select,
 	TextField
 } from "@material-ui/core";
+import {Alert} from "@material-ui/lab";
 import {PaperComponent} from "./confirmDialog";
-import {
-	ITaskType
-} from "../helpers/models";
+import {ITaskType} from "../helpers/models";
 import {createStyles, makeStyles, Theme} from "@material-ui/core/styles";
 import {Save} from "@material-ui/icons";
 import {ILessonTask} from "../reducers/lessonsReducer";
 import {ComponentSpinner} from "./spinner";
+import {delay} from "../helpers";
+import {useTranslation} from "react-i18next";
 
 const WidgetSingleOption = lazy(() => import("./widgetSingleOption"));
 const WidgetMultipleOptions = lazy(() => import("./widgetMultipleOptions"));
@@ -63,10 +64,12 @@ export const TaskDialog: FC<ITaskDialogProps> = ({open, onClose, onSave, task}) 
 	const classes = useStyles();
 	const [ID, setID] = useState<number>();
 	const [description, setDescription] = useState<string>("");
-	const [type, setType] = useState<ITaskType>(ITaskType.PICK_SINGLE_ANSWER);
+	const [type, setType] = useState<ITaskType>(ITaskType.NONE);
 	const [json, setJson] = useState<string>("");
 	const [sort, setSort] = useState<number>(0);
 	const [published, setPublished] = useState<boolean>(true);
+	const [typeSelectable, setTypeSelectable] =  useState<boolean>(true);
+	const [t] = useTranslation();
 	
 	useEffect(() => {
 		if (task) {
@@ -79,8 +82,24 @@ export const TaskDialog: FC<ITaskDialogProps> = ({open, onClose, onSave, task}) 
 		}
 	}, []);
 	
+	useEffect(() => {
+		// on render]
+		if (!open) {
+			return;
+		}
+		if (task) {
+			setTypeSelectable(false);
+		}
+		if (!task) {
+			reset();
+		}
+	}, [open]);
+	
 	const onTypeChange = (value: number) => {
 		setType(value);
+		if (value !== ITaskType.NONE) {
+			delay(100).then(() => setTypeSelectable(false));
+		}
 	};
 	
 	const handleSave = () => {
@@ -107,8 +126,9 @@ export const TaskDialog: FC<ITaskDialogProps> = ({open, onClose, onSave, task}) 
 		setID(undefined);
 		setJson("");
 		setDescription("");
-		setType(ITaskType.PICK_SINGLE_ANSWER);
+		setType(ITaskType.NONE);
 		setSort(0);
+		setTypeSelectable(true);
 	};
 	
 	const validate = (): boolean => {
@@ -148,7 +168,7 @@ export const TaskDialog: FC<ITaskDialogProps> = ({open, onClose, onSave, task}) 
 		default:
 			widget = null;
 	}
-
+	
 	return (
 		<Dialog open={open}
 				fullWidth
@@ -162,10 +182,10 @@ export const TaskDialog: FC<ITaskDialogProps> = ({open, onClose, onSave, task}) 
 				
 				</DialogContentText>
 				
-				<InputLabel id="select-type">Тип задания</InputLabel>
+				<InputLabel id="select-type">Тип задания {!typeSelectable && <>(выбрано)</>}</InputLabel>
 				<Select fullWidth
 						inputProps={{
-							disabled: !!task
+							disabled: !typeSelectable
 						}}
 						labelId="select-type"
 						onChange={({target: {value}}) => onTypeChange(value as number)}
@@ -187,40 +207,45 @@ export const TaskDialog: FC<ITaskDialogProps> = ({open, onClose, onSave, task}) 
 				
 				<div className={classes.spacer}/>
 				
-				<FormControl fullWidth>
-					<TextField
-						id="input-description"
-						label="Описание задания"
-						autoComplete="off"
-						fullWidth
-						required
-						inputProps={{
-							maxLength: MAX_LENGTH_DESCRIPTION,
-						}}
-						value={description}
-						onChange={(e) => setDescription(e.target.value)}
-						variant="outlined"
-					/>
-				</FormControl>
-				
-				<div className={classes.spacer}/>
-				
-				<FormControlLabel
-					control={
-						<Checkbox
-							checked={published}
-							onChange={() => setPublished(!published)}
-							name="chk-published"
-							color="primary"
+				{type === ITaskType.NONE ? <Alert severity="info">{t('PAGE_LESSONS.SELECT_TASK_TYPE_TEXT')}</Alert>
+					:
+					<>
+						<FormControl fullWidth>
+							<TextField
+								id="input-description"
+								label="Описание задания"
+								autoComplete="off"
+								fullWidth
+								required
+								inputProps={{
+									maxLength: MAX_LENGTH_DESCRIPTION,
+								}}
+								value={description}
+								onChange={(e) => setDescription(e.target.value)}
+								variant="outlined"
+							/>
+						</FormControl>
+						
+						<div className={classes.spacer}/>
+						
+						<FormControlLabel
+							control={
+								<Checkbox
+									checked={published}
+									onChange={() => setPublished(!published)}
+									name="chk-published"
+									color="primary"
+								/>
+							}
+							label="Опубликован"
 						/>
-					}
-					label="Опубликован"
-				/>
+						
+						<div className={classes.spacer}/>
+						
+						{widget}
+					</>
+				}
 				
-				<div className={classes.spacer}/>
-				
-				{widget}
-			
 			</DialogContent>
 			<DialogActions>
 				<Button onClick={onClose}>Закрыть</Button>

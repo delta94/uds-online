@@ -1,5 +1,17 @@
 import React, {FC, useEffect, useState} from "react";
-import {PageWrapper} from "../components/pageWrapper";
+import {PageWrapper} from "../components/pageWrapper"
+import {createStyles, makeStyles, Theme} from "@material-ui/core/styles";
+import {Link, RouteComponentProps, withRouter} from "react-router-dom";
+import {ROUTES} from "../constants";
+import {Save, Info, FileCopy} from "@material-ui/icons";
+import {Alert} from "@material-ui/lab";
+import {useDispatch} from "react-redux";
+import history from "../history";
+import {IUser} from "../reducers/usersReducer";
+import {getCourseUrl} from "../helpers/getUrl";
+import {ICourse} from "../reducers/courseReducer";
+import {useTranslation} from "react-i18next";
+import PictureCropDialog from "../components/pictureCropDialog";
 import {
     Button,
     Checkbox,
@@ -12,12 +24,6 @@ import {
     InputLabel,
     Tooltip
 } from "@material-ui/core";
-import {createStyles, makeStyles, Theme} from "@material-ui/core/styles";
-import {Link, RouteComponentProps, withRouter} from "react-router-dom";
-import {ROUTES} from "../constants";
-import {Save, Info, FileCopy} from "@material-ui/icons";
-import {Alert} from "@material-ui/lab";
-import {useDispatch} from "react-redux";
 import {
     clone_course,
     create_course,
@@ -27,12 +33,6 @@ import {
     update_course,
     upload_file
 } from "../actions";
-import history from "../history";
-import {IUser} from "../reducers/usersReducer";
-import {getCourseUrl} from "../helpers/getUrl";
-import {ICourse} from "../reducers/courseReducer";
-import {useTranslation} from "react-i18next";
-import PictureCropDialog from "../components/pictureCropDialog";
 
 const MAX_LENGTH_TITLE = 80;
 const MIN_LENGTH_TITLE = 10;
@@ -272,8 +272,6 @@ const CourseFormPage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) => {
 
                     </div>
                 </div>
-                
-                
                 
                 <div className={classes.spacer}/>
 

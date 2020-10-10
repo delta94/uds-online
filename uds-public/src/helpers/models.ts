@@ -40,6 +40,8 @@ export enum ITaskType {
 	FILL_GAPS
 }
 
+export type NullableTaskOption = ITaskOption | null;
+
 export interface ITaskOption {
 	id: number;
 	option: string;
@@ -71,11 +73,12 @@ export interface ITaskFillGaps {
 
 export interface ITaskCompareOptions {
 	text?: string,
-	options: {
-		col_a: ITaskOption[],
-		col_b: ITaskOption[],
-	},
+	optionsA: ITaskOption[],
+	optionsB: ITaskOption[],
+	control: SelectionPair[]
 }
+
+export type IAnswerCompareOptions = IAnswer<SelectionPair[]>;
 
 export type TaskJsonType = ITaskSingleOption | ITaskMultipleOptions | ITaskFillGaps;
 
@@ -88,3 +91,5 @@ export type ITask = Modify<ILessonTask, {
 	type: TaskJsonType,
 	_givenAnswer?: IAnswerResponse,
 }>;
+
+export type SelectionPair = [number, number];

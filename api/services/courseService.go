@@ -57,7 +57,7 @@ func (s *courseService) GetLesson(id uint, accountId string) (*m.Lesson, error) 
 	err := m.GetDB().
 		Where("published = ?", true).
 		Preload("Content").
-		Preload( "Content.Tasks").
+		Preload( "Content.Tasks", "published = ?", true).
 		Take(o, "id = ?", id).
 		Error
 	if err != nil {

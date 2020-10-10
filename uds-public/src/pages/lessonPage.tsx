@@ -62,7 +62,13 @@ const LessonPage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) => {
 			
 			<Suspense fallback={ComponentSpinner}>
 				{tasks.map((task) => {
-					const givenAnswer = answers.find(answer => answer.lesson_task_id === task.ID)
+					const givenAnswer = answers.find(answer => answer.lesson_task_id === task.ID);
+					console.log("=============");
+					console.log("tasks:", tasks);
+					console.log("answers:", answers);
+					console.log("Task ID/  GA:", task.ID, givenAnswer);
+					console.log("=============");
+					
 					return (
 						<Task
 							_givenAnswer={givenAnswer}

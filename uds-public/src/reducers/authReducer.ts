@@ -5,7 +5,6 @@ import {
 import {decode as jwtDecode} from "jsonwebtoken";
 import {AnyAction} from "redux";
 import {IAction} from "../helpers/models";
-import {IUser} from "../helpers/models";
 import Cookies from "js-cookie";
 
 
@@ -63,14 +62,15 @@ export const defaultState: IAuthState = {
 };
 
 const secure = process.env.NODE_ENV === 'production';
+const COOKIE_LIFETIME_DAYS = 7;
 
 export const reducer = (state: IAuthState = defaultState, action: AnyAction): IAuthState => {
 	switch (action.type) {
 		case LOG_IN: {
 			const a = action as IAction<ILoginPayload>;
-			Cookies.set(TOKEN, a.payload.token, {expires: 14, secure});
+			Cookies.set(TOKEN, a.payload.token, {expires: COOKIE_LIFETIME_DAYS, secure});
 			if (process.env.NODE_ENV === 'production') {
-				Cookies.set(TOKEN, a.payload.token, {expires: 14, secure, domain: process.env.REACT_APP_HOST_COOKIE_DOMAIN});
+				Cookies.set(TOKEN, a.payload.token, {expires: COOKIE_LIFETIME_DAYS, secure, domain: process.env.REACT_APP_HOST_COOKIE_DOMAIN});
 			}
 			state = {
 				...state,

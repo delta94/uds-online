@@ -6,6 +6,7 @@ import {TaskDialog} from "./taskDialog";
 import moment from "moment";
 import clsx from "clsx";
 import {Edit} from "@material-ui/icons";
+import {useTranslation} from "react-i18next";
 
 const useStyles = makeStyles((theme: Theme) =>
 	createStyles({
@@ -47,6 +48,7 @@ interface ITaskPreviewProps {
 export const TaskPreview: FC<ITaskPreviewProps> = ({task, onSave}) => {
 	const classes = useStyles();
 	const [taskDialogOpen, setTaskDialogOpen] = useState<boolean>(false);
+	const [t] = useTranslation();
 	
 	const handleSave = (t: ILessonTask) => {
 		onSave(t);
@@ -68,7 +70,7 @@ export const TaskPreview: FC<ITaskPreviewProps> = ({task, onSave}) => {
 						:
 						<small className={classes.saveRequired}>Требует сохранения</small>
 					}
-					<IconButton onClick={() => setTaskDialogOpen(true)}>
+					<IconButton title={t('BUTTONS.EDIT')} onClick={() => setTaskDialogOpen(true)}>
 						<Edit />
 					</IconButton>
 				</CardContent>
