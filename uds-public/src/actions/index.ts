@@ -251,6 +251,22 @@ export const save_answer = (task: number, course_id: string, lesson_id: string, 
 	};
 };
 
+export const reset_answers = (course_id: string, lesson_id: string, callback: (result: boolean) => void) => {
+	return () => {
+		return api_request({
+			method: "POST",
+			url: `courses/${course_id}/lessons/${lesson_id}/answers/reset`,
+			version: 1
+		})
+			.then(() => {
+				callback(true);
+			})
+			.catch(() => {
+				callback(false);
+			})
+	};
+};
+
 /* ======         ======= */
 
 

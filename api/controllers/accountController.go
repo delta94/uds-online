@@ -235,19 +235,21 @@ var UpdateAccount = func(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	id, err1 := strconv.Atoi(params["id"])
 	if err1 != nil {
-		u.RespondJson(w, u.Response{Message: "Invalid request"}, http.StatusOK)
+		u.RespondJson(w, u.Response{Message: "Invalid request", ErrorCode: u.ErrGeneral}, http.StatusOK)
 		return
 	}
 	account := &m.Account{}
 	err2 := json.NewDecoder(r.Body).Decode(account)
 	if err2 != nil {
-		u.RespondJson(w, u.Response{Message: "Invalid request"}, http.StatusOK)
+		u.RespondJson(w, u.Response{Message: "Invalid request", ErrorCode: u.ErrGeneral}, http.StatusOK)
 		return
 	}
 	ctx := r.Context().Value(0).(u.ContextPayload)
 	issuerId := ctx.Get("user")
 	if issuerId == "" {
 		log.Println("Error! Secure route has no user stored in context")
+		u.RespondJson(w, u.Response{Message: "Invalid request", ErrorCode: u.ErrGeneral}, http.StatusOK)
+		return
 	}
 	updated, err3 := s.AccountService.Update(uint(id), account, issuerId)
 	if err3.Error != nil {

@@ -105,7 +105,7 @@ const CoursesPage: FC<ICoursesPage> = () => {
 						</Paper>
 					)
 				})}
-				{courseState.data && !courseState.data.length && <Alert>
+				{courseState.data && !courseState.data.length && <Alert severity="info">
 					{t('PAGE_COURSES.NO_COURSES_FOUND')}
 				</Alert>}
 			</Suspense>

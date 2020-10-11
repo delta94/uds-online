@@ -169,7 +169,7 @@ var GetFilePath = func(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	upload := &m.Upload{}
-	err := m.GetDB().Take(upload, "alias = ?", alias).Error
+	err := m.GetDB().Unscoped().Take(upload, "alias = ?", alias).Error
 	if err != nil {
 		log.Println(err.Error())
 		u.RespondJson(w, u.Response{Message: "Path not found", ErrorCode: u.ErrNotFound}, http.StatusNotFound)

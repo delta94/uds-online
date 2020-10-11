@@ -61,6 +61,8 @@ func main() {
 	router.Handle(mw.Routes["v1"]["courses"]+"/{course_id}/lessons/{lesson_id}/answers", mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.GetTaskAnswers), []int{mw.RoleUser}))).Methods("GET", "OPTIONS")
 	// save task answer
 	router.Handle(mw.Routes["v1"]["courses"]+"/{course_id}/lessons/{lesson_id}/answers/save", mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.SaveTaskAnswer), []int{mw.RoleUser}))).Methods("POST", "OPTIONS")
+	// reset given task answers
+	router.Handle(mw.Routes["v1"]["courses"]+"/{course_id}/lessons/{lesson_id}/answers/reset", mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.ResetTaskAnswer), []int{mw.RoleUser}))).Methods("POST", "OPTIONS")
 
 	// get lesson (public)
 	router.Handle(mw.Routes["v1"]["lessons"]+"/{id}", mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.GetLesson), []int{mw.RoleUser}))).Methods("GET", "OPTIONS")

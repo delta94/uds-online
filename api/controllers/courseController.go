@@ -132,6 +132,33 @@ var GetTaskAnswers = func(w http.ResponseWriter, r *http.Request) {
 	u.RespondJson(w, u.Response{Payload: answers}, http.StatusOK)
 }
 
+var ResetTaskAnswer = func(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	courseId, err1 := strconv.Atoi(params["course_id"])
+	lessonId, err2 := strconv.Atoi(params["lesson_id"])
+	if err1 != nil || err2 != nil {
+		log.Print("Cannot reset answers. CourseID / LessonID not found")
+		u.RespondJson(w, u.Response{Message: "Invalid request"}, http.StatusOK)
+		return
+	}
+	ctx := r.Context().Value(0).(u.ContextPayload)
+	issuerId := ctx.Get("user")
+	if issuerId == "" {
+		log.Println("Error! Secure route has no user stored in context")
+		u.RespondJson(w, u.Response{Message: "Invalid request", ErrorCode: u.ErrGeneral}, http.StatusBadRequest)
+		return
+	}
+	err := srv.LessonService.ResetAnswers(issuerId, courseId, lessonId)
+
+	if err != nil {
+		log.Println("Cannot reset answers")
+		u.RespondJson(w, u.Response{Message: "Invalid request"}, http.StatusOK)
+	}
+
+	payload := make(map[string]interface{})
+	u.RespondJson(w, u.Response{Payload: payload}, http.StatusOK)
+}
+
 var SaveTaskAnswer = func(w http.ResponseWriter, r *http.Request) {
 	type Answer struct {
 		Json string `json:"json"`
@@ -147,8 +174,8 @@ var SaveTaskAnswer = func(w http.ResponseWriter, r *http.Request) {
 	courseId, err1 := strconv.Atoi(params["course_id"])
 	lessonId, err2 := strconv.Atoi(params["lesson_id"])
 	if err1 != nil || err2 != nil {
-		log.Print(err.Error())
-		u.RespondJson(w, u.Response{Message: "Invalid request"}, http.StatusOK)
+		log.Print("Cannot save answer. CourseID / LessonID not found")
+		u.RespondJson(w, u.Response{Message: "Invalid request", ErrorCode: u.ErrGeneral}, http.StatusOK)
 		return
 	}
 
@@ -174,13 +201,13 @@ var GetCourseAdmin = func(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(params["id"])
 	if err != nil {
 		log.Print(err.Error())
-		u.RespondJson(w, u.Response{Message: "Invalid request"}, http.StatusOK)
+		u.RespondJson(w, u.Response{Message: "Invalid request", ErrorCode: u.ErrGeneral}, http.StatusOK)
 		return
 	}
 	course, err := srv.CourseService.GetForAdmin(uint(id))
 	if err != nil {
 		log.Print(err.Error())
-		u.RespondJson(w, u.Response{Message: "Invalid request"}, http.StatusOK)
+		u.RespondJson(w, u.Response{Message: "Invalid request", ErrorCode: u.ErrNotFound}, http.StatusOK)
 		return
 	}
 	u.RespondJson(w, u.Response{Payload: course}, http.StatusOK)
@@ -200,13 +227,13 @@ var CopyCourse = func(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(params["id"])
 	if err != nil {
 		log.Print(err.Error())
-		u.RespondJson(w, u.Response{Message: "Invalid request"}, http.StatusOK)
+		u.RespondJson(w, u.Response{Message: "Invalid request", ErrorCode: u.ErrGeneral}, http.StatusOK)
 		return
 	}
 	course, err := srv.CourseService.Copy(uint(id))
 	if err != nil {
 		log.Print(err.Error())
-		u.RespondJson(w, u.Response{Message: err.Error()}, http.StatusOK)
+		u.RespondJson(w, u.Response{Message: err.Error(), ErrorCode: u.ErrGeneral}, http.StatusOK)
 		return
 	}
 	u.RespondJson(w, u.Response{Payload: course}, http.StatusOK)
@@ -282,13 +309,13 @@ var GetLessonAdmin = func(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(params["id"])
 	if err != nil {
 		log.Print(err.Error())
-		u.RespondJson(w, u.Response{Message: "Invalid request"}, http.StatusOK)
+		u.RespondJson(w, u.Response{Message: "Invalid request", ErrorCode: u.ErrGeneral}, http.StatusOK)
 		return
 	}
 	err, lesson := srv.LessonService.Get(uint(id))
 	if err != nil {
 		log.Print(err.Error())
-		u.RespondJson(w, u.Response{Message: err.Error()}, http.StatusOK)
+		u.RespondJson(w, u.Response{Message: err.Error(), ErrorCode: u.ErrGeneral}, http.StatusOK)
 		return
 	}
 	u.RespondJson(w, u.Response{Payload: lesson}, http.StatusOK)

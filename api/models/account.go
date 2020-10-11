@@ -26,7 +26,7 @@ type Account struct {
 	ConfirmationToken *Token    `gorm:"foreignkey:AccountID" json:"-"`
 	ResetToken        *Token    `gorm:"foreignkey:AccountID" json:"-"`
 	Password          *Password `json:"password" gorm:"foreignkey:AccountID"`
-	Role              int       `json:"role"`
+	Role              int       `gorm:"index;" json:"role"`
 	CreatedAt         time.Time
 	UpdatedAt         time.Time
 	DeletedAt         *time.Time      `sql:"index"`

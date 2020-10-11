@@ -275,6 +275,9 @@ export const get_course = (id: string, callback: (course: ICourse) => void) => {
 			.then((course) => {
 				dispatch(set_lessons(course.lessons));
 				callback(course);
+			})
+			.catch(() => {
+				history.replace(ROUTES.COURSES);
 			});
 	}
 }

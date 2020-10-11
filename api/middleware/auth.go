@@ -52,7 +52,7 @@ var JwtAuthMiddleware = func(next http.Handler, roles []int) http.Handler {
 		}
 		// Fetch User related to token
 		account := &m.Account{}
-		err = m.GetDB().Take(account, "id = ?", tk.Issuer).Error
+		err = m.GetDB().Unscoped().Take(account, "id = ?", tk.Issuer).Error
 		if err != nil {
 			if err == gorm.ErrRecordNotFound {
 				u.RespondJson(w, u.Response{Message: "user not found", ErrorCode: u.ErrAuth}, http.StatusOK)

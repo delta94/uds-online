@@ -67,6 +67,7 @@ func (s *accountService) Find(offset int, limit int, role int) ([]*m.Account, ui
 	var total uint = 0
 	objs := make([]*m.Account, 0)
 	query := m.GetDB().
+		Unscoped().
 		Order("created_at desc").
 		Table(s.TableName).
 		Where("role = ?", role).
@@ -182,6 +183,7 @@ func Login(email, pwd string, roles []int) (token string, errResp u.ErrorData) {
 func (s *accountService) GetPlainList(role int) (data []*m.Account, err error) {
 	objs := make([]*m.Account, 0)
 	query := m.GetDB().
+		Unscoped().
 		Order("created_at desc").
 		Table(s.TableName).
 		Find(&objs, "role = ?", role)
