@@ -1,11 +1,20 @@
+$pageBackgroundColor: rgb(242, 245, 250);
+
+
 body {
 	margin: 0;
 	font-family: "Roboto", "Helvetica", "Arial", sans-serif;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
-	line-height: 1.5;
+	line-height: 1.4;
+	background: $pageBackgroundColor;
 }
-
+body * {
+	box-sizing: border-box;
+}
+p {
+	margin: 0 0 0.7rem 0;
+}
 code {
 	font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
 	monospace;

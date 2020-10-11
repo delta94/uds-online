@@ -7,13 +7,14 @@ import Typography from '@material-ui/core/Typography';
 import Badge from '@material-ui/core/Badge';
 import MenuItem from '@material-ui/core/MenuItem';
 import Menu from '@material-ui/core/Menu';
-import {Mail, Menu as MenuIcon, MoreVert, ExitToAppOutlined} from '@material-ui/icons';
+import {Mail, Menu as MenuIcon, MoreVert, ExitToAppOutlined, MenuBook} from '@material-ui/icons';
 import {Button} from "@material-ui/core";
 import {log_out} from "../actions";
 import {useDispatch} from "react-redux";
 import red from '@material-ui/core/colors/red';
 import {ROUTES} from "../constants";
 import {Link} from "react-router-dom";
+import clsx from "clsx";
 
 const useStyles = makeStyles((theme) => ({
 	grow: {
@@ -28,6 +29,7 @@ const useStyles = makeStyles((theme) => ({
 	},
 	title: {
 		display: 'none',
+		marginRight: 30,
 		[theme.breakpoints.up('sm')]: {
 			display: 'block',
 		},
@@ -141,25 +143,35 @@ export const Header: FC<IHeaderProps> = ({onBurgerClick}) => {
 						UNDOSTRES|ONLINE
 					</Typography>
 					
-					<div className={classes.grow}/>
-					
-					<div className={classes.sectionDesktop}>
-						<IconButton color="inherit" component={Link} to={ROUTES.MESSAGES}>
-							{unreadMessages ?
+					<div className={clsx(classes.sectionDesktop, classes.grow)}>
+						<Button startIcon={<MenuBook />} color="inherit" component={Link}  to={ROUTES.COURSES}>
+							Курсы
+						</Button>
+						<Button
+							startIcon={unreadMessages ?
 								<Badge badgeContent={unreadMessages} color="secondary">
 									<Mail/>
 								</Badge>
 								:
 								<Mail />
 							}
-						</IconButton>
+							color="inherit"
+							component={Link}
+							to={ROUTES.MESSAGES}>
+							Сообщения
+						</Button>
+						
+						<div className={classes.grow}/>
 						
 						<Button variant="outlined" size="medium" className={classes.logout} onClick={() => dispatch(log_out())}>
 							Log out
 						</Button>
 					</div>
 					
-					<div className={classes.sectionMobile}>
+					<div className={clsx(classes.grow, classes.sectionMobile)}>
+						
+						<div className={classes.grow}/>
+						
 						<IconButton
 							aria-label="Show more"
 							aria-controls={mobileMenuId}

@@ -36,10 +36,11 @@ import {
 
 const MAX_LENGTH_TITLE = 80;
 const MIN_LENGTH_TITLE = 10;
-const MAX_LENGTH_ANNOTATION = 700;
+const MAX_LENGTH_ANNOTATION = 350;
 const MIN_LENGTH_ANNOTATION = 10;
 const MAX_PRICE_VALUE = 99999;
 const MIN_PRICE_VALUE = 100;
+const VIDEO_KEY_LENGTH = 12;
 
 const PICTURE_WIDTH = 200;
 const PICTURE_RATIO = 16 / 9;
@@ -100,6 +101,8 @@ const CourseFormPage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) => {
     const [assistants, setAssistants] = React.useState<IUser[]>([]);
     const [price, setPrice] = useState<number>(1000);
     const [published, setPublished] = useState<boolean>(false);
+    const [video, setVideo] = useState<string>("");
+    
     const dispatch = useDispatch();
     const [t] = useTranslation();
     
@@ -115,6 +118,7 @@ const CourseFormPage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) => {
                     setPublished(c.published);
                     setPrice(c.price);
                     setPicture(c.picture);
+                    setVideo(c.video);
                 })));
             }
         }));
@@ -134,6 +138,9 @@ const CourseFormPage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) => {
         if (price < MIN_PRICE_VALUE || price > MAX_PRICE_VALUE) {
             isValid = false;
         }
+        if (video.length !== VIDEO_KEY_LENGTH) {
+            isValid = false;
+        }
         return isValid;
     };
 
@@ -150,6 +157,7 @@ const CourseFormPage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) => {
             title,
             picture,
             price,
+            video,
             lessons: []
         };
         if (course_id) {
@@ -204,10 +212,7 @@ const CourseFormPage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) => {
                                      height={PICTURE_WIDTH / PICTURE_RATIO}
                                 />
                                 :
-                                <img src="" alt=""
-                                     width={PICTURE_WIDTH}
-                                     height={PICTURE_WIDTH / PICTURE_RATIO}
-                                />
+                                null
                             }
                         </div>
                         <Button
@@ -302,6 +307,7 @@ const CourseFormPage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) => {
                         id="input-price"
                         value={price}
                         fullWidth
+                        required
                         label="Стоимость курса, руб."
                         helperText={`От ${MIN_PRICE_VALUE} до ${MAX_PRICE_VALUE} руб.`}
                         inputProps={{
@@ -312,6 +318,25 @@ const CourseFormPage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) => {
                         onChange={(e) => setPrice(parseInt(e.target.value, 10) || MIN_PRICE_VALUE)}
                     />
                 </FormControl>
+    
+                <div className={classes.spacer}/>
+    
+                <FormControl fullWidth>
+                    <TextField
+                        id="input-video"
+                        value={video}
+                        fullWidth
+                        required
+                        label="Вводное видео"
+                        helperText={`Ссылка на видео ресурс`}
+                        inputProps={{
+                            max: VIDEO_KEY_LENGTH,
+                            min: VIDEO_KEY_LENGTH
+                        }}
+                        onChange={(e) => setVideo(e.target.value)}
+                    />
+                </FormControl>
+                
 
                 <div className={classes.spacer}/>
 

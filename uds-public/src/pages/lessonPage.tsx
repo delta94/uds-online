@@ -11,9 +11,23 @@ import history from "../history";
 import {ROUTES} from "../constants";
 import {ComponentSpinner} from "../components/spinner";
 import Task from "../components/task";
+import {sortBy} from "lodash";
+import {Button, Paper, Typography} from "@material-ui/core";
+import {Alert} from "@material-ui/lab";
 
 const useStyles = makeStyles((theme: Theme) =>
-	createStyles({}),
+	createStyles({
+		resetAnswers: {
+			padding: 10,
+			display: 'flex',
+			justifyContent: 'space-between',
+			alignItems: 'center',
+			marginTop: 20,
+			marginBottom: 20,
+			color: 'rgb(13, 60, 97)',
+			backgroundColor: 'rgb(232, 244, 253)'
+		}
+	}),
 );
 
 interface IRouteProps {
@@ -33,6 +47,10 @@ const LessonPage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) => {
 	
 	useEffect(() => {
 		// Preload lesson and check if the lesson is available for the user
+		loadTasks();
+	}, []);
+	
+	const loadTasks = () => {
 		dispatch(get_lesson(lesson_id, (lesson) => {
 			if (!lesson || !lesson.content || !('body' in lesson.content)) {
 				// redirect page
@@ -48,27 +66,28 @@ const LessonPage: FC<RouteComponentProps<IRouteProps, {}>> = ({match}) => {
 				setAnswers(_answers);
 			}));
 		}));
-	}, []);
+	};
 	
 	const reset_tasks = () => {
-	
+		loadTasks();
 	};
+	
+	
 	
 	return (
 		<PageWrapper heading={title}>
 			{body && <ParsedContent content={body}/>}
 			
 			<hr/>
-			
+			{answers && answers.length && <>
+			<Paper className={classes.resetAnswers}>
+				<Typography variant="body1">{t('PAGE_LESSON.RESET_TASKS_NOTE')}</Typography>
+				<Button variant="outlined" color="primary">{t('BUTTONS.RESET')}</Button>
+			</Paper>
+			</>}
 			<Suspense fallback={ComponentSpinner}>
-				{tasks.map((task) => {
+				{sortBy(tasks, 'sort').map((task) => {
 					const givenAnswer = answers.find(answer => answer.lesson_task_id === task.ID);
-					console.log("=============");
-					console.log("tasks:", tasks);
-					console.log("answers:", answers);
-					console.log("Task ID/  GA:", task.ID, givenAnswer);
-					console.log("=============");
-					
 					return (
 						<Task
 							_givenAnswer={givenAnswer}

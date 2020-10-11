@@ -73,6 +73,7 @@ export const issue_password_reset = (email: string) => {
 			data: {email},
 			version: 1
 		})
+			.catch(err => console.log(err));
 	}
 }
 export const reset_password = (password: string, confirmation: string, token: string, callback?: (arg0: number) => void) => {
@@ -88,6 +89,7 @@ export const reset_password = (password: string, confirmation: string, token: st
 			.then((response) => {
 				if (callback) callback(0);
 			})
+			.catch(err => console.log(err));
 	}
 }
 
@@ -108,7 +110,8 @@ export const register_user = (request: IRegisterRequest, recaptchaToken: string)
 		})
 			.then(() => {
 			
-			});
+			})
+			.catch(err => console.log(err));
 	};
 };
 
@@ -138,6 +141,7 @@ export const authenticate = (email: string, password: string) => {
 				const {role} = decoded as ITokenPayload;
 				dispatch(log_in(token, iss, role));
 			})
+			.catch(err => console.log(err));
 	};
 };
 
@@ -164,7 +168,8 @@ export const get_course = (id: string, callback: (course: ICourse) => void) => {
 			.then((course) => {
 				dispatch(set_lessons(course.lessons));
 				callback(course);
-			});
+			})
+			.catch(err => console.log(err));
 	}
 }
 
@@ -181,7 +186,8 @@ export const get_courses = (page?: number) => {
 		})
 			.then(({data, page, size, total}) => {
 				dispatch(set_pg_data<ICourse>(SET_COURSES, data, page, total, size));
-			});
+			})
+			.catch(err => console.log(err));
 	};
 };
 
@@ -221,9 +227,7 @@ export const get_answers = (course_id: string, lesson_id: string, callback: (ans
 
 				callback(answers);
 			})
-			.catch(err => {
-			
-			});
+			.catch(err => console.log(err));
 	};
 };
 

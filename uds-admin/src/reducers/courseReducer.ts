@@ -3,7 +3,6 @@ import {SET_COURSES} from "../actions/types";
 import {IAction, Model} from "../helpers/models";
 import {ILesson} from "./lessonsReducer";
 
-
 export interface ICourse extends Model<number> {
 	title: string,
 	picture: string,
@@ -12,6 +11,7 @@ export interface ICourse extends Model<number> {
 	price: number,
 	assistant_id: string,
 	purchased: boolean,
+	video: string,
 	lessons: ILesson[]
 }
 

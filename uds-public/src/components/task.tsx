@@ -120,7 +120,7 @@ const Task: FC<ITaskProps> = ({ID, _givenAnswer, course_id, lesson_id, descripti
 					variant="contained"
 					color="primary"
 					type='button'
-					disabled={!!givenAnswer}
+					disabled={!!givenAnswer || !potentialAnswer}
 					onClick={confirmAnswer}
 				>
 					{t('BUTTONS.CONFIRM')}

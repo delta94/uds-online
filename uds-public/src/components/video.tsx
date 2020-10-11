@@ -5,7 +5,8 @@ import {Fullscreen, Pause, PlayArrow, VolumeMute, VolumeOff} from "@material-ui/
 import {IconButton, Slider} from "@material-ui/core";
 
 interface IVideoProps {
-	src: string
+	src: string,
+	wide: boolean
 }
 
 
@@ -21,13 +22,20 @@ const useStyles = makeStyles((theme: Theme) =>
 		wrap: {
 			margin: '1rem auto',
 			padding: '10px 0',
-			backgroundColor: '#000000'
+			[theme.breakpoints.down('xs')]: {
+				backgroundColor: 'none',
+			}
 		},
 		inner: {
 			margin: '0 auto',
 			width: 712,
 			maxWidth: '100%',
-			backgroundColor: '#FFFFFF'
+			backgroundColor: '#FFFFFF',
+			[theme.breakpoints.down('xs')]: {
+				['& div:not([aria-label=control-bar])']: {
+					height: '200px !important',
+				}
+			},
 		},
 		video: {
 			maxHeight: '400px',
@@ -51,7 +59,7 @@ const useStyles = makeStyles((theme: Theme) =>
 	}),
 );
 
-export const Video: FC<IVideoProps> = ({src}) => {
+export const Video: FC<IVideoProps> = ({src, wide}) => {
 	const classes = useStyles();
 	const [playing, setPlaying] = useState(false);
 	const [muted, setMuted] = useState(false);
@@ -103,16 +111,18 @@ export const Video: FC<IVideoProps> = ({src}) => {
 		return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
 	}
 	
+	const innerStyle = wide ? {width: '100%'} : {};
+	
 	return (
 		<div className={classes.wrap}>
-			<div className={classes.inner}>
+			<div className={classes.inner} style={innerStyle}>
 				<ReactPlayer ref={ref}
 							 onContextMenu={handleClick}
 							 playing={playing}
 							 width='100%'
 							 style={{backgroundColor: '#000000'}}
 							 controls={false}
-							 height={400}
+							 height={360}
 							 onReady={onReady}
 							 onDuration={(s) => setDuration(Math.floor(s))}
 							 onProgress={onProgress as any}
@@ -120,7 +130,7 @@ export const Video: FC<IVideoProps> = ({src}) => {
 				/>
 				
 				
-				{duration > 0 && <div className={classes.controls}>
+				{duration > 0 && <div className={classes.controls} aria-label="control-bar">
 					<IconButton aria-label={playing ? "pause" : "play"}
 								className={classes.playbackBtn}
 								onClick={() => setPlaying(!playing)}>

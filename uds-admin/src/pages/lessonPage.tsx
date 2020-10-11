@@ -30,7 +30,7 @@ import {Sortable} from "../helpers/models";
 const HtmlEditor = lazy(() => import("../components/htmlEditor"));
 const MAX_LENGTH_TITLE = 80;
 const MIN_LENGTH_TITLE = 5;
-const MAX_LENGTH_ANNOTATION = 300;
+const MAX_LENGTH_ANNOTATION = 200;
 const MIN_LENGTH_ANNOTATION = 5;
 
 const useStyles = makeStyles((theme: Theme) =>

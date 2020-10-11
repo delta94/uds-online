@@ -19,8 +19,11 @@ const useStyles = (sidebar_width: number) => makeStyles((theme) => ({
 		zIndex: 10,
 		transition: 'ease 300ms',
 		[theme.breakpoints.down('xs')]: {
-			marginLeft: `-${sidebar_width}px`
-		}
+			marginLeft: `-${sidebar_width}px`,
+			display: 'block',
+		},
+		display: 'none',
+		marginLeft: `-${sidebar_width}px`
 	},
 	isOpen: {
 		[theme.breakpoints.down('xs')]: {

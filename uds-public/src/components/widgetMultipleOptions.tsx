@@ -122,7 +122,7 @@ export const WidgetMultipleOptions: FC<ITaskWidget<number[]>> = ({data, givenAns
                                 />
                             }
                             className={clsx({
-                                [classes.correctAnswer]: (givenAnswer && givenAnswer.includes(id)) && correctAnswers.includes(id) || correctAnswers.includes(id),
+                                [classes.correctAnswer]: (givenAnswer && givenAnswer.includes(id)) && correctAnswers.includes(id) || (givenAnswer && !givenAnswer.includes(id) && correctAnswers.includes(id)),
                                 [classes.wrongAnswer]: (givenAnswer && givenAnswer.includes(id)) && !correctAnswers.includes(id),
                             })}
                             label={option}

@@ -1,7 +1,7 @@
 {
 	"name": "uds-public",
 	"author": "Max Isaev",
-	"version": "0.5.1",
+	"version": "0.6.1",
 	"private": true,
 	"dependencies": {
 		"@material-ui/core": "4.11.0",
@@ -38,6 +38,7 @@
 		"jsonwebtoken": "8.5.1",
 		"lodash": "4.17.20",
 		"moment": "2.28.0",
+		"node-sass": "4.14.1",
 		"query-string": "6.13.1",
 		"react": "16.13.1",
 		"react-dnd": "11.1.3",

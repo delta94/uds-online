@@ -337,7 +337,7 @@ export const WidgetCompareOptions: FC<ITaskWidget<any>> = ({data, givenAnswer, o
 const Box: FC<BoxProps> = ({id, option, isDragging, connectDragSource}) => {
 	const classes = useStyles();
 	return (
-		<Paper ref={connectDragSource} className={classes.option}>
+		<Paper ref={connectDragSource} className={clsx(classes.option, classes.pointer)}>
 			{option}
 		</Paper>
 	)

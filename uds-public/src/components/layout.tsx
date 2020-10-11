@@ -4,12 +4,13 @@ import {makeStyles} from "@material-ui/core/styles";
 import {Sidebar} from "./sidebar";
 
 const SIDEBAR_WIDTH = 225;
+const MAX_WIDTH = 1000;
 
 const useStyles = makeStyles((theme) => ({
 	body: {
 		paddingTop: 10,
 		display: 'flex',
-		maxWidth: '1920px',
+		maxWidth: MAX_WIDTH,
 		marginLeft: 'auto',
 		marginRight: 'auto',
 	},

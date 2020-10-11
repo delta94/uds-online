@@ -1,28 +1,6 @@
-import React, {FC, useEffect, useState} from "react";
+import React, {FC} from "react";
 import parse from "html-react-parser";
-import {Video} from "./video";
-import {api_request} from "../helpers/api";
-import {ComponentSpinner} from "./spinner";
-import {createStyles, makeStyles, Theme} from "@material-ui/core/styles";
-
-const useStyles = makeStyles((theme: Theme) =>
-	createStyles({
-		imageWrap: {
-			display: 'block',
-			textAlign: 'center',
-			margin: '10px 0'
-		},
-		image: {
-			maxWidth: '100%',
-			maxHeight: 900
-		},
-		
-	})
-);
-interface GetPathResponse {
-	path: string,
-	type: string
-}
+import ContentObject from "./contentObject";
 
 interface IParsedContentProps {
 	content: string;
@@ -37,8 +15,21 @@ interface IParsedContentProps {
  * @constructor
  */
 export const ParsedContent: FC<IParsedContentProps> = ({content}) => {
-	let p = (parse(content.replace(/{{(.*)}}/g, '<div data-alias="$1"></div>')) as JSX.Element[]);
-	if (p && p.map) {
+	let p = (parse(content.replace(/{{(.*)}}/g, '<div data-alias="$1"></div>')));
+	if (!p) {
+		return (
+			<>
+				{p}
+			</>
+		);
+	}
+	// @ts-ignore
+	if (!p.map) {
+		// @ts-ignore
+		p = [p];
+	}
+	p = p as JSX.Element[];
+	if (p.map) {
 		p = p.map((el, key) => {
 			if (!el.props) {
 				return el;
@@ -56,37 +47,5 @@ export const ParsedContent: FC<IParsedContentProps> = ({content}) => {
 		</>
 	);
 }
-interface IContentObjectProps {
-	alias: string
-}
-const ContentObject: FC<IContentObjectProps> = ({alias}) => {
-	const classes = useStyles();
-	const [response, setResponse] = useState<GetPathResponse>();
-	useEffect(() => {
-		api_request<GetPathResponse>({
-			method: "GET",
-			url: `uploads/${alias}`
-		})
-			.then(({path, type}) => setResponse({
-				path: `${process.env.REACT_APP_HOST_API}/${path}`,
-				type
-			}))
-	}, []);
-	
-	if (response && response.type === "video") {
-		return <Video src={response.path} />
-	}
-	if (response && response.type === "audio") {
-		return <></>;
-	}
-	if (response && response.type === "image") {
-		return <picture className={classes.imageWrap}>
-			<img className={classes.image} src={response.path} alt="Изображение"/>
-		</picture>
-	}
-	return (
-		<>
-			<ComponentSpinner />
-		</>
-	)
-}
+
+export default ParsedContent;
