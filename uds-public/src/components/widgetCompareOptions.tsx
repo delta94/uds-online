@@ -61,7 +61,8 @@ const useStyles = makeStyles((theme: Theme) =>
 			margin: '0 5px',
 		},
 		row: {
-			display: 'flex'
+			display: 'flex',
+			marginBottom: 10
 		},
 		grow: {
 			flexGrow: 2

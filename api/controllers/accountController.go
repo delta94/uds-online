@@ -39,7 +39,7 @@ var recaptchaHeader = "x-recaptcha-token"
 
 
 var CreateAccount = func(w http.ResponseWriter, r *http.Request) {
-	var useRecaptcha, err = strconv.ParseBool(os.Getenv("USE_RECAPTCHA"))
+	var useRecaptcha, err = strconv.ParseBool(os.Getenv("REACT_APP_USE_RECAPTCHA"))
 	if err != nil {
 		log.Println("Wrong value for USE_RECAPTCHA")
 		useRecaptcha = false
