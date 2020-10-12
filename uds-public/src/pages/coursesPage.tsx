@@ -20,7 +20,7 @@ const useStyles = makeStyles((theme: Theme) =>
 			marginBottom: 10,
 			padding: 0,
 			display: 'flex',
-			minHeight: 208,
+			minHeight: 195,
 			
 			[theme.breakpoints.down('xs')]: {
 				display: 'block'
