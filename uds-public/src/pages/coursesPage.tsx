@@ -67,7 +67,7 @@ interface ICoursesPage {
 
 }
 
-const IMG_SRC_PREFIX = process.env[process.env.NODE_ENV === 'production' ? '' : 'REACT_APP_HOST_API'] + '/';
+const IMG_SRC_PREFIX = (process.env.NODE_ENV === 'production' ? process.env.REACT_APP_HOST_PUBLIC : process.env.REACT_APP_HOST_API) + '/';
 
 const CoursesPage: FC<ICoursesPage> = () => {
 	const [t] = useTranslation();
