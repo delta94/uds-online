@@ -7,6 +7,7 @@ import clsx from "clsx";
 import {Delete} from "@material-ui/icons";
 
 const MAX_LENGTH_TEXT = 500;
+const MAX_LENGTH_EXPLANATION = 300;
 const MAX_LENGTH_OPTION = 80;
 const MAX_OPTIONS = 8;
 
@@ -42,6 +43,7 @@ export const WidgetMultipleOptions: FC<ITaskWidget> = ({data, onJsonUpdate}) => 
     ]);
     const [control, setControl] = useState<number[]>([]);
     const [text, setText] = useState<string>("");
+    const [explanation, setExplanation] = useState<string>("");
 
     useEffect(() => {
         if (data) {
@@ -49,6 +51,9 @@ export const WidgetMultipleOptions: FC<ITaskWidget> = ({data, onJsonUpdate}) => 
             setOptions(parsed.options);
             setControl(parsed.control);
             setText(parsed.text);
+            if (parsed.explanation) {
+                setExplanation(parsed.explanation);
+            }
         }
     }, []);
 
@@ -60,10 +65,11 @@ export const WidgetMultipleOptions: FC<ITaskWidget> = ({data, onJsonUpdate}) => 
         const t: ITaskMultipleOptions = {
             text,
             control: control!,
-            options
+            options,
+            explanation
         };
         onJsonUpdate(encodeObjectToBase64(t));
-    }, [control, text, options]);
+    }, [control, text, options, explanation]);
 
     const validate = (): boolean => {
         let valid = true;
@@ -148,7 +154,24 @@ export const WidgetMultipleOptions: FC<ITaskWidget> = ({data, onJsonUpdate}) => 
             </FormControl>
 
             <div className={classes.spacer} />
-
+            
+            <FormControl fullWidth>
+                <TextField
+                    id="input-explanation"
+                    label="Пояснение"
+                    fullWidth
+                    autoComplete="off"
+                    inputProps={{
+                        maxLength: MAX_LENGTH_EXPLANATION,
+                    }}
+                    value={explanation}
+                    onChange={(e) => setExplanation(e.target.value)}
+                    variant="outlined"
+                />
+            </FormControl>
+    
+            <div className={classes.spacer} />
+            
             <Divider/>
 
             <div className={classes.spacer} />

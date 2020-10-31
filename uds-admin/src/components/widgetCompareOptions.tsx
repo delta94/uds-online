@@ -9,6 +9,7 @@ import {useTranslation} from "react-i18next";
 
 const MAX_LENGTH_TEXT = 500;
 const MAX_ROWS = 12;
+const MAX_LENGTH_EXPLANATION = 300;
 const MAX_LENGTH_OPTION = 80;
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -45,6 +46,7 @@ export const WidgetCompareOptions: FC<ITaskWidget> = ({data, onJsonUpdate}) => {
     const [optionsA, setOptionsA] = useState<NullableTaskOption[]>([]);
     const [optionsB, setOptionsB] = useState<NullableTaskOption[]>([]);
     const [text, setText] = useState<string>("");
+    const [explanation, setExplanation] = useState<string>("");
     const [rowNumber, setRowNumber] = useState<number>(5);
     const [control, setControl] = useState<SelectionPair[]>([]);
     const [t] = useTranslation();
@@ -55,6 +57,9 @@ export const WidgetCompareOptions: FC<ITaskWidget> = ({data, onJsonUpdate}) => {
             const parsed = decodeBase64ToObject<ITaskCompareOptions>(data);
             if (parsed.text) {
                 setText(parsed.text);
+            }
+            if (parsed.explanation) {
+                setExplanation(parsed.explanation);
             }
             setOptionsA(parsed.optionsA);
             setOptionsB(parsed.optionsB);
@@ -68,9 +73,6 @@ export const WidgetCompareOptions: FC<ITaskWidget> = ({data, onJsonUpdate}) => {
     
     useEffect(() => {
         setRowNumber(Math.max(optionsA.length, optionsB.length));
-        // console.log('ROW NUMBER: ', Math.max(optionsA.length, optionsB.length));
-        // console.log('OPTIONS optionsA: ', optionsA);
-        // console.log('OPTIONS optionsB: ', optionsB);
         
         if (!validate()) {
             onJsonUpdate("");
@@ -80,10 +82,11 @@ export const WidgetCompareOptions: FC<ITaskWidget> = ({data, onJsonUpdate}) => {
             text,
             optionsA,
             optionsB,
-            control
+            control,
+            explanation
         };
         onJsonUpdate(encodeObjectToBase64(t));
-    }, [optionsA, optionsB, text, control]);
+    }, [optionsA, optionsB, text, control, explanation]);
     
     const getControlValues = (setA: NullableTaskOption[], setB: NullableTaskOption[], count: number): SelectionPair[] => {
         const control: SelectionPair[] = [];
@@ -92,7 +95,6 @@ export const WidgetCompareOptions: FC<ITaskWidget> = ({data, onJsonUpdate}) => {
                 control.push([optionsA[i]!.id, optionsB[i]!.id]);
             }
         }
-        console.log("CONTROLS: ", control);
         return control;
     };
     
@@ -170,6 +172,23 @@ export const WidgetCompareOptions: FC<ITaskWidget> = ({data, onJsonUpdate}) => {
                     }}
                     value={text}
                     onChange={(e) => setText(e.target.value)}
+                    variant="outlined"
+                />
+            </FormControl>
+    
+            <div className={classes.spacer} />
+    
+            <FormControl fullWidth>
+                <TextField
+                    id="input-explanation"
+                    label="Пояснение"
+                    fullWidth
+                    autoComplete="off"
+                    inputProps={{
+                        maxLength: MAX_LENGTH_EXPLANATION,
+                    }}
+                    value={explanation}
+                    onChange={(e) => setExplanation(e.target.value)}
                     variant="outlined"
                 />
             </FormControl>

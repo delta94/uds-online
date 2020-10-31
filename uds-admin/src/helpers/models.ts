@@ -42,12 +42,14 @@ export type NullableTaskOption = ITaskOption | null;
 
 export interface ITaskSingleOption {
 	text: string,
+	explanation?: string,
 	options: ITaskOption[],
 	control: number
 }
 
 export interface ITaskMultipleOptions {
 	text: string,
+	explanation?: string,
 	options: ITaskOption[],
 	control: number[]
 }
@@ -58,6 +60,7 @@ export interface ITaskFillGaps {
 
 export interface ITaskCompareOptions {
 	text?: string,
+	explanation?: string,
 	optionsA: NullableTaskOption[],
 	optionsB: NullableTaskOption[],
 	control: SelectionPair[]

@@ -53,6 +53,7 @@ export interface IAnswer <T> {
 
 export interface ITaskSingleOption {
 	text: string,
+	explanation?: string,
 	options: ITaskOption[],
 	control: number
 }
@@ -61,6 +62,7 @@ export type IAnswerSingleOption = IAnswer<number>;
 
 export interface ITaskMultipleOptions {
 	text: string,
+	explanation?: string,
 	options: ITaskOption[],
 	control: number[]
 }
@@ -73,6 +75,7 @@ export interface ITaskFillGaps {
 
 export interface ITaskCompareOptions {
 	text?: string,
+	explanation?: string,
 	optionsA: ITaskOption[],
 	optionsB: ITaskOption[],
 	control: SelectionPair[]

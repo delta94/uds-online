@@ -4,6 +4,7 @@ import {decodeBase64ToObject, encodeObjectToBase64} from "../helpers";
 import {Checkbox, Divider, FormControlLabel, Typography} from "@material-ui/core";
 import clsx from "clsx";
 import {createStyles, makeStyles, Theme} from "@material-ui/core/styles";
+import {Alert} from "@material-ui/lab";
 
 const useStyles = makeStyles((theme: Theme) =>
 	createStyles({
@@ -42,6 +43,7 @@ export const WidgetSingleOption: FC<ITaskWidget<number>> = ({data, givenAnswer, 
 	const [options, setOptions] = useState<ITaskOption[]>([]);
 	const [control, setControl] = useState<number>();
 	const [text, setText] = useState<string>("");
+	const [explanation, setExplanation] = useState<string>("");
 	const [correctAnswer, setCorrectAnswer] = useState<number>();
 
 
@@ -51,6 +53,9 @@ export const WidgetSingleOption: FC<ITaskWidget<number>> = ({data, givenAnswer, 
 			setOptions(parsed.options);
 			setText(parsed.text);
 			setCorrectAnswer(parsed.control);
+			if (parsed.explanation && parsed.explanation.trim) {
+				setExplanation(parsed.explanation.trim());
+			}
 		}
 	}, []);
 	
@@ -79,6 +84,17 @@ export const WidgetSingleOption: FC<ITaskWidget<number>> = ({data, givenAnswer, 
 			return;
 		}
 		setControl(id);
+	};
+	
+	const hasError = ():boolean => {
+		let err = false;
+		if (!givenAnswer) {
+			return err;
+		}
+		if (givenAnswer !== correctAnswer) {
+			err = true;
+		}
+		return err;
 	};
 
 	return (
@@ -117,6 +133,8 @@ export const WidgetSingleOption: FC<ITaskWidget<number>> = ({data, givenAnswer, 
 					</div>
 				);
 			})}
+			
+			{explanation && hasError() && <Alert severity="info">{explanation}</Alert>}
 		
 		</>
 	);

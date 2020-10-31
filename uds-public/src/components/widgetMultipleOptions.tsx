@@ -4,6 +4,7 @@ import {decodeBase64ToObject, encodeObjectToBase64} from "../helpers";
 import {createStyles, makeStyles, Theme} from "@material-ui/core/styles";
 import {Checkbox, Divider, FormControlLabel, Typography} from "@material-ui/core";
 import clsx from "clsx";
+import {Alert} from "@material-ui/lab";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -41,6 +42,7 @@ export const WidgetMultipleOptions: FC<ITaskWidget<number[]>> = ({data, givenAns
     const [options, setOptions] = useState<ITaskOption[]>([]);
     const [control, setControl] = useState<number[]>([]);
     const [text, setText] = useState<string>("");
+    const [explanation, setExplanation] = useState<string>("");
     const [correctAnswers, setCorrectAnswers] = useState<number[]>([]);
 
     useEffect(() => {
@@ -52,6 +54,9 @@ export const WidgetMultipleOptions: FC<ITaskWidget<number[]>> = ({data, givenAns
             setCorrectAnswers([...parsed.control]);
             if (givenAnswer && givenAnswer.length > 0) {
                 setControl([...givenAnswer]);
+            }
+            if (parsed.explanation && parsed.explanation.trim) {
+                setExplanation(parsed.explanation.trim());
             }
         }
     }, []);
@@ -93,6 +98,21 @@ export const WidgetMultipleOptions: FC<ITaskWidget<number[]>> = ({data, givenAns
         }
         setControl([..._control]);
     };
+    
+    const hasError = ():boolean => {
+        let err = false;
+        if (!givenAnswer) {
+            return err;
+        }
+        const set = new Set([...givenAnswer, ...correctAnswers]);
+        if (set.size !== correctAnswers.length) {
+            err = true;
+        }
+        if (givenAnswer.length !== correctAnswers.length) {
+            err = true;
+        }
+        return err;
+    };
 
     return (
         <>
@@ -132,6 +152,9 @@ export const WidgetMultipleOptions: FC<ITaskWidget<number[]>> = ({data, givenAns
                     </div>
                 );
             })}
+            
+            {explanation && hasError() && <Alert severity="info">{explanation}</Alert>}
+            
         </>
     );
 };

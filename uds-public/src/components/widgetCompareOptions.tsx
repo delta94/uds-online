@@ -25,6 +25,7 @@ import {
 	DropTargetConnector,
 	DropTargetMonitor
 } from 'react-dnd';
+import {Alert} from "@material-ui/lab";
 
 
 const TYPE_PREFIX = 'BOX';
@@ -38,8 +39,9 @@ const useStyles = makeStyles((theme: Theme) =>
 			marginBottom: 5
 		},
 		slot: {
-			height: '1rem',
-			width: 100,
+			height: '1.5rem',
+			width: 200,
+			maxWidth: '50%',
 			border: '1px dashed #cecece',
 			borderRadius: 3
 		},
@@ -95,7 +97,7 @@ export interface DZoneProps {
 	onDone: (data: DropResult) => void,
 }
 
-export const WidgetCompareOptions: FC<ITaskWidget<any>> = ({data, givenAnswer, onUpdate}) => {
+export const WidgetCompareOptions: FC<ITaskWidget<SelectionPair[]>> = ({data, givenAnswer, onUpdate}) => {
 	const [prefix] = useState(TYPE_PREFIX + Math.floor(Math.random() * 10000));
 	const classes = useStyles();
 	const [optionsA, setOptionsA] = useState<NullableTaskOption[]>([]);
@@ -103,12 +105,16 @@ export const WidgetCompareOptions: FC<ITaskWidget<any>> = ({data, givenAnswer, o
 	const [correctAnswers, setCorrectAnswers] = useState<SelectionPair[]>([]);
 	const [selection, setSelection] = useState<SelectionPair[]>([]);
 	const [text, setText] = useState<string>("");
+	const [explanation, setExplanation] = useState<string>("");
 	
 	useEffect(() => {
 		if (data) {
 			const parsed = decodeBase64ToObject<ITaskCompareOptions>(data);
 			if (parsed.text) {
 				setText(parsed.text);
+			}
+			if (parsed.explanation && parsed.explanation.trim) {
+				setExplanation(parsed.explanation.trim());
 			}
 			setOptionsA(parsed.optionsA);
 			setOptionsB(shuffle(parsed.optionsB));
@@ -222,9 +228,6 @@ export const WidgetCompareOptions: FC<ITaskWidget<any>> = ({data, givenAnswer, o
 		return optionB.option;
 	}
 	
-	const paragraph = text ? <Typography variant='body1'>{text}</Typography> : null;
-	
-	
 	const DTarget = DropTarget(
 		prefix,
 		{
@@ -273,6 +276,24 @@ export const WidgetCompareOptions: FC<ITaskWidget<any>> = ({data, givenAnswer, o
 		}),
 	)(Box);
 	
+	
+	const hasError = ():boolean => {
+		let err = false;
+		if (!givenAnswer) {
+			return err;
+		}
+		optionsA.forEach(optA => {
+			if (optA && checkIfSelected(optA.id) && !checkIfCorrect(optA.id)) {
+				err = true;
+			}
+		});
+		if (givenAnswer.length !== correctAnswers.length) {
+			err = true;
+		}
+		return err;
+	};
+	
+	const paragraph = text ? <Typography variant='body1'>{text}</Typography> : null;
 	const html = document.querySelector("html");
 	const isTouch = html ? html.classList.contains('touch') : false;
 	
@@ -330,6 +351,8 @@ export const WidgetCompareOptions: FC<ITaskWidget<any>> = ({data, givenAnswer, o
 					)
 				})}
 			</DndProvider>
+			
+			{explanation && hasError() && <Alert severity="info">{explanation}</Alert>}
 		</>
 	);
 };
