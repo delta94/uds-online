@@ -16,6 +16,18 @@ body, * {
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 }
+header p {
+	margin: 0;
+}
+p {
+	margin: 0 0 0.7rem 0;
+}
+.m-auto {
+	margin: auto;
+}
+audio, video {
+	outline: none;
+}
 .MuiDialogTitle-root {
 	background: #0064b9;
 	color: #ffffff;

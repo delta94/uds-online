@@ -47,7 +47,11 @@ export const ContentObject: FC<IContentObjectProps> = ({alias, wide}) => {
 		return <Video wide={!!wide} src={response.path}  />
 	}
 	if (response && response.type === "audio") {
-		return <></>;
+		return <>
+			<audio className="m-auto" controls preload="auto" controlsList="nodownload">
+				<source src={response.path}/>
+			</audio>
+		</>;
 	}
 	if (response && response.type === "image") {
 		return <picture className={classes.imageWrap}>

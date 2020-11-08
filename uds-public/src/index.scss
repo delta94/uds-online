@@ -1,6 +1,5 @@
 $pageBackgroundColor: rgb(242, 245, 250);
 
-
 body {
 	margin: 0;
 	font-family: "Roboto", "Helvetica", "Arial", sans-serif;
@@ -12,8 +11,17 @@ body {
 body * {
 	box-sizing: border-box;
 }
+audio, video {
+	outline: none;
+}
+header p {
+	margin: 0;
+}
 p {
 	margin: 0 0 0.7rem 0;
+}
+.m-auto {
+	margin: auto;
 }
 code {
 	font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
