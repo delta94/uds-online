@@ -1,4 +1,4 @@
-import React, {FC, FormEvent, useEffect, useRef, useState} from "react";
+import React, {FC, FormEvent, lazy, Suspense, useEffect, useRef, useState} from "react";
 import {PageWrapper} from "../components/pageWrapper";
 import {
 	Button,
@@ -6,7 +6,9 @@ import {
 	DialogActions,
 	DialogContent,
 	DialogTitle,
-	FormControl, InputLabel, MenuItem,
+	FormControl,
+	InputLabel,
+	MenuItem,
 	Select,
 	TextField
 } from "@material-ui/core";
@@ -15,8 +17,10 @@ import {PaperComponent} from "../components/confirmDialog";
 import {createStyles, makeStyles, Theme} from "@material-ui/core/styles";
 import {IUser} from "../reducers/usersReducer";
 import {useDispatch, useSelector} from "react-redux";
-import {create_purchase, get_courses, get_users_plain, popup_snack} from "../actions";
+import {create_purchase, get_courses, get_purchases, get_users_plain, popup_snack} from "../actions";
 import {IReducerState} from "../reducers";
+import {ComponentSpinner} from "../components/spinner";
+import {useTranslation} from "react-i18next";
 
 const useStyles = makeStyles((theme: Theme) =>
 	createStyles({
@@ -27,24 +31,24 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 interface AddPurchaseDialogProps {
+	accounts: IUser[],
 	open: boolean,
 	onClose: () => void
 }
 
-const MAX_SUM = 9000;
+const MAX_SUM = 99999;
 
-const AddPurchaseDialog: FC<AddPurchaseDialogProps> = ({open, onClose}) => {
+const AddPurchaseDialog: FC<AddPurchaseDialogProps> = ({accounts, open, onClose}) => {
 	const classes = useStyles();
 	const dispatch = useDispatch();
 	const formRef = useRef<HTMLFormElement>(null);
 	const [loading] = useState<boolean>(false);
 	const [accountID, setAccountID] = useState<string>("");
 	const [courseID, setCourseID] = useState<string>("");
-	const [accounts, setAccounts] = useState<IUser[]>([]);
 	const courseState = useSelector((state: IReducerState) => state.course);
 	const [sum, setSum] = useState<number>(0);
 	const [order, setOrder] = useState<number>(0);
-	
+	const [t] = useTranslation();
 	
 	useEffect(() => {
 		setAccountID("");
@@ -53,13 +57,6 @@ const AddPurchaseDialog: FC<AddPurchaseDialogProps> = ({open, onClose}) => {
 		setOrder(0);
 	}, [open]);
 	
-	useEffect(() => {
-		dispatch(get_courses());
-		dispatch(get_users_plain((accounts => {
-			setAccounts(accounts);
-		})))
-	}, []);
-	
 	const onSubmit = (e: FormEvent) => {
 		if (!isFormValid()) {
 			e.preventDefault();
@@ -67,7 +64,8 @@ const AddPurchaseDialog: FC<AddPurchaseDialogProps> = ({open, onClose}) => {
 		}
 		dispatch(create_purchase(Number(courseID), accountID, sum, order, () => {
 			onClose();
-			dispatch(popup_snack("Запись успешно создана"))
+			dispatch(popup_snack("Запись успешно создана"));
+			dispatch(get_purchases());
 		}));
 	};
 	
@@ -108,7 +106,7 @@ const AddPurchaseDialog: FC<AddPurchaseDialogProps> = ({open, onClose}) => {
 							{accounts && accounts.map((a) => {
 								return (
 									<MenuItem key={a.ID} value={a.ID}>
-										{a.email} &bull; [ ID: {a.ID} ]
+										{a.name}, {a.email} &bull; [ ID: {a.ID} ]
 									</MenuItem>
 								)
 							})}
@@ -178,29 +176,59 @@ const AddPurchaseDialog: FC<AddPurchaseDialogProps> = ({open, onClose}) => {
 				</form>
 			</DialogContent>
 			<DialogActions>
-				<Button type="button" color="default" onClick={() => onClose()}>Закрыть</Button>&nbsp;
+				<Button type="button" color="default" onClick={() => onClose()}>{t('BUTTONS.CLOSE')}</Button>&nbsp;
 				<Button type="button" color="primary" variant="contained" disabled={!isFormValid() || loading}
-						onClick={onSubmit}>Подтведить</Button>
+						onClick={onSubmit}>{t('BUTTONS.CONFIRM')}</Button>
 			</DialogActions>
 		</Dialog>
 	)
 };
 
+const TradeTable = lazy(() => import('../components/tradeTable'));
+
 const TradePage: FC = () => {
+	const [t] = useTranslation();
 	const [open, setOpen] = useState<boolean>(false);
+	const [accounts, setAccounts] = useState<IUser[]>([]);
+	const dispatch = useDispatch();
+	const purchaseState = useSelector((state: IReducerState) => state.purchases);
+	
+	useEffect(() => {
+		dispatch(get_purchases());
+		dispatch(get_courses());
+		dispatch(get_users_plain((accounts => {
+			setAccounts(accounts);
+		})))
+	}, []);
+	
+	
+	const handlePageChange = (value: number) => {
+		dispatch(get_purchases(value - 1));
+	}
 	
 	const addButton = <Button
 		variant="contained"
 		color="primary"
 		startIcon={<Add/>}
-		onClick={() => setOpen(true)}>Добавить</Button>;
+		onClick={() => setOpen(true)}>{t('BUTTONS.ADD')}</Button>;
 	
 	return (
-		<PageWrapper heading="Продажи" actionArea={addButton}>
+		<PageWrapper heading={t('TITLES.SALES')} actionArea={addButton}>
 			
-			<AddPurchaseDialog open={open} onClose={() => setOpen(false)}/>
-		
-		
+			<Suspense fallback={<ComponentSpinner/>}>
+				<TradeTable
+					accounts={accounts}
+					purchases={purchaseState.data}
+					page={purchaseState.page}
+					total={purchaseState.total}
+					size={purchaseState.size}
+					onChangePage={
+						(v: number) => handlePageChange(v)
+					}
+				/>
+			</Suspense>
+			
+			<AddPurchaseDialog accounts={accounts} open={open}  onClose={() => setOpen(false)}/>
 		</PageWrapper>
 	);
 };

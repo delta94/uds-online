@@ -11,6 +11,7 @@
 	},
 	"TITLES": {
 		"ASSETS": "Ресурсы",
+		"SALES": "Продажи",
 		"COURSES": "Курсы",
 		"COURSE": "Курс {{name}}"
 	},
@@ -35,7 +36,17 @@
 	"PAGE_LESSONS": {
 		"SELECT_TASK_TYPE_TEXT": "Выберите тип задания"
 	},
+	"PAGE_PURCHASES": {
+		"DELETE_DIALOG_TITLE": "Удаление записи",
+		"DELETE_DIALOG_TEXT": "Информация о покупке данного курса для этого пользователя будет удалена. Продолжить?",
+		"ACCOUNT": "Пользователь",
+		"ORDER": "Номер заказа",
+		"PURCHASED": "Куплено",
+		"SUM": "Сумма, руб",
+		"COURSE_TITLE": "Название курса"
+	},
 	"BUTTONS": {
+		"ADD": "Добавить",
 		"CLOSE": "Закрыть",
 		"CANCEL": "Отмена",
 		"CONFIRM": "Подтвердить",

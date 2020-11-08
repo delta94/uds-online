@@ -78,6 +78,8 @@ func main() {
 	router.Handle(mw.Routes["v1"]["purchases"], mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.GetPurchases), []int{mw.RoleAdmin}))).Methods("GET", "OPTIONS")
 	// create purchase
 	router.Handle(mw.Routes["v1"]["purchases"], mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.CreatePurchase), []int{mw.RoleAdmin}))).Methods("POST", "OPTIONS")
+	// delete purchase
+	router.Handle(mw.Routes["v1"]["purchases"] + "/{id}", mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.DeletePurchase), []int{mw.RoleAdmin}))).Methods("DELETE", "OPTIONS")
 
 	// Upload
 	router.Handle(mw.Routes["v1"]["uploads"], mw.XhrMiddleware(mw.JwtAuthMiddleware(http.HandlerFunc(controllers.HandleLocalUpload), []int{mw.RoleAdmin}))).Methods("POST", "OPTIONS")

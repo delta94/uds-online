@@ -2,6 +2,8 @@ package controllers
 
 import (
 	"encoding/json"
+	"github.com/gorilla/mux"
+	"log"
 	"net/http"
 	"strconv"
 	m "uds-online/api/models"
@@ -44,8 +46,25 @@ var GetPurchases = func(w http.ResponseWriter, r *http.Request) {
 
 	purchases, total, err := s.PurchaseService.Find(offset, limit)
 	if err != nil {
+		log.Print(err.Error())
 		u.RespondJson(w, u.Response{Message: err.Error(), ErrorCode: u.ErrGeneral}, http.StatusOK)
 		return
 	}
 	u.RespondJson(w, u.PaginatedResponse{Payload: u.PaginatedResponsePayload{Size: limit, Total: total, Page: offset, Data: purchases}}, http.StatusOK)
+}
+
+var DeletePurchase = func(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	id := params["id"]
+	if id == "" {
+		u.RespondJson(w, u.Response{Message: "Invalid request", ErrorCode: u.ErrGeneral}, http.StatusOK)
+		return
+	}
+	err := s.PurchaseService.Delete(id)
+	if err != nil {
+		log.Print(err.Error())
+		u.RespondJson(w, u.Response{Message: err.Error(), ErrorCode: u.ErrGeneral}, http.StatusOK)
+		return
+	}
+	u.RespondJson(w, u.Response{}, http.StatusOK)
 }

@@ -399,6 +399,18 @@ export const get_purchases = (page?: number) => {
 	};
 };
 
+export const delete_purchase = (id: string, callback: (result: boolean) => void) => {
+	return (dispatch: Dispatch) => {
+		return api_request({
+			method: "DELETE",
+			url: `purchases/${id}`
+		})
+			.then(() => {
+				callback(true);
+			})
+			.catch(() => callback(false));
+	}
+}
 /*
 ===================== Uploads =====================
 */

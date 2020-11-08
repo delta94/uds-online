@@ -37,4 +37,12 @@ func (s *purchaseService) Find(offset int, limit int) ([]*m.Purchase, uint, erro
 	return objs, total, nil
 }
 
+func (s *purchaseService) Delete(id string) error {
+	err := m.GetDB().Unscoped().Delete(&m.Purchase{}, "id = ?", id).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 var PurchaseService = purchaseService{TableName: "purchases"}

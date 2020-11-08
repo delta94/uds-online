@@ -150,11 +150,11 @@ const UploadRow: FC<IUploadRowProps> = ({upload: {alias, ID, original_name, Crea
 				open={deleteDialogOpen}
 				text={t('PAGE_ASSETS.DELETE_DIALOG_TEXT')}>
 				
-				<Button onClick={() => setDeleteDialogOpen(false)}>Отмена</Button>
+				<Button onClick={() => setDeleteDialogOpen(false)}>{t('BUTTONS.CANCEL')}</Button>
 				
 				<Button onClick={handleDelete}
 						color="primary"
-						variant="contained">Подтвердить</Button>
+						variant="contained">{t('BUTTONS.CONFIRM')}</Button>
 			</ConfirmDialog>
 		</>
 	);
