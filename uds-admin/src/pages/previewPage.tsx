@@ -13,7 +13,7 @@ const useStyles = makeStyles((theme: Theme) =>
 		
 		},
 		header: {
-			padding: '0 1rem',
+			padding: '0.5rem 1rem',
 			background: '#ffffa4',
 			marginBottom: 10,
 			display: 'flex',

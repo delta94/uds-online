@@ -37,11 +37,25 @@ var Neuter = func(next http.Handler) http.Handler {
 		}
 		cookieParts := strings.Split(cookies, ";")
 		tokenPart := ""
+		// get app-id
+		var appId string
+
 		for _, cp := range cookieParts {
 			kv := strings.Split(cp, "=")
 			for _, v := range kv {
 				k := strings.Trim(v, " ")
-				if k == "_token" || k == "token" {
+				if k == "app-id" {
+					appId = kv[1]
+				}
+			}
+		}
+
+		// get token
+		for _, cp := range cookieParts {
+			kv := strings.Split(cp, "=")
+			for _, v := range kv {
+				k := strings.Trim(v, " ")
+				if (k == "_token" && appId == "app-a") || (k == "token" && appId == "app-p") {
 					tokenPart = kv[1]
 				}
 			}

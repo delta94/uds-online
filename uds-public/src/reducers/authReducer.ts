@@ -9,6 +9,8 @@ import Cookies from "js-cookie";
 
 
 const TOKEN = "token";
+const APP_ID = "app-p";
+Cookies.set('app-id', APP_ID, {expires: 365, domain: process.env.REACT_APP_HOST_COOKIE_DOMAIN});
 
 export interface IAuthRequest {
 	email: string,
